@@ -102,6 +102,7 @@ def kind_of(value):
 
 def score_snapshot(forecasts, extrema, max_delta_minutes, pair, snapshot_id):
     candidates = []
+    eligible_count = 0
     for fi, forecast in enumerate(forecasts):
         ft = parse_time(forecast.get("valid_time"))
         issue = parse_time(forecast.get("forecast_fetched_at_utc") or forecast.get("collected_at"))
@@ -116,6 +117,7 @@ def score_snapshot(forecasts, extrema, max_delta_minutes, pair, snapshot_id):
         bucket = lead_bucket(lead_hours)
         if bucket is None:
             continue
+        eligible_count += 1
         for oi, observed in enumerate(extrema):
             if observed["kind"] != kind:
                 continue
@@ -151,7 +153,7 @@ def score_snapshot(forecasts, extrema, max_delta_minutes, pair, snapshot_id):
             "height_datum": "TWVD2001",
             "observation_dataset": "O-B0075-001", "forecast_dataset": "F-A0021-001",
         })
-    return matches, len(used_f)
+    return matches, eligible_count
 
 def aggregate(matches):
     groups = defaultdict(list)
@@ -231,13 +233,15 @@ def main():
         })
         station_matches = []
         candidate_count = 0
+        eligible_count = 0
         for snapshot_id in snapshot_ids:
             rows = forecasts_by_snapshot_location[(snapshot_id, pair["location_id"])]
             # Only evaluate events whose target time is within the observed series coverage.
             rows = [r for r in rows if (parse_time(r.get("valid_time")) is not None
                     and points[0][0] <= parse_time(r["valid_time"]) <= points[-1][0])]
             candidate_count += len(rows)
-            matches, _ = score_snapshot(rows, extrema, a.max_delta_minutes, pair, snapshot_id)
+            matches, eligible = score_snapshot(rows, extrema, a.max_delta_minutes, pair, snapshot_id)
+            eligible_count += eligible
             station_matches.extend(matches)
         all_matches.extend(station_matches)
         coverage.append({
@@ -247,6 +251,8 @@ def main():
             "observation_samples": len(points), "median_sampling_interval_minutes": sampling,
             "observed_extrema": len(extrema), "forecast_vintages_seen": len(snapshot_ids),
             "forecast_events_in_observation_window": candidate_count,
+            "eligible_forecast_events_issued_before_target": eligible_count,
+            "unmatched_eligible_forecast_events": max(0, eligible_count - len(station_matches)),
             "matched_events": len(station_matches),
         })
 
