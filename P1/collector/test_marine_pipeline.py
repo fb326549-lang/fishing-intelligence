@@ -8,7 +8,7 @@ COLLECTOR = Path(__file__).resolve().parents[1] / "collector"
 sys.path.insert(0, str(COLLECTOR))
 
 from normalize_cwa_marine import as_layer_list, clean, layer_label  # noqa: E402
-from build_east_region_conditions import REGIONS, mean_value, num  # noqa: E402
+from build_east_region_conditions import REGIONS, mean_value, num, parse_status, parse_properties  # noqa: E402
 
 
 class MarineNormalizationTests(unittest.TestCase):
@@ -34,6 +34,15 @@ class MarineNormalizationTests(unittest.TestCase):
         # 359° and 1° should average to north, not 180°.
         result = mean_value("wave_direction_deg", [359.0, 1.0])
         self.assertTrue(result < 0.01 or result > 359.99)
+
+    def test_live_station_status_and_element_metadata_parsing(self):
+        self.assertEqual(parse_status("1"), 1)
+        self.assertEqual(parse_status("0"), 0)
+        self.assertIsNone(parse_status("unknown"))
+        props = parse_properties('{"WaveHeight":"1","SeaTemperature":"0"}')
+        self.assertEqual(parse_status(props.get("WaveHeight")), 1)
+        self.assertEqual(parse_status(props.get("SeaTemperature")), 0)
+        self.assertEqual(parse_properties("invalid-json"), {})
 
     def test_all_six_planning_regions_are_declared(self):
         self.assertEqual(len(REGIONS), 6)
