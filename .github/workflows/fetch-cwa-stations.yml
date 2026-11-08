@@ -1,0 +1,42 @@
+name: Fetch CWA station inventory
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-stations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout P1 branch
+        uses: actions/checkout@v4
+        with:
+          ref: p1-foundation
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install collector dependency
+        run: python -m pip install requests
+
+      - name: Fetch CWA station metadata
+        env:
+          CWA_AUTHORIZATION: ${{ secrets.CWA_AUTHORIZATION }}
+        run: |
+          if [ -z "$CWA_AUTHORIZATION" ]; then
+            echo "::error::Repository secret CWA_AUTHORIZATION is not configured."
+            exit 1
+          fi
+          python P1/collector/fetch_cwa_stations.py --out output/cwa_stations
+
+      - name: Upload station inventory artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cwa-station-inventory
+          path: output/cwa_stations/
+          if-no-files-found: error
+          retention-days: 7
