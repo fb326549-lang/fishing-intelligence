@@ -268,12 +268,12 @@ function calculateFishing(){
  const add=(name,value,weight)=>{if(Number.isFinite(value))parts.push({name,score:Math.max(0,Math.min(100,value)),weight})};
  if(t){const p=t.progress;add('潮汐',50+50*(1-Math.abs(p-5)/5),.25)}
  const cv=num(m.ocean_current_velocity);
- if(Number.isFinite(cv)){const ideal=method==='船釣'?1.2:1.0;add('海流',Math.max(0,100-Math.abs(cv-ideal)*48),.20)}
+ if(Number.isFinite(cv)){const ideal=1.0;add('海流',Math.max(0,100-Math.abs(cv-ideal)*48),.20)}
  const wind=num(w.wind_speed_10m);
  if(Number.isFinite(wind))add('風速',wind<=10?100:Math.max(0,100-(wind-10)*4.5),.18);
  const gust=num(w.wind_gusts_10m);
  if(Number.isFinite(gust))add('陣風',gust<=15?100:Math.max(0,100-(gust-15)*3),.08);
- const wave=num(m.wave_height),waveLimit=['岸釣','堤防釣','磯釣','浮游磯釣'].includes(method)?1.5:2.2;
+ const wave=num(m.wave_height),waveLimit=2.2;
  if(Number.isFinite(wave))add('浪高',wave<=.5?100:Math.max(0,100-(wave-.5)*(75/waveLimit)),.18);
  const rain=num(w.precipitation_probability);
  if(Number.isFinite(rain))add('降雨',Math.max(0,100-rain*.8),.06);
