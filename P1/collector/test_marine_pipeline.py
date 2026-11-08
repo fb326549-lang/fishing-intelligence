@@ -201,6 +201,82 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
             self.assertIn("distance <= 500 m", result.stderr)
 
 
+
+class CwaTideHistoryArchiveTests(unittest.TestCase):
+    def test_archive_is_idempotent_for_observations_and_keeps_forecast_vintages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs, fc, pair, history = [root / n for n in ("obs.csv", "fc.csv", "pair.csv", "history")]
+            observations = [{
+                "station_id": "S1", "station_name": "測站", "latitude": "23.0",
+                "longitude": "121.0", "valid_time": "2026-11-09T01:00:00+08:00",
+                "TideHeight": "0.71"
+            }]
+            forecasts = [{
+                "location_id": "L1", "location_name": "預報地點", "region_id": "taitung_south",
+                "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮",
+                "height_above_twvd_cm": "70", "height_above_local_msl_cm": "80",
+                "height_above_chart_datum_cm": "150", "fetched_at_utc": "2026-11-08T00:00:00+00:00"
+            }]
+            pairing = [{
+                "station_id": "S1", "location_id": "L1", "matching_status": "matched"
+            }]
+            for path, rows in [(obs, observations), (fc, forecasts), (pair, pairing)]:
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    w = csv.DictWriter(f, fieldnames=list(rows[0]))
+                    w.writeheader()
+                    w.writerows(rows)
+
+            def run(snapshot):
+                return subprocess.run([
+                    sys.executable, str(COLLECTOR / "archive_cwa_tide_history.py"),
+                    "--observations", str(obs), "--forecasts", str(fc),
+                    "--pairing", str(pair), "--history-dir", str(history),
+                    "--snapshot-id", snapshot, "--collected-at", "2026-11-09T02:00:00+00:00"
+                ], capture_output=True, text=True)
+
+            first = run("run-1")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            second = run("run-1")
+            self.assertEqual(second.returncode, 0, second.stderr)
+            third = run("run-2")
+            self.assertEqual(third.returncode, 0, third.stderr)
+
+            obs_lines = (history / "observed_tides.jsonl").read_text(encoding="utf-8").splitlines()
+            forecast_lines = (history / "forecast_vintages.jsonl").read_text(encoding="utf-8").splitlines()
+            run_lines = (history / "collection_runs.jsonl").read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(obs_lines), 1)
+            self.assertEqual(len(forecast_lines), 2)
+            self.assertEqual(len(run_lines), 3)
+            archived = [json.loads(line) for line in forecast_lines]
+            self.assertEqual({row["snapshot_id"] for row in archived}, {"run-1", "run-2"})
+            self.assertEqual({row["height_above_twvd_cm"] for row in archived}, {"70"})
+
+    def test_archive_rejects_invalid_history_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs, fc, pair, history = [root / n for n in ("obs.csv", "fc.csv", "pair.csv", "history")]
+            history.mkdir()
+            (history / "observed_tides.jsonl").write_text("{bad json\\n", encoding="utf-8")
+            for path, row in [
+                (obs, {"station_id": "S1", "valid_time": "t", "TideHeight": "1"}),
+                (fc, {"location_id": "L1", "valid_time": "t", "tide": "滿潮"}),
+                (pair, {"station_id": "S1", "location_id": "L1", "matching_status": "matched"}),
+            ]:
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    w = csv.DictWriter(f, fieldnames=list(row))
+                    w.writeheader()
+                    w.writerow(row)
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "archive_cwa_tide_history.py"),
+                "--observations", str(obs), "--forecasts", str(fc),
+                "--pairing", str(pair), "--history-dir", str(history),
+                "--snapshot-id", "run-1"
+            ], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("invalid JSON", result.stderr)
+
+
 class MarineNormalizationTests(unittest.TestCase):
     def test_missing_sentinels_are_not_zero(self):
         for value in (None, "", "None", "null", "NaN", "N/A"):
