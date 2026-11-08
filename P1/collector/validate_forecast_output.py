@@ -11,7 +11,17 @@ REGIONS = {
     "fengbin_shitiping", "chenggong_donghe", "taitung_south",
 }
 HORIZONS = {6, 12, 24}
-EXPECTED_VARIABLES = 9
+REGIONAL_VARIABLES = 9
+SOURCE_VARIABLES = {
+    "wave_height", "wave_direction", "wave_period",
+    "wind_wave_height", "wind_wave_direction", "wind_wave_period",
+    "swell_wave_height", "swell_wave_direction", "swell_wave_period",
+    "sea_surface_temperature", "sea_level_height_msl",
+    "ocean_current_velocity", "ocean_current_direction",
+    "temperature_2m", "relative_humidity_2m", "precipitation",
+    "precipitation_probability", "pressure_msl", "wind_speed_10m",
+    "wind_direction_10m", "wind_gusts_10m", "cloud_cover",
+}
 
 def load_csv(path: Path):
     with path.open(encoding="utf-8-sig", newline="") as handle:
@@ -58,8 +68,8 @@ def main() -> int:
             available = int(row["available_variable_count"])
             expected = int(row["expected_variable_count"])
             pct = float(row["data_completeness_pct"])
-            if expected != EXPECTED_VARIABLES:
-                errors.append(f"regional row {index}: expected_variable_count={expected}, expected {EXPECTED_VARIABLES}")
+            if expected != REGIONAL_VARIABLES:
+                errors.append(f"regional row {index}: expected {REGIONAL_VARIABLES} regional variables, got {expected}")
             if not 0 <= available <= expected:
                 errors.append(f"regional row {index}: invalid available count {available}")
             calculated = round(available / expected * 100, 1) if expected else 0
@@ -71,21 +81,33 @@ def main() -> int:
         except (KeyError, ValueError, ZeroDivisionError):
             errors.append(f"regional row {index}: invalid completeness fields")
 
-    missing_pairs = expected_pairs - seen
-    if missing_pairs:
-        errors.append(f"missing {len(missing_pairs)} region/horizon combinations")
-    if len(horizons) != len(REGIONS) * len(HORIZONS) * EXPECTED_VARIABLES:
-        errors.append(
-            f"horizon CSV row count {len(horizons)} does not equal "
-            f"{len(REGIONS) * len(HORIZONS) * EXPECTED_VARIABLES}"
-        )
+    if seen != expected_pairs:
+        errors.append(f"regional output does not contain exactly {len(expected_pairs)} region/horizon combinations")
+
+    source_groups = {}
     for index, row in enumerate(horizons, start=2):
+        try:
+            key = (row["location_id"], int(row["horizon_hours"]))
+            variable = row["variable_code"]
+        except (KeyError, ValueError):
+            errors.append(f"horizon row {index}: invalid location/horizon/variable key")
+            continue
+        source_groups.setdefault(key, set())
+        if variable in source_groups[key]:
+            errors.append(f"horizon row {index}: duplicate variable {variable} for {key}")
+        source_groups[key].add(variable)
         if row.get("data_kind") not in ("forecast", "modelled", "forecast/modelled"):
             errors.append(f"horizon row {index}: unexpected data_kind={row.get('data_kind')!r}")
         if row.get("quality_status") == "available" and row.get("value") in ("", None):
             errors.append(f"horizon row {index}: available value is blank")
         if row.get("quality_status") != "available" and row.get("value") not in ("", None):
             errors.append(f"horizon row {index}: missing status has nonblank value")
+
+    if set(source_groups) != expected_pairs:
+        errors.append("source horizon CSV does not contain exactly all six-region/three-horizon groups")
+    for key, variables in source_groups.items():
+        if variables != SOURCE_VARIABLES:
+            errors.append(f"source group {key}: expected 22 unique variables, found {len(variables)}")
 
     locations = manifest.get("locations", [])
     marine_partial = [x.get("id") for x in locations if x.get("marine", {}).get("status") == "partial"]
@@ -106,6 +128,7 @@ def main() -> int:
         "regional_records": len(regional),
         "horizon_variable_rows": len(horizons),
         "region_horizon_combinations": len(seen),
+        "source_variables_per_region_horizon": len(SOURCE_VARIABLES),
         "marine_partial_locations": marine_partial,
         "marine_error_locations": marine_errors,
         "weather_error_locations": weather_errors,
