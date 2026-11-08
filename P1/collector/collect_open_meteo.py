@@ -13,10 +13,9 @@ from typing import Any
 import requests
 
 MARINE_FIELDS = [
-    "wave_height", "wave_direction", "wave_period", "wave_peak_period",
+    "wave_height", "wave_direction", "wave_period",
     "wind_wave_height", "wind_wave_direction", "wind_wave_period",
-    "wind_wave_peak_period", "swell_wave_height", "swell_wave_direction",
-    "swell_wave_period", "swell_wave_peak_period",
+    "swell_wave_height", "swell_wave_direction", "swell_wave_period",
     "sea_surface_temperature", "sea_level_height_msl",
     "ocean_current_velocity", "ocean_current_direction",
 ]
@@ -118,12 +117,22 @@ def main() -> int:
             rows.extend(normalize_hourly(
                 location, marine, fetched_at, "open-meteo-marine", "modelled"
             ))
+            marine_hourly = marine["hourly"]
+            marine_counts = {
+                name: sum(value is not None for value in values)
+                for name, values in marine_hourly.items()
+                if name != "time" and isinstance(values, list)
+            }
+            marine_partial = any(count == 0 for count in marine_counts.values())
             entry["marine"] = {
-                "status": "success",
+                "status": "partial" if marine_partial else "success",
+                "request_status": "success",
                 "grid": {"latitude": marine.get("latitude"), "longitude": marine.get("longitude")},
-                "variables": list(marine["hourly"].keys()),
+                "variables": list(marine_hourly.keys()),
                 "units": marine.get("hourly_units", {}),
-                "hour_count": len(marine["hourly"]["time"]),
+                "hour_count": len(marine_hourly["time"]),
+                "available_value_counts": marine_counts,
+                "missing_variables": [name for name, count in marine_counts.items() if count == 0],
             }
         except Exception as exc:
             entry["marine"] = {"status": "error", "error": str(exc)}
@@ -137,19 +146,29 @@ def main() -> int:
             rows.extend(normalize_hourly(
                 location, weather, fetched_at, "open-meteo-forecast", "forecast"
             ))
+            weather_hourly = weather["hourly"]
+            weather_counts = {
+                name: sum(value is not None for value in values)
+                for name, values in weather_hourly.items()
+                if name != "time" and isinstance(values, list)
+            }
+            weather_partial = any(count == 0 for count in weather_counts.values())
             entry["weather"] = {
-                "status": "success",
+                "status": "partial" if weather_partial else "success",
+                "request_status": "success",
                 "grid": {"latitude": weather.get("latitude"), "longitude": weather.get("longitude")},
-                "variables": list(weather["hourly"].keys()),
+                "variables": list(weather_hourly.keys()),
                 "units": weather.get("hourly_units", {}),
-                "hour_count": len(weather["hourly"]["time"]),
+                "hour_count": len(weather_hourly["time"]),
+                "available_value_counts": weather_counts,
+                "missing_variables": [name for name, count in weather_counts.items() if count == 0],
             }
         except Exception as exc:
             entry["weather"] = {"status": "error", "error": str(exc)}
 
         entry["status"] = (
             "success" if entry["marine"]["status"] == "success" and entry["weather"]["status"] == "success"
-            else "partial" if entry["marine"]["status"] == "success" or entry["weather"]["status"] == "success"
+            else "partial" if entry["marine"]["status"] in ("success", "partial") or entry["weather"]["status"] in ("success", "partial")
             else "error"
         )
         manifest["locations"].append(entry)
@@ -167,12 +186,14 @@ def main() -> int:
     manifest["partial_locations"] = sum(item["status"] == "partial" for item in manifest["locations"])
     manifest["failed_locations"] = sum(item["status"] == "error" for item in manifest["locations"])
     manifest["marine_successes"] = sum(item["marine"]["status"] == "success" for item in manifest["locations"])
+    manifest["marine_partial"] = sum(item["marine"]["status"] == "partial" for item in manifest["locations"])
     manifest["weather_successes"] = sum(item["weather"]["status"] == "success" for item in manifest["locations"])
+    manifest["weather_partial"] = sum(item["weather"]["status"] == "partial" for item in manifest["locations"])
     save_json(folder / "manifest.json", manifest)
 
     print(f"Run {run_id}: rows={len(rows)}")
     print(f"Locations full={manifest['successful_locations']}, partial={manifest['partial_locations']}, failed={manifest['failed_locations']}")
-    print(f"Marine success={manifest['marine_successes']}/{len(locations)}; weather success={manifest['weather_successes']}/{len(locations)}")
+    print(f"Marine full={manifest['marine_successes']}, partial={manifest['marine_partial']}; weather full={manifest['weather_successes']}, partial={manifest['weather_partial']}")
     print("All Open-Meteo records are forecast/modelled data, not in-situ observations.")
     return 0 if manifest["failed_locations"] == 0 else 1
 
