@@ -19,7 +19,7 @@ Observation records are deduplicated by station ID, valid time and TideHeight va
 
 All vertical height datums are stored separately. No conversion is performed during archival. No interpolation, regional averaging, or fishing/catch score is produced.
 
-## First two successful snapshots
+## First three successful snapshots
 Latest verified history summary at the time of this report:
 - Successful collection runs: 3
 - Unique observed TideHeight records/revisions: 288
