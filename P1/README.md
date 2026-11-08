@@ -72,3 +72,25 @@ for a particular variable. Do not interpret status 0, 2, or blank as a valid
 measurement.
 
 Official dataset: https://opendata.cwa.gov.tw/dataset/forecast/O-B0076-001
+
+
+## Important CWA dataset distinction
+- `O-B0076-001`: buoy/tide-station metadata and observation-element status. Use it to discover stations and determine which variables each station reports.
+- `O-B0075-001`: 48-hour real-time buoy/tide-station marine observations.
+- `O-B0075-002`: 30-day buoy/tide-station marine observations.
+- `O-MMC-0001`: real-time marine-condition display product; useful as a cross-check, but do not confuse it with the station metadata dataset.
+
+The CWA Swagger lists O-B0075-001 and O-B0075-002 under observations. The dataset metadata page for O-B0076-001 includes an example of the O-MMC-0001 real-time marine-condition XML. Keep these product IDs separate in the source registry and ingestion code.
+
+## Next local verification step
+Run the station metadata collector on your own Windows computer using the API key already held by you:
+```powershell
+$env:CWA_AUTHORIZATION="貼上你的授權碼"
+python collector/fetch_cwa_stations.py --out data/cwa_stations
+```
+Do not send the authorization code in chat or add it to any file. After the run, share only:
+- the printed station count;
+- the first 10 lines of `stations.csv` (remove any personal/private fields if present);
+- any HTTP error text, after confirming it contains no token.
+
+Then we can map actual stations to the six regions and query O-B0075-001 for one station. Keep the raw API JSON local until its fields and redistribution terms have been reviewed.
