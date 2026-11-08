@@ -20,14 +20,14 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 <section class="panel"><h2>🌊 海洋環境</h2><div class="grid"><div class="metric"><div class="label">海表溫度</div><div class="value" id="sst">—</div></div><div class="metric"><div class="label">海流速度</div><div class="value" id="current">—</div></div><div class="metric"><div class="label">浪高</div><div class="value" id="wave">—</div></div><div class="metric"><div class="label">浪週期</div><div class="value" id="period">—</div></div></div><div id="marineStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel"><h2>🌬️ 天氣與風況</h2><div class="grid"><div class="metric"><div class="label">風速</div><div class="value" id="wind">—</div></div><div class="metric"><div class="label">陣風</div><div class="value" id="gust">—</div></div><div class="metric"><div class="label">氣壓</div><div class="value" id="pressure">—</div></div><div class="metric"><div class="label">降雨機率</div><div class="value" id="rain">—</div></div></div><div id="weatherStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel"><h2>🐟 魚種活躍度</h2><div style="font-size:24px;font-weight:800" id="activity">尚未評估</div><p class="small" id="activityNote">目前先呈現實際取得的環境資料。分魚種活躍度尚未啟用；需整合潮汐、季節魚種分布、棲地與底質資料後才計算，避免以猜測值冒充預測。</p><label>釣法</label><select id="method"><option>不限釣法</option><option>岸釣</option><option>磯釣</option><option>堤防釣</option><option>船釣</option><option>路亞</option><option>沉底</option><option>浮游磯釣</option></select></section>
-<section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">目前潮位</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">漲退潮</div><div class="value" id="tidePhase">待串接</div></div></div><p class="small">下一階段整合中央氣象署潮汐預報與觀測站資料，依選點匹配鄰近測站；目前不以推估值代替官方潮汐資料。</p></section>
+<section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">下一個滿潮／乾潮</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">目前潮勢</div><div class="value" id="tidePhase">待串接</div></div></div><p class="small" id="tideDetail">依選定座標自動比對最近的中央氣象署潮汐預報地點。潮高採官方預報值，不以推估值代替。</p></section>
 <section class="panel"><h2>📡 資料來源與更新</h2><div class="small">海洋預報：Open-Meteo Marine；天氣預報：Open-Meteo Forecast。海底水深、底質、魚種分布及正式潮汐資料列入後續階段。</div><div id="updated" class="status">尚未查詢</div><div class="notice">海洋模式在近岸、港灣及複雜地形可能有誤差。出海前請另確認中央氣象署海象、海上警報及航安資訊，不可將本工具作為唯一安全依據。</div></section>
-<section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>潮汐 API 網址（下一階段啟用）<input id="tideUrl" autocomplete="url"></label><label>潮汐 API 授權碼（如資料源需要）<input id="tideKey" type="password" autocomplete="off"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">API 網址可在這裡修改，不必直接改程式碼。授權碼目前只存於本機瀏覽器；正式公開多人使用前，應改由安全後端保管私密金鑰。不同 API 若資料格式不同，仍需同步調整資料轉換方式。</div></section>
+<section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>中央氣象署潮汐 API 網址<input id="tideUrl" autocomplete="url"></label><label>中央氣象署 OpenData 授權碼<input id="tideKey" type="password" autocomplete="off" placeholder="貼上你的 CWA API 授權碼"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">潮汐資料使用中央氣象署 F-A0021-001。授權碼只存於目前裝置的瀏覽器，不會寫入 GitHub 程式碼；但瀏覽器發出的 API 請求仍會帶出授權碼，請勿在公用裝置使用。</div></section>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (()=>{'use strict';
-const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'',tideKey:''},KEY='fishing_intelligence_config_v1';
+const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-A0021-001',tideKey:''},KEY='fishing_intelligence_config_v1';
 let point={lat:23.7,lon:121},pin=null;
 const map=L.map('map').setView([23.7,121],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
@@ -41,7 +41,38 @@ $('taiwan').onclick=()=>map.setView([23.7,121],7);$('refresh').onclick=loadData;
 $('settingsBtn').onclick=()=>{$('settings').classList.toggle('show');if($('settings').classList.contains('show')){$('settings').scrollIntoView({behavior:'smooth'});fillSettings()}};
 $('save').onclick=saveSettings;$('restore').onclick=()=>{localStorage.removeItem(KEY);fillSettings();$('configStatus').textContent='已還原預設 API 設定。'};
 $('test').onclick=async()=>{if(!saveSettings())return;const c=config(),u=new URL(c.marineUrl);u.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature',forecast_days:'1'});try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);await r.json();$('configStatus').textContent='海洋 API 連線成功。'}catch(e){$('configStatus').textContent='連線失敗：'+e.message+'。可能是網路、CORS 或服務限制。'}};
-async function loadData(){const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
+async function loadTide(){
+const c=config();
+$('tideLevel').textContent='查詢中…';$('tidePhase').textContent='—';$('tideDetail').textContent='正在取得中央氣象署潮汐預報…';
+if(!c.tideKey){$('tideLevel').textContent='尚未設定授權碼';$('tidePhase').textContent='—';$('tideDetail').textContent='請開啟「API 設定」，貼上中央氣象署 OpenData 授權碼並儲存。';return}
+try{
+const u=new URL(c.tideUrl||defaults.tideUrl);
+u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
+const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);
+const j=await r.json();
+if(j.success==='false'||j.status==='ERROR')throw Error(j.message||'中央氣象署回應錯誤');
+let locs=j.records?.TideForecasts?.Location||j.records?.tideForecasts?.location||[];
+if(!Array.isArray(locs))locs=[locs];
+if(!locs.length)throw Error('回傳資料中找不到潮汐預報地點，請確認 API 授權碼及資料集權限');
+const distance=(a,b)=>{const rad=x=>x*Math.PI/180,dl=rad(Number(a.Latitude)-point.lat),dn=rad(Number(a.Longitude)-point.lon),x=Math.sin(dl/2)**2+Math.cos(rad(point.lat))*Math.cos(rad(Number(a.Latitude)))*Math.sin(dn/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
+const nearest=locs.filter(x=>x&&x.Latitude&&x.Longitude).sort((a,b)=>distance(a,b)-distance(b,b))[0];
+// Re-sort explicitly using distance to selected point.
+const station=locs.filter(x=>x&&x.Latitude&&x.Longitude).reduce((best,x)=>!best||distance(x,point)<distance(best,point)?x:best,null);
+if(!station)throw Error('官方資料沒有可配對的測站座標');
+let daily=station.TimePeriods?.Daily||station.timePeriods?.daily||[];
+if(!Array.isArray(daily))daily=[daily];
+const events=[];
+daily.forEach(d=>(d.Time||d.time||[]).forEach(t=>events.push({date:t.DateTime||t.dateTime,tide:t.Tide||t.tide,height:t.TideHeights?.AboveLocalMSL??t.TideHeights?.AboveChartDatum??t.tideHeights?.AboveLocalMSL??t.tideHeights?.AboveChartDatum})));
+const now=Date.now(),future=events.filter(e=>e.date&&new Date(e.date).getTime()>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
+const past=events.filter(e=>e.date&&new Date(e.date).getTime()<now).sort((a,b)=>new Date(b.date)-new Date(a.date));
+if(!future.length)throw Error('最近測站沒有未來潮汐資料');
+const next=future[0],label=String(next.tide||'潮汐預報');
+const phase=label.includes('滿潮')?'準備漲潮／接近滿潮前後':label.includes('乾潮')?'準備退潮／接近乾潮前後':'依官方潮汐時刻判讀';
+$('tideLevel').textContent=(label.includes('滿潮')?'滿潮':'乾潮')+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm':'');
+$('tidePhase').textContent=past.length?(String(past[0].tide).includes('滿潮')?'退潮中':'漲潮中'):'等待下一筆預報';
+$('tideDetail').textContent='配對地點：'+(station.LocationName||station.locationName||'最近預報地點')+'；距離約 '+distance(station,point).toFixed(1)+' 公里。下一筆官方預報：'+label+'。潮高基準依官方欄位 AboveLocalMSL（公分）；不同基準不可直接混用。';
+}catch(e){$('tideLevel').textContent='取得失敗';$('tidePhase').textContent='—';$('tideDetail').textContent='潮汐資料錯誤：'+e.message+'。請確認授權碼、API 網址及網路連線。'}}
+async function loadData(){loadTide();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,wave_height,wave_period',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl',hourly:'precipitation_probability',forecast_days:'2',timezone:'Asia/Taipei'});
 const [mr,wr]=await Promise.all([fetch(mu),fetch(wu)]);if(!mr.ok)throw Error('Marine API HTTP '+mr.status);if(!wr.ok)throw Error('Weather API HTTP '+wr.status);
