@@ -88,7 +88,10 @@ class CwaRegionalTideBuilderTests(unittest.TestCase):
                 sys.executable, str(COLLECTOR / "build_cwa_regional_tide_forecast.py"),
                 "--input", str(tide_path), "--mapping", str(map_path), "--out", str(out_path)
             ], capture_output=True, text=True)
-            return result, out_path
+            output_text = out_path.read_text(encoding="utf-8-sig") if out_path.exists() else None
+            summary_path = out_path.with_name("regional_tide_summary.json")
+            summary_text = summary_path.read_text(encoding="utf-8") if summary_path.exists() else None
+            return result, output_text, summary_text
 
     def test_six_region_mapping_keeps_site_events_separate_and_excludes_islands(self):
         tide_rows = [
@@ -102,14 +105,14 @@ class CwaRegionalTideBuilderTests(unittest.TestCase):
             dict(base, location_id="10002030", location_name="宜蘭縣蘇澳鎮", region_id="yilan_suao", mapping_status="mapped"),
             dict(base, location_id="10014110", location_name="臺東縣綠島鄉", region_id="", mapping_status="excluded_offshore_context"),
         ]
-        result, out_path = self.run_builder(tide_rows, mapping_rows)
+        result, output_text, summary_text = self.run_builder(tide_rows, mapping_rows)
         self.assertEqual(result.returncode, 0, result.stderr)
-        with out_path.open(encoding="utf-8-sig", newline="") as f:
-            output = list(csv.DictReader(f))
+        self.assertIsNotNone(output_text)
+        output = list(csv.DictReader(output_text.splitlines()))
         self.assertEqual(len(output), 2)
         self.assertEqual({r["region_id"] for r in output}, {"yilan_suao"})
         self.assertEqual({r["height_above_twvd_cm"] for r in output}, {"40", "-20"})
-        summary = json.loads(out_path.with_name("regional_tide_summary.json").read_text(encoding="utf-8"))
+        summary = json.loads(summary_text)
         self.assertEqual(summary["mapped_event_rows"], 2)
         self.assertEqual(summary["mapped_unique_locations"], 1)
         self.assertEqual(summary["unmapped_or_excluded_location_count"], 2)
@@ -121,7 +124,7 @@ class CwaRegionalTideBuilderTests(unittest.TestCase):
             dict(base, location_id="X", location_name="測試", region_id="yilan_suao", mapping_status="mapped"),
             dict(base, location_id="X", location_name="測試", region_id="yilan_suao", mapping_status="mapped"),
         ]
-        result, _ = self.run_builder(tide_rows, mapping_rows)
+        result, _, _ = self.run_builder(tide_rows, mapping_rows)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Duplicate location_id", result.stderr)
 
