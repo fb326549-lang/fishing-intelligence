@@ -33,12 +33,15 @@ jobs:
             exit 1
           fi
           python P1/collector/fetch_cwa_stations.py --out output/cwa_stations
+          python P1/collector/fetch_cwa_marine.py --out output/cwa_marine
 
       - name: Upload private-run results as workflow artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cwa-station-inventory
-          path: output/cwa_stations/
+          path: |
+            output/cwa_stations/
+            output/cwa_marine/
           if-no-files-found: warn
           retention-days: 3
