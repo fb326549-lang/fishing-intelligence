@@ -34,6 +34,7 @@ jobs:
           fi
           python P1/collector/fetch_cwa_stations.py --out output/cwa_stations
           python P1/collector/fetch_cwa_marine.py --out output/cwa_marine
+          python P1/collector/normalize_cwa_marine.py --input output/cwa_marine --stations output/cwa_stations/stations.csv --out output/normalized
 
       - name: Upload private-run results as workflow artifact
         if: always()
@@ -43,5 +44,6 @@ jobs:
           path: |
             output/cwa_stations/
             output/cwa_marine/
+            output/normalized/
           if-no-files-found: warn
           retention-days: 3
