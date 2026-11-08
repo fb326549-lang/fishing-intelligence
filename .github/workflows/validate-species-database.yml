@@ -1,0 +1,33 @@
+name: Validate species database
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - p1-foundation
+    paths:
+      - "P1/species/**"
+      - ".github/workflows/validate-species-database.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout development branch
+        uses: actions/checkout@v4
+        with:
+          ref: p1-foundation
+      - name: Validate species CSV references
+        run: |
+          python P1/species/validate_species_database.py \
+            --species-dir P1/species \
+            --out species_data_validation.json
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: species-data-validation
+          path: species_data_validation.json
+          if-no-files-found: error
