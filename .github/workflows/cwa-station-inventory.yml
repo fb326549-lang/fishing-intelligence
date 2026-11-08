@@ -35,8 +35,7 @@ jobs:
           python P1/collector/fetch_cwa_stations.py --out output/cwa_stations
           python P1/collector/fetch_cwa_marine.py --out output/cwa_marine
           python P1/collector/normalize_cwa_marine.py --input output/cwa_marine --stations output/cwa_stations/stations.csv --out output/normalized
-          python P1/collector/build_east_region_conditions.py --input output/normalized/
-            output/east_region/O-B0075-001.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/cwa_stations/stations.csv --out output/east_region
+          python P1/collector/build_east_region_conditions.py --input output/normalized/O-B0075-001.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/cwa_stations/stations.csv --out output/east_region
 
       - name: Upload private-run results as workflow artifact
         if: always()
@@ -47,5 +46,6 @@ jobs:
             output/cwa_stations/
             output/cwa_marine/
             output/normalized/
+            output/east_region/
           if-no-files-found: warn
           retention-days: 3
