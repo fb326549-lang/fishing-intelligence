@@ -11,16 +11,16 @@ header{position:sticky;top:0;background:#08283df2;padding:14px 16px;border-botto
 main{max-width:1000px;margin:auto;padding:14px;display:grid;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;min-width:0}.panel h2{font-size:16px;margin:0 0 12px}
 button,input,select{background:#19465e;color:var(--text);border:1px solid #39718d;border-radius:10px;padding:11px;font-size:14px}button{cursor:pointer}button:active{opacity:.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#163b51;border-radius:10px;padding:12px;min-width:0}.label{font-size:11px;color:var(--muted)}.value{font-size:21px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#map{height:330px;border-radius:12px;z-index:1}.wide{grid-column:1/-1}#settings{display:none}#settings.show{display:block}label{display:block;font-size:12px;color:var(--muted);margin-top:9px}input,select{width:100%;margin-top:5px}.notice{font-size:11px;line-height:1.5;color:var(--muted);background:#0a2333;padding:10px;border-radius:9px;margin-top:10px}.tag{display:inline-block;border:1px solid #39718d;border-radius:99px;padding:4px 8px;font-size:11px;color:#b9eafa}
-@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
+.favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
 </style></head>
 <body>
 <header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">台灣海域優先・智慧海釣助手</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
 <main>
-<section class="panel wide"><div class="row"><h2>📍 選擇釣點</h2><span id="coords" class="small">尚未選點</span></div><div id="map"></div><div class="tools"><button id="gps">◎ 目前位置</button><button id="taiwan">回到台灣</button><button id="refresh">重新查詢</button></div><div id="pointStatus" class="status">點擊地圖選擇海域，或使用目前位置。</div></section>
+<section class="panel wide"><div class="row"><h2>📍 選擇釣點</h2><span id="coords" class="small">尚未選點</span></div><div id="map"></div><div class="tools"><button id="gps">◎ 目前位置</button><button id="taiwan">回到台灣</button><button id="refresh">重新查詢</button><button id="saveFavorite">☆ 收藏目前釣點</button></div><div class="metric" style="margin-top:10px"><div class="row"><strong>⭐ 我的最愛釣點</strong><span class="small" id="favoriteCount">0 個收藏</span></div><div id="favoriteList" class="favorite-list"><div class="small">尚未收藏釣點。先點選地圖，再按「收藏目前釣點」。</div></div></div><div id="pointStatus" class="status">點擊地圖選擇海域，或使用目前位置。</div></section>
 <section class="panel"><h2>🌊 海洋環境</h2><div class="grid"><div class="metric"><div class="label">海表溫度</div><div class="value" id="sst">—</div></div><div class="metric"><div class="label">海流速度</div><div class="value" id="current">—</div></div><div class="metric"><div class="label">浪高</div><div class="value" id="wave">—</div></div><div class="metric"><div class="label">浪週期</div><div class="value" id="period">—</div></div></div><div id="marineStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel"><h2>🌬️ 天氣與風況</h2><div class="grid"><div class="metric"><div class="label">風速</div><div class="value" id="wind">—</div></div><div class="metric"><div class="label">陣風</div><div class="value" id="gust">—</div></div><div class="metric"><div class="label">氣壓</div><div class="value" id="pressure">—</div></div><div class="metric"><div class="label">降雨機率</div><div class="value" id="rain">—</div></div></div><div id="weatherStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel wide"><h2>🐟 台灣常見魚種・智慧魚情</h2><div class="grid"><div><label>海域區域</label><select id="fishRegion"><option value="auto">依釣點自動判斷</option><option value="north">北部／東北角</option><option value="east">東部</option><option value="west">西部／中部</option><option value="south">南部</option></select></div><div><label>目標魚種</label><select id="targetFish"><option value="all">不限魚種（綜合環境）</option></select></div></div><div class="row" style="margin-top:12px"><div><div class="label">環境適釣指數</div><div class="value" id="activity" style="font-size:34px">等待資料</div></div><span class="tag" id="activityGrade">尚未評分</span></div><p class="small" id="activityNote">依選定海域、魚種及即時環境條件計算。</p><div id="activityBreakdown" class="small" style="line-height:1.8;margin-top:8px">各項環境評分尚未產生。</div><div class="metric" style="margin-top:10px"><div class="label">本海域常見目標魚種</div><div id="regionalFish" style="line-height:1.9;margin-top:6px">等待定位</div></div><label>釣法</label><select id="method"><option>不限釣法</option><option>岸釣</option><option>磯釣</option><option>堤防釣</option><option>船釣</option><option>路亞</option><option>沉底</option><option>浮游磯釣</option></select><div class="notice">指數是依海流、潮汐、風浪、氣壓及魚種習性建立的環境參考值，不代表魚群即時偵測或保證漁獲。魚種名單依台灣沿岸棲地與常見垂釣對象整理；各地季節、禁漁規定及實際出現情況仍須確認。</div></section>
-<section class="panel wide" id="recommendations"><h2>🎯 今日魚種推薦與最佳時段</h2><p class="small">依目前海域常見魚種、海溫、海流、潮汐、風浪及逐時天氣條件排序。這是環境適合度，不是魚群探測。</p><div id="topFish" class="grid"><div class="metric">等待環境資料</div></div><div class="metric" style="margin-top:10px"><div class="label">今日較佳作釣時段（逐時預報估算）</div><div class="value" id="bestWindow">等待逐時資料</div><div class="small" id="bestWindowNote">取得天氣及海象逐時預報後計算。</div></div></section><section class="panel wide" id="journal"><h2>📝 個人釣魚日誌</h2><p class="small">紀錄每次釣況，資料保存在目前手機／瀏覽器，不會上傳。累積紀錄後可用來校正推薦模型。</p><div class="grid"><div><label>日期</label><input id="logDate" type="date"></div><div><label>魚種</label><select id="logFish"><option value="">選擇魚種</option></select></div><div><label>魚獲尾數</label><input id="logCount" type="number" min="1" step="1" value="1"></div><div><label>重量（公斤，可留空）</label><input id="logWeight" type="number" min="0" step="0.01" placeholder="例如 1.25"></div><div><label>魚體長度（公分，可留空）</label><input id="logLength" type="number" min="0" step="0.1" placeholder="例如 35"></div><div><label>釣法</label><select id="logMethod"><option>磯釣</option><option>堤防釣</option><option>岸釣</option><option>路亞</option><option>沉底</option><option>浮游磯釣</option><option>船釣</option><option>其他</option></select></div><div><label>餌料／假餌</label><input id="logBait" placeholder="例如 南極蝦、米諾"></div><div><label>天候／潮況</label><input id="logConditions" placeholder="例如 漲潮、東北風"></div></div><label>備註</label><input id="logNotes" placeholder="釣點特徵、咬況、裝備等"><div class="tools"><button id="saveLog">儲存這筆釣獲</button><button id="exportLogs">匯出 CSV</button><button id="clearLogs">清空日誌</button></div><div class="status" id="logStatus">尚無釣獲紀錄。</div><div id="logList" style="display:grid;gap:8px;margin-top:10px"></div></section><section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">下一個滿潮／乾潮</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">目前潮勢</div><div class="value" id="tidePhase">待串接</div></div></div><div class="metric" style="margin-top:8px"><div class="row"><span class="label">目前潮汐進度</span><strong id="tideProgressText">等待資料</strong></div><div style="height:10px;background:#0a2333;border-radius:99px;overflow:hidden;margin-top:8px"><div id="tideProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#2aa8d8,#5bd5a0);border-radius:99px"></div></div><div class="row small" style="margin-top:5px"><span>轉折點（滿潮／乾潮）</span><span id="tideRangeText">—</span></div></div><p class="small" id="tideDetail">依選定座標自動比對最近的中央氣象署潮汐預報地點。</p></section>
+<section class="panel wide" id="recommendations"><h2>🎯 今日魚種推薦與最佳時段</h2><p class="small">依目前海域常見魚種、海溫、海流、潮汐、風浪及逐時天氣條件排序。這是環境適合度，不是魚群探測。</p><div id="topFish" class="grid"><div class="metric">等待環境資料</div></div><div class="metric" style="margin-top:10px"><div class="label">今日較佳作釣時段（逐時預報估算）</div><div class="value" id="bestWindow">等待逐時資料</div><div class="small" id="bestWindowNote">取得天氣及海象逐時預報後計算。</div></div></section><section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">下一個滿潮／乾潮</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">目前潮勢</div><div class="value" id="tidePhase">待串接</div></div></div><div class="metric" style="margin-top:8px"><div class="row"><span class="label">目前潮汐進度</span><strong id="tideProgressText">等待資料</strong></div><div style="height:10px;background:#0a2333;border-radius:99px;overflow:hidden;margin-top:8px"><div id="tideProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#2aa8d8,#5bd5a0);border-radius:99px"></div></div><div class="row small" style="margin-top:5px"><span>轉折點（滿潮／乾潮）</span><span id="tideRangeText">—</span></div></div><p class="small" id="tideDetail">依選定座標自動比對最近的中央氣象署潮汐預報地點。</p></section>
 <section class="panel"><h2>📡 資料來源與更新</h2><div class="small">海洋預報：Open-Meteo Marine；天氣預報：Open-Meteo Forecast。海底水深、底質、魚種分布及正式潮汐資料列入後續階段。</div><div id="updated" class="status">尚未查詢</div><div class="notice">海洋模式在近岸、港灣及複雜地形可能有誤差。出海前請另確認中央氣象署海象、海上警報及航安資訊，不可將本工具作為唯一安全依據。</div></section>
 <section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>中央氣象署潮汐 API 網址<input id="tideUrl" autocomplete="url"></label><label>中央氣象署 OpenData 授權碼<input id="tideKey" type="password" autocomplete="off" placeholder="貼上你的 CWA API 授權碼"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">潮汐資料使用中央氣象署 F-A0021-001。授權碼只存於目前裝置的瀏覽器，不會寫入 GitHub 程式碼；但瀏覽器發出的 API 請求仍會帶出授權碼，請勿在公用裝置使用。</div></section>
 </main>
@@ -32,46 +32,43 @@ let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null
 const map=L.map('map').setView([23.7,121],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
 function config(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}}
-const LOG_KEY='fishing_intelligence_catch_log_v1';
-function localDateInput(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
-function getLogs(){try{const x=JSON.parse(localStorage.getItem(LOG_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
-function saveLogs(rows){localStorage.setItem(LOG_KEY,JSON.stringify(rows))}
-function initJournal(){
- const sel=$('logFish'),names=[...new Set(Object.values(FISH_DB).flat().map(x=>x[0]))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
- sel.innerHTML='<option value="">選擇魚種</option>'+names.map(n=>'<option value="'+n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')+'">'+n+'</option>').join('')+'<option value="其他">其他</option>';
- $('logDate').value=localDateInput();renderLogs();
- $('saveLog').onclick=()=>{
-  const fish=$('logFish').value,count=Number($('logCount').value),weight=$('logWeight').value,length=$('logLength').value;
-  if(!fish){$('logStatus').textContent='請先選擇魚種。';return}
-  if(!Number.isInteger(count)||count<1){$('logStatus').textContent='尾數至少要填 1。';return}
-  const row={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:$('logDate').value||localDateInput(),fish,count,weight:weight===''?'':Number(weight),length:length===''?'':Number(length),method:$('logMethod').value,bait:$('logBait').value.trim(),conditions:$('logConditions').value.trim(),notes:$('logNotes').value.trim(),lat:Number(point.lat.toFixed(5)),lon:Number(point.lon.toFixed(5)),createdAt:new Date().toISOString()};
-  const rows=getLogs();rows.unshift(row);saveLogs(rows);$('logWeight').value='';$('logLength').value='';$('logBait').value='';$('logConditions').value='';$('logNotes').value='';$('logCount').value='1';$('logStatus').textContent='已儲存。共 '+rows.length+' 筆紀錄；資料只留在這台裝置。';renderLogs();
- };
- $('exportLogs').onclick=()=>{
-  const rows=getLogs();if(!rows.length){$('logStatus').textContent='目前沒有可匯出的紀錄。';return}
-  const cols=['date','fish','count','weight_kg','length_cm','method','bait','conditions','notes','latitude','longitude'];
-  const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\uFEFF'+[cols.join(','),...rows.map(r=>[r.date,r.fish,r.count,r.weight,r.length,r.method,r.bait,r.conditions,r.notes,r.lat,r.lon].map(esc).join(','))].join('\r\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='fishing-catch-log.csv';a.click();URL.revokeObjectURL(url);$('logStatus').textContent='已產生 CSV 匯出檔。';
- };
- $('clearLogs').onclick=()=>{if(!getLogs().length){$('logStatus').textContent='目前沒有紀錄。';return}if(confirm('確定清空所有釣獲紀錄？此動作無法復原。')){saveLogs([]);renderLogs();$('logStatus').textContent='日誌已清空。'}};
- $('logList').onclick=e=>{const b=e.target.closest('[data-delete]');if(!b)return;const rows=getLogs().filter(r=>r.id!==b.dataset.delete);saveLogs(rows);renderLogs();$('logStatus').textContent='已刪除該筆紀錄。'};
-}
-function renderLogs(){
- const rows=getLogs(),box=$('logList');box.replaceChildren();
- if(!rows.length){box.textContent='尚無紀錄。每次釣完魚可在這裡留下資料。';return}
- rows.slice(0,30).forEach(r=>{
-  const card=document.createElement('div');card.className='metric';
-  const top=document.createElement('div');top.className='row';
-  const title=document.createElement('strong');title.textContent=r.date+'｜'+r.fish+' × '+r.count;
-  const del=document.createElement('button');del.textContent='刪除';del.dataset.delete=r.id;del.setAttribute('aria-label','刪除 '+r.fish+' 紀錄');top.append(title,del);card.append(top);
-  const detail=document.createElement('div');detail.className='small';detail.style.marginTop='6px';
-  detail.textContent=[r.method,r.weight!==''?'重量 '+r.weight+' kg':'',r.length!==''?'長度 '+r.length+' cm':'',r.bait?'餌料 '+r.bait:'',r.conditions,r.lat!=null?'座標 '+r.lat+', '+r.lon:'',r.notes].filter(Boolean).join('｜');card.append(detail);box.append(card);
- });
- if(rows.length>30){const more=document.createElement('div');more.className='small';more.textContent='畫面顯示最近 30 筆；匯出 CSV 可取得全部 '+rows.length+' 筆。';box.append(more)}
-}
 function fillSettings(){const c=config();Object.keys(c).forEach(k=>$(k).value=c[k]||'')}
 function saveSettings(){const c={};Object.keys(defaults).forEach(k=>c[k]=$(k).value.trim());try{new URL(c.marineUrl);new URL(c.weatherUrl);if(c.tideUrl)new URL(c.tideUrl)}catch{$('configStatus').textContent='網址格式錯誤，請檢查後再儲存。';return false}localStorage.setItem(KEY,JSON.stringify(c));$('configStatus').textContent='設定已儲存；下次查詢將使用新設定。';return true}
+
+const FAVORITES_KEY='fishing_intelligence_favorites_v1';
+function getFavorites(){try{const x=JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
+function saveFavorites(rows){localStorage.setItem(FAVORITES_KEY,JSON.stringify(rows))}
+function initFavorites(){
+ $('saveFavorite').onclick=()=>{
+  const lat=Number(point.lat.toFixed(5)),lon=Number(point.lon.toFixed(5)),rows=getFavorites();
+  if(rows.some(x=>Math.abs(x.lat-lat)<0.00001&&Math.abs(x.lon-lon)<0.00001)){$('pointStatus').textContent='這個座標已經收藏過了。';return}
+  const name=prompt('替這個地圖位置命名（可自行修改）：','釣點 '+lat.toFixed(4)+', '+lon.toFixed(4));
+  if(name===null)return;if(!name.trim()){alert('名稱不能空白。');return}
+  rows.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:name.trim(),lat,lon});
+  saveFavorites(rows);renderFavorites();$('pointStatus').textContent='已收藏「'+name.trim()+'」。下次可直接從我的最愛載入。';
+ };
+ $('favoriteList').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-action]');if(!b)return;
+  const id=b.dataset.id,rows=getFavorites(),item=rows.find(x=>x.id===id);if(!item)return;
+  if(b.dataset.action==='load'){map.setView([item.lat,item.lon],13);choose(item.lat,item.lon);$('pointStatus').textContent='已載入收藏釣點：「'+item.name+'」。'}
+  if(b.dataset.action==='rename'){const name=prompt('修改釣點名稱：',item.name);if(name===null)return;if(!name.trim()){alert('名稱不能空白。');return}item.name=name.trim();saveFavorites(rows);renderFavorites()}
+  if(b.dataset.action==='delete'){if(!confirm('確定刪除收藏釣點「'+item.name+'」？'))return;saveFavorites(rows.filter(x=>x.id!==id));renderFavorites()}
+ });
+ renderFavorites();
+}
+function renderFavorites(){
+ const rows=getFavorites(),box=$('favoriteList');$('favoriteCount').textContent=rows.length+' 個收藏';box.replaceChildren();
+ if(!rows.length){const d=document.createElement('div');d.className='small';d.textContent='尚未收藏釣點。先點選地圖，再按「收藏目前釣點」。';box.append(d);return}
+ rows.forEach(item=>{
+  const row=document.createElement('div');row.className='favorite-item';
+  const name=document.createElement('div');name.className='favorite-name';name.textContent=item.name;
+  const coord=document.createElement('div');coord.className='small';coord.textContent=item.lat.toFixed(4)+', '+item.lon.toFixed(4);
+  const load=document.createElement('button');load.textContent='前往';load.dataset.action='load';load.dataset.id=item.id;
+  const rename=document.createElement('button');rename.textContent='改名';rename.dataset.action='rename';rename.dataset.id=item.id;
+  const del=document.createElement('button');del.textContent='刪除';del.dataset.action='delete';del.dataset.id=item.id;
+  row.append(name,coord,load,rename,del);box.append(row);
+ });
+}
 function choose(lat,lon){point={lat,lon};if(pin)pin.setLatLng([lat,lon]);else pin=L.marker([lat,lon]).addTo(map);$('coords').textContent=lat.toFixed(4)+', '+lon.toFixed(4);$('pointStatus').textContent='已選定座標，正在更新環境資料…';renderFishOptions();calculateFishing();loadData()}
 map.on('click',e=>choose(e.latlng.lat,e.latlng.lng));
 $('gps').onclick=()=>{if(!navigator.geolocation){alert('此瀏覽器不支援定位');return}navigator.geolocation.getCurrentPosition(pos=>{map.setView([pos.coords.latitude,pos.coords.longitude],12);choose(pos.coords.latitude,pos.coords.longitude)},()=>alert('定位失敗，請確認 Safari 已允許定位，並使用 HTTPS。'))};
@@ -199,6 +196,24 @@ const FISH_DB={
  ['竹筴魚','近海中上層','船釣、路亞',18,28,2]
  ]
 };
+
+const SEASON_MONTHS={
+ '黑毛':[10,11,12,1,2,3],'白毛':[10,11,12,1,2,3],'臭肚':[4,5,6,7,8,9,10],
+ '黑鯛（烏格）':[10,11,12,1,2,3,4],'黃鰭鯛（赤翅）':[4,5,6,9,10,11],
+ '石斑類':[4,5,6,7,8,9,10],'金梭魚（竹梭）':[5,6,7,8,9,10],
+ '鯖魚':[10,11,12,1,2,3],'竹筴魚':[4,5,6,7,8,9,10,11],
+ '白帶魚':[8,9,10,11,12,1,2],'鱸魚':[10,11,12,1,2,3,4],
+ '午仔魚':[5,6,7,8,9,10],'紅槽／赤鯮':[4,5,6,7,8,9,10,11],
+ '笛鯛類（青雞）':[4,5,6,7,8,9,10],'鬼頭刀':[4,5,6,7,8,9],
+ '飛魚':[3,4,5,6,7],'紅甘／鰤魚':[10,11,12,1,2,3],
+ '烏魚':[10,11,12,1,2],'沙梭':[4,5,6,7,8,9,10],
+ '花身雞魚':[4,5,6,7,8,9,10],'石首魚類（鮸／黃魚等）':[10,11,12,1,2,3],
+ '鰻魚':[10,11,12,1,2,3],'鸚哥魚':[5,6,7,8,9,10]
+};
+const INCOMING_TIDE_FISH=['黑毛','白毛','臭肚','黑鯛（烏格）','石斑類','金梭魚（竹梭）','鱸魚','紅槽／赤鯮','笛鯛類（青雞）','鬼頭刀','紅甘／鰤魚','鸚哥魚'];
+const OUTGOING_TIDE_FISH=['午仔魚','沙梭','花身雞魚','鰻魚','石首魚類（鮸／黃魚等）','烏魚'];
+function seasonalFit(name,month){const months=SEASON_MONTHS[name];return !months?{score:55,label:'季節資料待補'}:months.includes(month)?{score:100,label:'當季常見'}:{score:38,label:'非主要季節'}}
+function tideFit(name,tide){if(!tide)return {score:55,label:'潮汐資料未取得'};const incoming=INCOMING_TIDE_FISH.includes(name),outgoing=OUTGOING_TIDE_FISH.includes(name);if(!incoming&&!outgoing)return {score:65,label:'潮汐偏好未明'};const match=(incoming&&tide.phase==='漲潮')||(outgoing&&tide.phase==='退潮');return match?{score:100,label:'較符合潮向'}:{score:55,label:'潮向非主要偏好'}}
 function detectFishRegion(){
  const manual=$('fishRegion').value;
  if(manual!=='auto')return manual;
@@ -212,7 +227,7 @@ function renderFishOptions(){
  const opts=['<option value="all">不限魚種（綜合環境）</option>',...names.map((x,i)=>'<option value="'+i+'">'+x[0]+'</option>')];
  sel.innerHTML=opts.join('');
  if([...sel.options].some(o=>o.value===old))sel.value=old;
- $('regionalFish').textContent=names.map(x=>x[0]+'（'+x[1]+'）').join('、');
+ const month=new Date().getMonth()+1,seasonal=names.filter(x=>seasonalFit(x[0],month).score>=90).map(x=>x[0]);$('regionalFish').textContent=names.map(x=>x[0]+'（'+x[1]+'）').join('、');$('regionalFish').insertAdjacentHTML('beforeend','<div class="season-note">本月季節性常見魚種：'+(seasonal.join('、')||'目前資料庫沒有明確標示')+'。季節為參考，仍受海況與洄游影響。</div>');
 }
 function calculateFishing(){
  const m=latest.marine||{},w=latest.weather||{},t=latest.tide,method=$('method').value;
@@ -255,15 +270,18 @@ function calculateFishing(){
 }
 function renderRecommendations(baseScore,region,method){
  const list=FISH_DB[region]||[],m=latest.marine||{},temp=Number(m.sea_surface_temperature),cur=Number(m.ocean_current_velocity),wave=Number(m.wave_height);
+ const month=new Date().getMonth()+1,tide=latest.tide;
  const ranked=list.map(f=>{
   let score=baseScore;
   if(Number.isFinite(temp)){const d=temp<f[3]?f[3]-temp:temp>f[4]?temp-f[4]:0;score=score*.78+Math.max(35,100-d*9)*.22}
   if(Number.isFinite(cur))score=score*.88+Math.max(25,100-Math.abs(cur-f[5])*30)*.12;
   if(Number.isFinite(wave)&&['岸釣','堤防釣','磯釣','浮游磯釣'].some(x=>f[2].includes(x))&&wave>1.5)score-=Math.min(18,(wave-1.5)*15);
   if(method!=='不限釣法'&&!f[2].includes(method))score-=10;
-  return {fish:f,score:Math.max(0,Math.min(100,Math.round(score)))};
- }).sort((a,b)=>b.score-a.score).slice(0,3);
- $('topFish').innerHTML=ranked.map((x,i)=>'<div class="metric"><div class="row"><strong>#'+(i+1)+' '+x.fish[0]+'</strong><span class="tag">'+x.score+'分</span></div><div class="small" style="margin-top:6px">棲地：'+x.fish[1]+'</div><div class="small">建議釣法：'+x.fish[2]+'</div></div>').join('');
+  const season=seasonalFit(f[0],month),tideScore=tideFit(f[0],tide);
+  score=score*.72+season.score*.18+tideScore.score*.10;
+  return {fish:f,score:Math.max(0,Math.min(100,Math.round(score))),season,tide:tideScore};
+ }).sort((a,b)=>b.score-a.score).slice(0,5);
+ $('topFish').innerHTML=ranked.map((x,i)=>'<div class="metric"><div class="row"><strong>#'+(i+1)+' '+x.fish[0]+'</strong><span class="tag">'+x.score+'分</span></div><div class="small" style="margin-top:6px">棲地：'+x.fish[1]+'</div><div class="small">建議釣法：'+x.fish[2]+'</div><div class="season-note">'+x.season.label+' · '+x.tide.label+'</div></div>').join('');
  const h=latest.hourlyWeather||{},mh=latest.hourlyMarine||{},times=h.time||[],wind=h.wind_speed_10m||[],gust=h.wind_gusts_10m||[],rain=h.precipitation_probability||[],waves=mh.wave_height||[],curr=mh.ocean_current_velocity||[];
  const now=Date.now(),candidates=[];
  for(let i=0;i<times.length;i++){
@@ -286,7 +304,7 @@ $('method').addEventListener('change',calculateFishing);
 $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFishing()});
 $('targetFish').addEventListener('change',calculateFishing);
 renderFishOptions();
-initJournal();
+initFavorites();
 async function loadData(){loadTide();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m',forecast_days:'2',timezone:'Asia/Taipei'});
