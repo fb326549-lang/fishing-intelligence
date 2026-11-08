@@ -44,7 +44,16 @@ def main():
                      "latitude":meta.get("latitude"),"longitude":meta.get("longitude"),
                      "county":meta.get("county"),"valid_time":obs.get("DateTime"),
                      "data_kind":"observed","source":"CWA"}
-                flatten("",obs.get("WeatherElements",{}),row)
+                elements = obs.get("WeatherElements",{})
+                flatten("",elements,row)
+                # Sea currents are nested by measurement layer; expose layer-1
+                # fields as separate columns while preserving the original JSON.
+                current_layers = elements.get("SeaCurrents",{}).get("Layer",[])
+                if isinstance(current_layers,dict): current_layers=[current_layers]
+                if isinstance(current_layers,list) and current_layers:
+                    layer = current_layers[0]
+                    for key in ("LayerNumber","CurrentDirection","CurrentDirectionDescription","CurrentSpeed","CurrentSpeedInKnots"):
+                        if key in layer: row[f"SeaCurrent_{key}"]=layer[key]
                 rows.append(row)
         if rows:
             fields=list(dict.fromkeys(k for r in rows for k in r))
