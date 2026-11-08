@@ -131,10 +131,18 @@ def main():
         forecast_by_location[row.get("location_id", "")].append(row)
 
     match_rows, station_summaries = [], []
+    seen_stations, seen_locations = set(), set()
     for pair in pairings:
         if pair.get("matching_status") != "matched":
             continue
         sid, lid = pair["station_id"], pair["location_id"]
+        distance = num(pair.get("distance_m"))
+        if not sid or not lid or pair.get("region_id") not in REGIONS or distance is None or distance > 500:
+            raise SystemExit(f"Invalid matched station/location pair: {sid}/{lid}; matched pairs require a valid region and distance <= 500 m.")
+        if sid in seen_stations or lid in seen_locations:
+            raise SystemExit(f"Duplicate matched station or forecast location pair: {sid}/{lid}")
+        seen_stations.add(sid)
+        seen_locations.add(lid)
         obs_rows = obs_by_station.get(sid, [])
         forecast_rows = forecast_by_location.get(lid, [])
         points, extrema, sampling_minutes = find_observed_extrema(obs_rows)
