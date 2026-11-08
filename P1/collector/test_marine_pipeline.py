@@ -14,27 +14,32 @@ from build_east_region_conditions import REGIONS, mean_value, num, parse_status,
 
 class CwaTideForecastTests(unittest.TestCase):
     def test_documented_tide_forecast_shape_and_height_datums(self):
-        payload = {
-            "cwaopendata": {
-                "Resources": {"Resource": {"Data": {"TideForecasts": {"Location": [{
-                    "LocationId": "10015050",
-                    "LocationName": "花蓮縣吉安鄉",
-                    "Latitude": "23.94240",
-                    "Longitude": "121.61250",
-                    "TimePeriods": {"Daily": [{
-                        "Date": "2026-11-16",
-                        "LunarDate": "2026-10-08",
-                        "TideRange": "小",
-                        "Time": [
-                            {"DateTime": "2026-11-16T04:06:00+08:00", "Tide": "乾潮",
-                             "TideHeights": {"AboveTWVD": "-33", "AboveLocalMSL": "-22", "AboveChartDatum": "90"}},
-                            {"DateTime": "2026-11-16T11:23:00+08:00", "Tide": "滿潮",
-                             "TideHeights": {"AboveTWVD": "31", "AboveLocalMSL": "41", "AboveChartDatum": "153"}}
-                        ]
-                    }]}}
-                }]}}}
-            }
+        event_low = {
+            "DateTime": "2026-11-16T04:06:00+08:00",
+            "Tide": "乾潮",
+            "TideHeights": {"AboveTWVD": "-33", "AboveLocalMSL": "-22", "AboveChartDatum": "90"},
         }
+        event_high = {
+            "DateTime": "2026-11-16T11:23:00+08:00",
+            "Tide": "滿潮",
+            "TideHeights": {"AboveTWVD": "31", "AboveLocalMSL": "41", "AboveChartDatum": "153"},
+        }
+        daily = {
+            "Date": "2026-11-16",
+            "LunarDate": "2026-10-08",
+            "TideRange": "小",
+            "Time": [event_low, event_high],
+        }
+        location = {
+            "LocationId": "10015050",
+            "LocationName": "花蓮縣吉安鄉",
+            "Latitude": "23.94240",
+            "Longitude": "121.61250",
+            "TimePeriods": {"Daily": [daily]},
+        }
+        payload = {"cwaopendata": {"Resources": {"Resource": {
+            "Data": {"TideForecasts": {"Location": [location]}}
+        }}}}
         rows = normalize_tides(payload, "2026-11-08T00:00:00+00:00")
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["location_id"], "10015050")
