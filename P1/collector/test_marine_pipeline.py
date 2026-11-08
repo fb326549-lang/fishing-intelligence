@@ -7,8 +7,57 @@ from pathlib import Path
 COLLECTOR = Path(__file__).resolve().parents[1] / "collector"
 sys.path.insert(0, str(COLLECTOR))
 
-from normalize_cwa_marine import as_layer_list, clean, layer_label  # noqa: E402
+from normalize_cwa_marine import as_layer_list, clean, layer_label  # noqa: E402\nfrom fetch_cwa_tide_forecast import normalize as normalize_tides  # noqa: E402
 from build_east_region_conditions import REGIONS, mean_value, num, parse_status, parse_properties  # noqa: E402
+
+
+class CwaTideForecastTests(unittest.TestCase):
+    def test_documented_tide_forecast_shape_and_height_datums(self):
+        payload = {
+            "cwaopendata": {
+                "Resources": {"Resource": {"Data": {"TideForecasts": {"Location": [{
+                    "LocationId": "10015050",
+                    "LocationName": "花蓮縣吉安鄉",
+                    "Latitude": "23.94240",
+                    "Longitude": "121.61250",
+                    "TimePeriods": {"Daily": [{
+                        "Date": "2026-11-16",
+                        "LunarDate": "2026-10-08",
+                        "TideRange": "小",
+                        "Time": [
+                            {"DateTime": "2026-11-16T04:06:00+08:00", "Tide": "乾潮",
+                             "TideHeights": {"AboveTWVD": "-33", "AboveLocalMSL": "-22", "AboveChartDatum": "90"}},
+                            {"DateTime": "2026-11-16T11:23:00+08:00", "Tide": "滿潮",
+                             "TideHeights": {"AboveTWVD": "31", "AboveLocalMSL": "41", "AboveChartDatum": "153"}}
+                        ]
+                    }]}}
+                }]}}}
+            }
+        }
+        rows = normalize_tides(payload, "2026-11-08T00:00:00+00:00")
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["location_id"], "10015050")
+        self.assertEqual(rows[0]["height_above_local_msl_cm"], -22.0)
+        self.assertEqual(rows[1]["tide"], "滿潮")
+        self.assertEqual(rows[1]["region_id"], "")
+
+    def test_tide_missing_height_stays_null_not_zero(self):
+        payload = {"Data": {"TideForecasts": {"Location": [{
+            "LocationId": "X1", "LocationName": "測試",
+            "TimePeriods": {"Daily": [{"Date": "2026-11-08", "Time": [{
+                "DateTime": "2026-11-08T10:00:00+08:00", "Tide": "滿潮",
+                "TideHeights": {"AboveTWVD": "None"}
+            }]}]}
+        }]}}}
+        row = normalize_tides(payload, "test")[0]
+        self.assertIsNone(row["height_above_twvd_cm"])
+        self.assertIsNone(row["height_above_local_msl_cm"])
+
+    def test_tide_failure_or_unrecognized_schema_is_rejected(self):
+        with self.assertRaises(ValueError):
+            normalize_tides({"success": "false"}, "test")
+        with self.assertRaises(ValueError):
+            normalize_tides({"Records": {}}, "test")
 
 
 class MarineNormalizationTests(unittest.TestCase):
