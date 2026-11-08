@@ -1,0 +1,38 @@
+name: Open-Meteo marine forecast
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect-forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out P1 branch
+        uses: actions/checkout@v4
+        with:
+          ref: p1-foundation
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install collector dependencies
+        run: python -m pip install --disable-pip-version-check -r P1/collector/requirements.txt
+
+      - name: Fetch Open-Meteo forecasts for six East Taiwan regions
+        run: |
+          python P1/collector/collect_open_meteo.py --config P1/collector/config.example.json --out output/open_meteo --delay 1
+
+      - name: Upload forecast artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: open-meteo-six-region-forecast
+          path: output/open_meteo/
+          if-no-files-found: warn
+          retention-days: 3
