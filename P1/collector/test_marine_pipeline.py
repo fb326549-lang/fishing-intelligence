@@ -260,7 +260,7 @@ class CwaTideHistoryArchiveTests(unittest.TestCase):
             (history / "observed_tides.jsonl").write_text("{bad json\\n", encoding="utf-8")
             for path, row in [
                 (obs, {"station_id": "S1", "valid_time": "t", "TideHeight": "1"}),
-                (fc, {"location_id": "L1", "valid_time": "t", "tide": "滿潮"}),
+                (fc, {"location_id": "L1", "region_id": "taitung_south", "valid_time": "t", "tide": "滿潮"}),
                 (pair, {"station_id": "S1", "location_id": "L1", "matching_status": "matched"}),
             ]:
                 with path.open("w", encoding="utf-8-sig", newline="") as f:
