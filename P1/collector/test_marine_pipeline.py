@@ -132,7 +132,7 @@ class CwaRegionalTideBuilderTests(unittest.TestCase):
         tide_rows = [{"location_id": "X", "location_name": "不同名稱", "valid_time": "t"}]
         base = {"latitude": "1", "longitude": "2", "mapping_basis": "test", "notes": "test"}
         mapping_rows = [dict(base, location_id="X", location_name="原始名稱", region_id="yilan_suao", mapping_status="mapped")]
-        result, _ = self.run_builder(tide_rows, mapping_rows)
+        result, _, _ = self.run_builder(tide_rows, mapping_rows)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Location name mismatch", result.stderr)
 
