@@ -94,3 +94,19 @@ Do not send the authorization code in chat or add it to any file. After the run,
 - any HTTP error text, after confirming it contains no token.
 
 Then we can map actual stations to the six regions and query O-B0075-001 for one station. Keep the raw API JSON local until its fields and redistribution terms have been reviewed.
+
+
+## Evidence-gated species/environment context engine
+
+The first species-engine stage is deliberately a context layer, not a bite forecast:
+
+```bash
+python P1/species/build_species_environment_context.py \
+  --species-dir P1/species \
+  --regional-forecast path/to/regional_forecast_conditions_6_12_24.csv \
+  --out path/to/species_environment_context.csv
+```
+
+It includes only single-taxon candidates with verified taxonomy and documented East Taiwan distribution, links each record to its evidence IDs, and carries habitat context and environmental-data completeness. It does not claim that a species occurs at every planning region or fishing spot.
+
+Activity scores and catch probabilities remain blank until species-specific response parameters and local fishing-effort/catch records have been collected and validated. Broad habitat and reported depth descriptions are not converted into arbitrary hourly wave/current/SST thresholds. The forecast workflow runs this context stage and uploads its output with the other artifacts.
