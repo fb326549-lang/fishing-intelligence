@@ -215,7 +215,7 @@ class CwaTideHistoryAnalysisTests(unittest.TestCase):
                 {"station_id": "C4U02", "valid_time": "2026-11-09T02:00:00+08:00", "TideHeight": "0.40", "collected_at": "2026-11-09T03:00:00+00:00"},
             ]
             forecasts = [
-                {"snapshot_id": "early", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-08T12:00:00+00:00"},
+                {"snapshot_id": "early", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-08T00:00:00+00:00"},
                 {"snapshot_id": "late", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-09T02:00:00+00:00"},
             ]
             (history / "observed_tides.jsonl").write_text(
