@@ -2,7 +2,7 @@
 """Compare CWA high/low tide forecasts with nearby CWA tide observations.
 
 Only explicitly paired station/location combinations are evaluated. Observed
-TideHeight is metres relative to chart datum; forecast AboveChartDatum is cm.
+TideHeight is metres relative to TWVD2001; forecast AboveTWVD is cm for mainland stations.
 Hourly observed local extrema are matched to forecast events within a stated
 time tolerance. This is a limited diagnostic, not a complete forecast score.
 """
@@ -76,7 +76,7 @@ def match_events(forecasts, extrema, max_delta_minutes):
     for fi, forecast in enumerate(forecasts):
         ft = parse_time(forecast.get("valid_time"))
         kind = tide_kind(forecast.get("tide"))
-        height_cm = num(forecast.get("height_above_chart_datum_cm"))
+        height_cm = num(forecast.get("height_above_twvd_cm"))
         if ft is None or kind is None or height_cm is None:
             continue
         for oi, observed in enumerate(extrema):
@@ -98,7 +98,7 @@ def match_events(forecasts, extrema, max_delta_minutes):
             "forecast_time": f["valid_time"],
             "observed_extremum_time": o["time"].isoformat(),
             "tide_type": f["tide"],
-            "forecast_above_chart_datum_m": round(forecast_m, 3),
+            "forecast_above_twvd_m": round(forecast_m, 3),
             "observed_tide_height_m": round(o["height_m"], 3),
             "height_error_observed_minus_forecast_m": round(error, 3),
             "absolute_height_error_m": round(abs(error), 3),
@@ -137,8 +137,8 @@ def main():
             continue
         sid, lid = pair["station_id"], pair["location_id"]
         distance = num(pair.get("distance_m"))
-        if not sid or not lid or pair.get("region_id") not in REGIONS or distance is None or distance > 500:
-            raise SystemExit(f"Invalid matched station/location pair: {sid}/{lid}; matched pairs require a valid region and distance <= 500 m.")
+        if not sid or not lid or pair.get("region_id") not in REGIONS or distance is None or distance > 500 or pair.get("comparison_datum") != "TWVD2001":
+            raise SystemExit(f"Invalid matched station/location pair: {sid}/{lid}; matched pairs require a valid region, TWVD2001 datum and distance <= 500 m.")
         if sid in seen_stations or lid in seen_locations:
             raise SystemExit(f"Duplicate matched station or forecast location pair: {sid}/{lid}")
         seen_stations.add(sid)
@@ -168,7 +168,7 @@ def main():
                 "pair_distance_m": pair["distance_m"],
                 "observation_dataset": "O-B0075-001",
                 "forecast_dataset": "F-A0021-001",
-                "height_datum": "chart_datum",
+                "height_datum": "TWVD2001",
             })
             match_rows.append(m)
         abs_h = [m["absolute_height_error_m"] for m in matches]
@@ -196,7 +196,7 @@ def main():
     match_fields = [
         "station_id", "station_name", "location_id", "location_name", "region_id", "region_name",
         "pair_distance_m", "forecast_time", "observed_extremum_time", "tide_type",
-        "forecast_above_chart_datum_m", "observed_tide_height_m",
+        "forecast_above_twvd_m", "observed_tide_height_m",
         "height_error_observed_minus_forecast_m", "absolute_height_error_m",
         "timing_error_observed_minus_forecast_minutes", "absolute_timing_error_minutes",
         "observation_dataset", "forecast_dataset", "height_datum",
@@ -209,7 +209,7 @@ def main():
         "observation_dataset": "O-B0075-001",
         "forecast_dataset": "F-A0021-001",
         "data_kind": "observed_vs_forecast_diagnostic",
-        "height_comparison": "TideHeight metres and AboveChartDatum centimetres converted to metres; both relative to chart datum",
+        "height_comparison": "TideHeight metres and AboveTWVD centimetres converted to metres; both relative to TWVD2001 for mainland tide stations",
         "max_event_time_difference_minutes": a.max_delta_minutes,
         "matched_event_count": len(match_rows),
         "stations": station_summaries,
