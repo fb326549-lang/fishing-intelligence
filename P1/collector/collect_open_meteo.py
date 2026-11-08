@@ -80,7 +80,7 @@ def normalize_current(location_id: str, payload: dict[str, Any], fetched_at: str
             "location_id": location_id, "variable_code": variable,
             "value": value, "unit": units.get(variable),
             "valid_time": valid_time, "fetched_at": fetched_at,
-            "source": source, "data_kind": "forecast_or_model",
+            "source": source, "data_kind": "modelled",
             "quality_status": "missing" if value is None else "unchecked"
         })
     return rows
