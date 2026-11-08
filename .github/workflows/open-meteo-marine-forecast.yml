@@ -36,6 +36,7 @@ jobs:
           latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
           test -n "$latest_dir"
           python P1/collector/summarize_forecast_horizons.py --input "$latest_dir/environmental_forecast.csv" --out "$latest_dir/forecast_horizons_6_12_24.csv"
+          python P1/collector/build_regional_forecast_conditions.py --input "$latest_dir/forecast_horizons_6_12_24.csv" --out "$latest_dir/regional_forecast_conditions_6_12_24.csv"
 
       - name: Upload forecast artifact
         if: always()
