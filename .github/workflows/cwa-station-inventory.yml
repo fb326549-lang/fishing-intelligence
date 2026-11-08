@@ -1,30 +1,55 @@
 name: CWA station inventory
 
 on:
+  schedule:
+    - cron: '0 23 * * *'
   workflow_dispatch:
+  push:
+    branches:
+      - p1-foundation
+    paths:
+      - 'P1/collector/fetch_cwa_tide_forecast.py'
+      - 'P1/collector/build_cwa_regional_tide_forecast.py'
+      - 'P1/collector/compare_cwa_tide_observed_forecast.py'
+      - 'P1/collector/archive_cwa_tide_history.py'
+      - 'P1/collector/analyze_cwa_tide_forecast_history.py'
+      - 'P1/stations/cwa_tide_observation_forecast_pairing.csv'
+      - 'P1/stations/cwa_tide_region_mapping.csv'
+      - '.github/workflows/cwa-station-inventory.yml'
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: cwa-tide-history-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   fetch-stations:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Check out P1 branch
         uses: actions/checkout@v4
         with:
           ref: p1-foundation
 
+      - name: Check out persistent tide history branch
+        uses: actions/checkout@v4
+        with:
+          ref: tide-history
+          path: tide-history
+          persist-credentials: true
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install collector dependency
-        run: python -m pip install --disable-pip-version-check requests
+      - name: Install collector dependencies
+        run: python -m pip install --disable-pip-version-check -r P1/collector/requirements.txt
 
-      - name: Fetch CWA station metadata
+      - name: Fetch CWA station metadata and marine observations
         env:
           CWA_AUTHORIZATION: ${{ secrets.CWA_AUTHORIZATION }}
         run: |
@@ -35,6 +60,40 @@ jobs:
           python P1/collector/fetch_cwa_stations.py --out output/cwa_stations
           python P1/collector/fetch_cwa_marine.py --out output/cwa_marine
           python P1/collector/normalize_cwa_marine.py --input output/cwa_marine --stations output/cwa_stations/stations.csv --out output/normalized
+          python P1/collector/build_east_region_conditions.py --input output/normalized/O-B0075-001.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/cwa_stations/stations.csv --out output/east_region
+          python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
+          python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
+          python P1/collector/compare_cwa_tide_observed_forecast.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --out output/cwa_tides/tide_observed_forecast_comparison.csv
+          python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --history-dir tide-history/data --snapshot-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --collected-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir tide-history/data --out-dir tide-history/data/analysis
+
+      - name: Commit tide history and forecast verification outputs
+        run: |
+          git -C tide-history config user.name "github-actions[bot]"
+          git -C tide-history config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SNAPSHOT_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          COLLECTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git -C tide-history add data/
+          if ! git -C tide-history diff --cached --quiet; then
+            git -C tide-history commit -m "Archive CWA tide snapshot ${GITHUB_RUN_ID}"
+            pushed=0
+            for attempt in 1 2 3; do
+              if git -C tide-history push origin HEAD:tide-history; then
+                pushed=1
+                break
+              fi
+              echo "History branch moved during upload; refreshing and rebuilding append-only snapshot (attempt ${attempt})."
+              git -C tide-history fetch origin tide-history
+              git -C tide-history reset --hard origin/tide-history
+              python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --history-dir tide-history/data --snapshot-id "${SNAPSHOT_ID}" --collected-at "${COLLECTED_AT}"
+              python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir tide-history/data --out-dir tide-history/data/analysis
+              git -C tide-history add data/
+              git -C tide-history commit -m "Archive CWA tide snapshot ${GITHUB_RUN_ID}"
+            done
+            test "$pushed" -eq 1
+          else
+            echo "No new tide history records to archive."
+          fi
 
       - name: Upload private-run results as workflow artifact
         if: always()
@@ -45,5 +104,7 @@ jobs:
             output/cwa_stations/
             output/cwa_marine/
             output/normalized/
+            output/east_region/
+            output/cwa_tides/
           if-no-files-found: warn
           retention-days: 3
