@@ -25,6 +25,8 @@ jobs:
           python P1/species/validate_species_database.py \
             --species-dir P1/species \
             --out species_data_validation.json
+      - name: Test evidence-gated species context engine
+        run: python -m unittest P1/species/test_species_environment_context.py -v
       - name: Upload validation report
         uses: actions/upload-artifact@v4
         with:
