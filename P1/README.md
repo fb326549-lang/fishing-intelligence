@@ -110,3 +110,20 @@ python P1/species/build_species_environment_context.py \
 It includes only single-taxon candidates with verified taxonomy and documented East Taiwan distribution, links each record to its evidence IDs, and carries habitat context and environmental-data completeness. It does not claim that a species occurs at every planning region or fishing spot.
 
 Activity scores and catch probabilities remain blank until species-specific response parameters and local fishing-effort/catch records have been collected and validated. Broad habitat and reported depth descriptions are not converted into arbitrary hourly wave/current/SST thresholds. The forecast workflow runs this context stage and uploads its output with the other artifacts.
+
+
+## Historical CWA tide forecast verification
+
+The append-only history is stored on the dedicated `tide-history` branch. The historical verifier reads archived CWA observation and forecast vintages and writes:
+- `data/analysis/event_matches.csv`
+- `data/analysis/accuracy_by_lead.csv`
+- `data/analysis/analysis_summary.json`
+
+Run locally from the repository root:
+```bash
+python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir path/to/tide-history/data --out-dir output/tide-analysis
+```
+
+The verifier uses only reviewed mainland station/location pairs and TWVD2001 heights. Forecast lead time is calculated from the original CWA fetch timestamp. Forecasts fetched at or after the target event are excluded. It reports descriptive MAE and timing errors only after valid matches exist; no fish activity score or catch probability is inferred from a small or empty sample.
+
+The CWA workflow is configured for 07:00 Taiwan-time daily collection. GitHub scheduled workflows run only from the repository default branch, so the schedule will become active only after the workflow is reviewed and merged to that branch. The P1 development branch does not modify `main`.
