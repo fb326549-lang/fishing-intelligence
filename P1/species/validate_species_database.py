@@ -62,7 +62,11 @@ def main() -> int:
     evidence_ids = {r.get("evidence_id", "").strip() for r in evidence}
     candidate_by_id = {r.get("candidate_id", "").strip(): r for r in candidates}
 
+    allowed_confidence = {"high", "medium", "low"}
     for index, row in enumerate(evidence, start=2):
+        confidence = (row.get("confidence") or "").strip().lower()
+        if confidence not in allowed_confidence:
+            errors.append(f"evidence row {index}: invalid confidence={confidence!r}")
         cid = (row.get("candidate_id") or "").strip()
         if cid and cid not in candidate_ids:
             errors.append(f"evidence row {index}: unknown candidate_id={cid}")
@@ -91,7 +95,7 @@ def main() -> int:
         "counts": {"candidates": len(candidates), "evidence_records": len(evidence),
                    "ecology_records": len(ecology)},
         "checks": ["required columns", "unique record IDs", "candidate references",
-                   "evidence references", "evidence source URLs", "scientific-name consistency"],
+                   "evidence references", "evidence source URLs", "confidence vocabulary", "scientific-name consistency"],
         "error_count": len(errors),
         "errors": errors,
         "scope_note": "Structural validation only; does not validate taxonomy, source accuracy, or ecological claims.",
