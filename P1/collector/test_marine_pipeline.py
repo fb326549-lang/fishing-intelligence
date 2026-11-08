@@ -7,7 +7,8 @@ from pathlib import Path
 COLLECTOR = Path(__file__).resolve().parents[1] / "collector"
 sys.path.insert(0, str(COLLECTOR))
 
-from normalize_cwa_marine import as_layer_list, clean, layer_label  # noqa: E402\nfrom fetch_cwa_tide_forecast import normalize as normalize_tides  # noqa: E402
+from normalize_cwa_marine import as_layer_list, clean, layer_label  # noqa: E402
+from fetch_cwa_tide_forecast import normalize as normalize_tides  # noqa: E402
 from build_east_region_conditions import REGIONS, mean_value, num, parse_status, parse_properties  # noqa: E402
 
 
