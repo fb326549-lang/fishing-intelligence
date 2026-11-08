@@ -202,6 +202,55 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
 
 
 
+
+class CwaTideHistoryAnalysisTests(unittest.TestCase):
+    def test_scores_forecast_vintage_by_positive_lead_time_and_twvd_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history, out = root / "history", root / "analysis"
+            history.mkdir()
+            observations = [
+                {"station_id": "C4U02", "valid_time": "2026-11-09T00:00:00+08:00", "TideHeight": "0.50", "collected_at": "2026-11-09T03:00:00+00:00"},
+                {"station_id": "C4U02", "valid_time": "2026-11-09T01:00:00+08:00", "TideHeight": "1.00", "collected_at": "2026-11-09T03:00:00+00:00"},
+                {"station_id": "C4U02", "valid_time": "2026-11-09T02:00:00+08:00", "TideHeight": "0.40", "collected_at": "2026-11-09T03:00:00+00:00"},
+            ]
+            forecasts = [
+                {"snapshot_id": "early", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-08T12:00:00+00:00"},
+                {"snapshot_id": "late", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-09T02:00:00+00:00"},
+            ]
+            (history / "observed_tides.jsonl").write_text(
+                "".join(json.dumps(row, ensure_ascii=False) + "\\n" for row in observations), encoding="utf-8")
+            (history / "forecast_vintages.jsonl").write_text(
+                "".join(json.dumps(row, ensure_ascii=False) + "\\n" for row in forecasts), encoding="utf-8")
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "analyze_cwa_tide_forecast_history.py"),
+                "--history-dir", str(history), "--out-dir", str(out)
+            ], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            matches = list(csv.DictReader((out / "event_matches.csv").open(encoding="utf-8-sig", newline="")))
+            self.assertEqual(len(matches), 1)
+            self.assertEqual(matches[0]["snapshot_id"], "early")
+            self.assertEqual(matches[0]["lead_time_bucket"], "12-24h")
+            self.assertEqual(matches[0]["absolute_height_error_m"], "0.2")
+            summary = json.loads((out / "analysis_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["matched_event_count"], 1)
+            self.assertEqual(summary["interpretation"], "Insufficient evidence")
+
+    def test_analysis_rejects_empty_history_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history, out = root / "history", root / "analysis"
+            history.mkdir()
+            (history / "observed_tides.jsonl").write_text("", encoding="utf-8")
+            (history / "forecast_vintages.jsonl").write_text("", encoding="utf-8")
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "analyze_cwa_tide_forecast_history.py"),
+                "--history-dir", str(history), "--out-dir", str(out)
+            ], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("must both be non-empty", result.stderr)
+
+
 class CwaTideHistoryArchiveTests(unittest.TestCase):
     def test_archive_is_idempotent_for_observations_and_keeps_forecast_vintages(self):
         with tempfile.TemporaryDirectory() as tmp:
