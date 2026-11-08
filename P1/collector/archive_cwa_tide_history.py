@@ -61,6 +61,10 @@ def main():
     forecast_path = Path(a.history_dir) / "forecast_vintages.jsonl"
     runs_path = Path(a.history_dir) / "collection_runs.jsonl"
 
+    forecast_location_ids = {r.get("location_id") for r in forecast_rows if r.get("region_id")}
+    if not forecast_location_ids:
+        raise SystemExit("No mapped six-region CWA tide forecast locations to archive.")
+
     obs_keys = load_keys(obs_path, ("station_id", "valid_time", "TideHeight"))
     new_obs = []
     for r in obs_rows:
@@ -89,7 +93,7 @@ def main():
     ))
     new_forecasts = []
     for r in forecast_rows:
-        if r.get("location_id") not in location_ids or not r.get("valid_time"):
+        if r.get("location_id") not in forecast_location_ids or not r.get("valid_time"):
             continue
         key = (a.snapshot_id, str(r.get("location_id", "")),
                str(r.get("valid_time", "")), str(r.get("tide", "")))
@@ -119,6 +123,7 @@ def main():
         "new_forecast_vintage_events": len(new_forecasts),
         "matched_station_count": len(station_ids),
         "matched_forecast_location_count": len(location_ids),
+        "archived_forecast_location_count": len(forecast_location_ids),
         "observation_history_records": len(obs_keys),
         "forecast_history_records": len(forecast_keys),
         "observation_file": obs_path.name,
@@ -132,6 +137,7 @@ def main():
         "collection_run_count": sum(1 for line in runs_path.open(encoding="utf-8") if line.strip()),
         "matched_station_ids": sorted(station_ids),
         "matched_forecast_location_ids": sorted(location_ids),
+        "archived_forecast_location_ids": sorted(forecast_location_ids),
         "latest_run": run,
         "policy": [
             "CWA observed TideHeight records are appended when station/time/value is new.",
