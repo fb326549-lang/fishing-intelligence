@@ -137,6 +137,70 @@ class CwaRegionalTideBuilderTests(unittest.TestCase):
         self.assertIn("Location name mismatch", result.stderr)
 
 
+
+class CwaTideObservationForecastComparisonTests(unittest.TestCase):
+    def test_observed_extrema_match_forecast_events_after_datum_unit_conversion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs_path, forecast_path, pair_path, out_path = [root / n for n in (
+                "observations.csv", "forecasts.csv", "pairing.csv", "comparison.csv"
+            )]
+            observations = [
+                {"station_id": "S1", "valid_time": f"2026-11-09T{hour:02d}:00:00+08:00", "TideHeight": str(height)}
+                for hour, height in [(0, 0.2), (1, 0.5), (2, 0.3), (3, -0.2), (4, -0.5), (5, -0.1)]
+            ]
+            forecasts = [
+                {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_chart_datum_cm": "45"},
+                {"location_id": "L1", "valid_time": "2026-11-09T03:30:00+08:00", "tide": "乾潮", "height_above_chart_datum_cm": "-45"},
+            ]
+            pairings = [{
+                "station_id": "S1", "station_name": "測試潮位站",
+                "location_id": "L1", "location_name": "測試預報地點",
+                "region_id": "yilan_suao", "distance_m": "100", "matching_status": "matched"
+            }]
+            for path, rows in [(obs_path, observations), (forecast_path, forecasts), (pair_path, pairings)]:
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    w = csv.DictWriter(f, fieldnames=list(rows[0]))
+                    w.writeheader()
+                    w.writerows(rows)
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "compare_cwa_tide_observed_forecast.py"),
+                "--observations", str(obs_path), "--forecasts", str(forecast_path),
+                "--pairing", str(pair_path), "--out", str(out_path),
+                "--max-delta-minutes", "120"
+            ], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with out_path.open(encoding="utf-8-sig", newline="") as f:
+                matches = list(csv.DictReader(f))
+            self.assertEqual(len(matches), 2)
+            self.assertEqual(matches[0]["forecast_above_chart_datum_m"], "0.45")
+            self.assertAlmostEqual(float(matches[0]["height_error_observed_minus_forecast_m"]), 0.05, places=3)
+            summary = json.loads(out_path.with_name("tide_forecast_observation_comparison_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["matched_event_count"], 2)
+            self.assertEqual(summary["stations"][0]["observation_sampling_interval_median_minutes"], 60.0)
+
+    def test_pairing_over_500m_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs, fc, pair, out = [root / n for n in ("o.csv", "f.csv", "p.csv", "out.csv")]
+            for path, row in [
+                (obs, {"station_id": "S1", "valid_time": "2026-11-09T00:00:00+08:00", "TideHeight": "0"}),
+                (fc, {"location_id": "L1", "valid_time": "2026-11-09T00:00:00+08:00", "tide": "滿潮", "height_above_chart_datum_cm": "0"}),
+                (pair, {"station_id": "S1", "station_name": "S", "location_id": "L1", "location_name": "L", "region_id": "yilan_suao", "distance_m": "501", "matching_status": "matched"}),
+            ]:
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    w = csv.DictWriter(f, fieldnames=list(row))
+                    w.writeheader()
+                    w.writerow(row)
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "compare_cwa_tide_observed_forecast.py"),
+                "--observations", str(obs), "--forecasts", str(fc),
+                "--pairing", str(pair), "--out", str(out)
+            ], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("distance <= 500 m", result.stderr)
+
+
 class MarineNormalizationTests(unittest.TestCase):
     def test_missing_sentinels_are_not_zero(self):
         for value in (None, "", "None", "null", "NaN", "N/A"):
