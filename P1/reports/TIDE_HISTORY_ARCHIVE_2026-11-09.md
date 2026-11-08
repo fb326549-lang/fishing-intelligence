@@ -4,8 +4,8 @@
 - Main branch remains unchanged.
 - Development branch: p1-foundation.
 - Persistent append-only storage branch: tide-history.
-- The first two history snapshots were successfully committed.
-- The latest CWA collection after adding concurrent-push retry is running: https://github.com/fb326549-lang/fishing-intelligence/actions/runs/42533737664
+- Three history snapshots were successfully committed; the latest archive write completed successfully.
+- Latest successful CWA collection with concurrent-push retry: https://github.com/fb326549-lang/fishing-intelligence/actions/runs/42533737664
 - Offline regression suite: 16 tests passed: https://github.com/fb326549-lang/fishing-intelligence/actions/runs/42533647202
 
 ## Storage design
@@ -21,15 +21,15 @@ All vertical height datums are stored separately. No conversion is performed dur
 
 ## First two successful snapshots
 Latest verified history summary at the time of this report:
-- Successful collection runs: 2
+- Successful collection runs: 3
 - Unique observed TideHeight records/revisions: 288
-- Forecast vintage event records: 4,668
+- Forecast vintage event records: 8,597
 - Matched mainland tide stations: 6
 - Matched verification forecast locations: 6
 - Archived six-region forecast locations: 32
 - Forecast events in each complete run: 3,929
-- New forecast vintage records in the second run: 3,929
-- New observed revisions in the second run: 0 (the rolling observation window overlapped the prior snapshot with unchanged values)
+- New forecast vintage records in the latest run: 3,929
+- New observed revisions in the latest run: 0 (the rolling observation window overlapped prior snapshots with unchanged values)
 
 History files:
 - data/observed_tides.jsonl
