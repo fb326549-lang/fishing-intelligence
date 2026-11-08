@@ -150,13 +150,13 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
                 for hour, height in [(0, 0.2), (1, 0.5), (2, 0.3), (3, -0.2), (4, -0.5), (5, -0.1)]
             ]
             forecasts = [
-                {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_chart_datum_cm": "45"},
-                {"location_id": "L1", "valid_time": "2026-11-09T03:30:00+08:00", "tide": "乾潮", "height_above_chart_datum_cm": "-45"},
+                {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "45"},
+                {"location_id": "L1", "valid_time": "2026-11-09T03:30:00+08:00", "tide": "乾潮", "height_above_twvd_cm": "-45"},
             ]
             pairings = [{
                 "station_id": "S1", "station_name": "測試潮位站",
                 "location_id": "L1", "location_name": "測試預報地點",
-                "region_id": "yilan_suao", "distance_m": "100", "matching_status": "matched"
+                "region_id": "yilan_suao", "distance_m": "100", "matching_status": "matched", "comparison_datum": "TWVD2001"
             }]
             for path, rows in [(obs_path, observations), (forecast_path, forecasts), (pair_path, pairings)]:
                 with path.open("w", encoding="utf-8-sig", newline="") as f:
@@ -173,7 +173,7 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
             with out_path.open(encoding="utf-8-sig", newline="") as f:
                 matches = list(csv.DictReader(f))
             self.assertEqual(len(matches), 2)
-            self.assertEqual(matches[0]["forecast_above_chart_datum_m"], "0.45")
+            self.assertEqual(matches[0]["forecast_above_twvd_m"], "0.45")
             self.assertAlmostEqual(float(matches[0]["height_error_observed_minus_forecast_m"]), 0.05, places=3)
             summary = json.loads(out_path.with_name("tide_forecast_observation_comparison_summary.json").read_text(encoding="utf-8"))
             self.assertEqual(summary["matched_event_count"], 2)
@@ -186,7 +186,7 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
             for path, row in [
                 (obs, {"station_id": "S1", "valid_time": "2026-11-09T00:00:00+08:00", "TideHeight": "0"}),
                 (fc, {"location_id": "L1", "valid_time": "2026-11-09T00:00:00+08:00", "tide": "滿潮", "height_above_chart_datum_cm": "0"}),
-                (pair, {"station_id": "S1", "station_name": "S", "location_id": "L1", "location_name": "L", "region_id": "yilan_suao", "distance_m": "501", "matching_status": "matched"}),
+                (pair, {"station_id": "S1", "station_name": "S", "location_id": "L1", "location_name": "L", "region_id": "yilan_suao", "distance_m": "501", "matching_status": "matched", "comparison_datum": "TWVD2001"}),
             ]:
                 with path.open("w", encoding="utf-8-sig", newline="") as f:
                     w = csv.DictWriter(f, fieldnames=list(row))
