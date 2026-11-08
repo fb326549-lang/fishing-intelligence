@@ -1,0 +1,11 @@
+station_id,station_name_zh,station_name_en,station_type,longitude,latitude,region_id,source_station_key,access_url,metadata_latest_date,coverage_role,verification_status,notes
+46708A,龜山島資料浮標,Turtle Island Buoy,FB,121.9256,24.8469,yilan_suao,Vector_CWB_FB_46708A,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_FB_46708A/data/,2026-08-10,offshore_context,metadata_list_verified,離蘇澳海岸有距離；作為外海背景參考，不等同蘇澳岸際浪況
+C4U01,蘇澳潮位站,Su'ao Tidal Station,TG,121.8669,24.5925,yilan_suao,Vector_CWB_TG_C4U01,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_TG_C4U01/data/,2026-08-10,local_tide_reference,metadata_list_verified,潮位參考站；不能提供完整浮標波浪資訊
+46699A,花蓮資料浮標,Hualien Buoy,FB,121.6325,24.0311,hualien_north,Vector_CWB_FB_46699A,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_FB_46699A/data/,2026-08-10,offshore_context,metadata_list_verified,作為花蓮近海背景參考；仍須測試各觀測變數實際可用性
+C4T01,花蓮潮位站,Hualien Tidal Station,TG,121.6236,23.9806,hualien_north,Vector_CWB_TG_C4T01,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_TG_C4T01/data/,2026-08-10,local_tide_reference,metadata_list_verified,潮位參考站；不可將潮位站當作浮標波浪站
+C4S02,成功潮位站,Chenggong Tidal Station,TG,121.3799,23.0972,chenggong_donghe,Vector_CWB_TG_C4S02,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_TG_C4S02/data/,2026-08-10,local_tide_reference,metadata_list_verified,潮位參考站；需確認可用觀測項目
+46761F,成功浮球式波浪站,Chenggong Wave Station,FB,121.4206,23.1332,chenggong_donghe,Vector_CWB_FB_46761F,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_FB_46761F/data/,2026-08-10,offshore_context,metadata_list_verified,浮球式波浪站；NODASS清單提供的座標與CWA範例座標略有差異，統一以NODASS站點清單值並保留來源
+C4S01,蘭嶼潮位站,Orchid Island Tidal Station,TG,121.5069,22.0581,taitung_south,Vector_CWB_TG_C4S01,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_TG_C4S01/data/,2026-08-10,regional_context,metadata_list_verified,離台東南段本島海岸有距離，只作區域背景參考，不代表本島近岸實測
+C6S94,蘭嶼資料浮標,Orchid Island Buoy,FB,121.5828,22.0753,taitung_south,Vector_CWB_FB_C6S94,https://nodass.namr.gov.tw/noapi/namr/v1/obs/Vector_CWB_FB_C6S94/data/,2026-08-10,regional_context,metadata_list_verified,離台東南段本島海岸有距離，只作區域背景參考
+,,,,,,,,"",,hualien_south,coverage_gap,not_verified,目前此清單未找到可直接代表花蓮南段的站點；不得借用花蓮站冒充當地觀測
+,,,,,,,,"",,fengbin_shitiping,coverage_gap,not_verified,目前此清單未找到可直接代表豐濱石梯坪的站點；需使用模型網格並標示解析度，或另查其他資料來源
