@@ -105,20 +105,20 @@ calculateFishing();
 }
 function calculateFishing(){
  const m=latest.marine||{},w=latest.weather||{},t=latest.tide,method=$('method').value;
- const parts=[];
+ const parts=[],num=v=>(v===null||v===undefined||v===''?NaN:Number(v));
  const add=(name,value,weight)=>{if(Number.isFinite(value))parts.push({name,score:Math.max(0,Math.min(100,value)),weight})};
  if(t){const p=t.progress;add('潮汐',50+50*(1-Math.abs(p-5)/5),.25)}
- const cv=Number(m.ocean_current_velocity);
+ const cv=num(m.ocean_current_velocity);
  if(Number.isFinite(cv)){const ideal=method==='船釣'?1.2:1.0;add('海流',Math.max(0,100-Math.abs(cv-ideal)*48),.20)}
- const wind=Number(w.wind_speed_10m);
+ const wind=num(w.wind_speed_10m);
  if(Number.isFinite(wind))add('風速',wind<=10?100:Math.max(0,100-(wind-10)*4.5),.18);
- const gust=Number(w.wind_gusts_10m);
+ const gust=num(w.wind_gusts_10m);
  if(Number.isFinite(gust))add('陣風',gust<=15?100:Math.max(0,100-(gust-15)*3),.08);
- const wave=Number(m.wave_height),waveLimit=['岸釣','堤防釣','磯釣','浮游磯釣'].includes(method)?1.5:2.2;
+ const wave=num(m.wave_height),waveLimit=['岸釣','堤防釣','磯釣','浮游磯釣'].includes(method)?1.5:2.2;
  if(Number.isFinite(wave))add('浪高',wave<=.5?100:Math.max(0,100-(wave-.5)*(75/waveLimit)),.18);
- const rain=Number(w.precipitation_probability);
+ const rain=num(w.precipitation_probability);
  if(Number.isFinite(rain))add('降雨',Math.max(0,100-rain*.8),.06);
- const pressure=Number(w.pressure_msl);
+ const pressure=num(w.pressure_msl);
  if(Number.isFinite(pressure))add('氣壓',Math.max(40,100-Math.abs(pressure-1013)*2),.05);
  if(parts.length<3){$('activity').textContent='資料不足';$('activityGrade').textContent='尚未評分';$('activityNote').textContent='目前可用的環境資料不足 3 項，請重新查詢或稍後再試。';$('activityBreakdown').textContent='已取得 '+parts.length+' 項可評分資料。';return}
  const totalWeight=parts.reduce((a,x)=>a+x.weight,0),score=Math.round(parts.reduce((a,x)=>a+x.score*x.weight,0)/totalWeight);
