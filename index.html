@@ -139,12 +139,12 @@ if(todayRange){
  const rank=sorted.filter(x=>x<=todayRange.range).length/Math.max(1,sorted.length);
  const grade=rank>=.67?'大潮':rank>=.34?'中潮':'小潮';
  $('tideRangeToday').textContent=todayRange.range.toFixed(1)+' cm';
- $('tideRangeGrade').textContent='今日判定：'+grade+'（依本測站本期預報潮差相對排名）';
- $('tideRangeExplain').textContent='今日滿潮與乾潮預報潮高差；本月預報比較 '+ranges.length+' 天。潮差越大代表潮位變化幅度越大，不等同實際流速。';
+ $('tideRangeGrade').textContent=grade;
+ $('tideRangeGrade').title='依本測站本期預報潮差相對排名；潮差不等同實際流速。';
 }else{
  $('tideRangeToday').textContent='資料不足';
- $('tideRangeGrade').textContent='目前無法判定大潮／中潮／小潮';
- $('tideRangeExplain').textContent='此測站今日缺少完整滿潮、乾潮潮高，請稍後重新查詢。';
+ $('tideRangeGrade').textContent='資料不足';
+ $('tideRangeGrade').title='此測站今日缺少完整滿潮、乾潮潮高，請稍後重新查詢。';
 }
 $('tideLevel').textContent=label+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm':'');
 let tideState=null;
