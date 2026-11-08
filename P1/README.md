@@ -51,3 +51,24 @@ The collector calls Open-Meteo Marine and Forecast endpoints for each configured
 - Duplicate requests are avoided by scheduled caching in the eventual backend.
 - No secrets or paid credentials are committed.
 - Nothing in this branch is merged to `main` until reviewed and tested.
+
+
+## CWA station inventory (metadata only)
+The official CWA dataset O-B0076-001 provides buoy/tide station IDs, names,
+coordinates, station types, area names, and observation-element status. Its
+metadata page states hourly updates and free access. The live feed may have
+different stations or statuses over time; never hardcode the seed CSV as the
+complete station inventory.
+
+Set the API token in the shell, then run:
+```powershell
+$env:CWA_AUTHORIZATION="YOUR_CWA_TOKEN"
+python collector/fetch_cwa_stations.py --out data/cwa_stations
+```
+The script preserves the raw JSON and exports a CSV. Review each station's
+`station_status` and `observed_properties` before mapping it to a fishing
+region. A station can exist but have no active transmission or no observation
+for a particular variable. Do not interpret status 0, 2, or blank as a valid
+measurement.
+
+Official dataset: https://opendata.cwa.gov.tw/dataset/forecast/O-B0076-001
