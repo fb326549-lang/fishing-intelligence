@@ -51,16 +51,25 @@ u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
 const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);
 const j=await r.json();
 if(j.success==='false'||j.status==='ERROR')throw Error(j.message||'中央氣象署回應錯誤');
-let locs=j.records?.TideForecasts?.Location||j.records?.tideForecasts?.location||[];
-if(!Array.isArray(locs))locs=[locs];
-if(!locs.length)throw Error('回傳資料中找不到潮汐預報地點，請確認 API 授權碼及資料集權限');
-const distance=(a,b)=>{const rad=x=>x*Math.PI/180,alat=Number(a.Latitude??a.latitude),alon=Number(a.Longitude??a.longitude),blat=Number(b.Latitude??b.latitude??b.lat),blon=Number(b.Longitude??b.longitude??b.lon),dl=rad(alat-blat),dn=rad(alon-blon),x=Math.sin(dl/2)**2+Math.cos(rad(blat))*Math.cos(rad(alat))*Math.sin(dn/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
-const station=locs.filter(x=>x&&(x.Latitude??x.latitude)!=null&&(x.Longitude??x.longitude)!=null).reduce((best,x)=>!best||distance(x,point)<distance(best,point)?x:best,null);
+// CWA JSON 的包裝層/大小寫可能因輸出格式而異，遞迴尋找真正的測站節點。
+const asArray=v=>v==null?[]:Array.isArray(v)?v:[v];
+const locations=[];
+const walk=(node,depth=0)=>{
+ if(!node||typeof node!=='object'||depth>12)return;
+ if((node.Latitude??node.latitude)!=null&&(node.Longitude??node.longitude)!=null&&(node.TimePeriods||node.timePeriods))locations.push(node);
+ if(Array.isArray(node)){node.forEach(v=>walk(v,depth+1));return}
+ Object.values(node).forEach(v=>walk(v,depth+1));
+};
+walk(j);
+const locs=locations;
+if(!locs.length)throw Error('API 已回應，但 JSON 結構中找不到含座標與潮汐時段的測站；請確認資料集 F-A0021-001 回傳格式。');
+const distance=(a,b)=>{const rad=x=>x*Math.PI/180,alat=Number(a.Latitude??a.latitude),alon=Number(a.Longitude??a.longitude),blat=Number(b.lat),blon=Number(b.lon),dl=rad(alat-blat),dn=rad(alon-blon),x=Math.sin(dl/2)**2+Math.cos(rad(blat))*Math.cos(rad(alat))*Math.sin(dn/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
+const station=locs.reduce((best,x)=>!best||distance(x,point)<distance(best,point)?x:best,null);
 if(!station)throw Error('官方資料沒有可配對的測站座標');
-let daily=station.TimePeriods?.Daily||station.timePeriods?.daily||[];
-if(!Array.isArray(daily))daily=[daily];
+const periods=station.TimePeriods||station.timePeriods||{};
+let daily=asArray(periods.Daily||periods.daily);
 const events=[];
-daily.forEach(d=>(d.Time||d.time||[]).forEach(t=>events.push({date:t.DateTime||t.dateTime,tide:t.Tide||t.tide,height:t.TideHeights?.AboveLocalMSL??t.TideHeights?.AboveChartDatum??t.tideHeights?.AboveLocalMSL??t.tideHeights?.AboveChartDatum})));
+daily.forEach(d=>asArray(d.Time||d.time).forEach(t=>events.push({date:t.DateTime||t.dateTime,tide:t.Tide||t.tide,height:t.TideHeights?.AboveLocalMSL??t.TideHeights?.AboveChartDatum??t.tideHeights?.AboveLocalMSL??t.tideHeights?.AboveChartDatum})));
 const now=Date.now(),future=events.filter(e=>e.date&&new Date(e.date).getTime()>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
 const past=events.filter(e=>e.date&&new Date(e.date).getTime()<now).sort((a,b)=>new Date(b.date)-new Date(a.date));
 if(!future.length)throw Error('最近測站沒有未來潮汐資料');
