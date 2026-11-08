@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Collect Open-Meteo marine + atmospheric forecasts for six planning regions.
+"""Collect independent Open-Meteo marine and atmospheric hourly forecasts.
 
-All records are model-derived, never CWA in-situ observations. Raw provider
-JSON is retained. Forecast timestamps are local Asia/Taipei when configured.
+All records are model-derived, never CWA in-situ observations. Marine and
+weather requests fail independently so one provider endpoint cannot suppress
+the other. Raw responses and per-product status are retained for audit.
 """
 from __future__ import annotations
 import argparse, csv, json, time
@@ -14,7 +15,8 @@ import requests
 MARINE_FIELDS = [
     "wave_height", "wave_direction", "wave_period", "wave_peak_period",
     "wind_wave_height", "wind_wave_direction", "wind_wave_period",
-    "swell_wave_height", "swell_wave_direction", "swell_wave_period",
+    "wind_wave_peak_period", "swell_wave_height", "swell_wave_direction",
+    "swell_wave_period", "swell_wave_peak_period",
     "sea_surface_temperature", "sea_level_height_msl",
     "ocean_current_velocity", "ocean_current_direction",
 ]
@@ -24,28 +26,30 @@ WEATHER_FIELDS = [
     "wind_direction_10m", "wind_gusts_10m", "cloud_cover",
 ]
 TIMEOUT = 45
-HEADERS = {"User-Agent": "FishingIntelligence-P1/0.2 (research; https://github.com/fb326549-lang/fishing-intelligence)"}
+HEADERS = {"User-Agent": "FishingIntelligence-P1/0.3 (research; https://github.com/fb326549-lang/fishing-intelligence)"}
 
 def request_json(session: requests.Session, url: str, params: dict[str, Any]) -> dict[str, Any]:
     response = session.get(url, params=params, timeout=TIMEOUT)
     response.raise_for_status()
     payload = response.json()
     if not isinstance(payload, dict) or payload.get("error"):
-        raise ValueError(f"Invalid provider response: {payload.get('reason', 'not a JSON object') if isinstance(payload, dict) else 'not an object'}")
-    if "hourly" not in payload:
-        raise ValueError("Provider response missing hourly data")
+        reason = payload.get("reason", "not a JSON object") if isinstance(payload, dict) else "not an object"
+        raise ValueError(f"Invalid provider response: {reason}")
+    hourly = payload.get("hourly")
+    if not isinstance(hourly, dict) or not isinstance(hourly.get("time"), list):
+        raise ValueError("Provider response missing hourly.time array")
     return payload
 
 def normalize_hourly(location: dict[str, Any], payload: dict[str, Any], fetched_at: str,
                      source: str, kind: str) -> list[dict[str, Any]]:
     hourly = payload["hourly"]
-    times = hourly.get("time") or []
+    times = hourly["time"]
     units = payload.get("hourly_units") or {}
     rows = []
     for variable, values in hourly.items():
-        if variable == "time" or not isinstance(values, list):
+        if variable == "time":
             continue
-        if len(values) != len(times):
+        if not isinstance(values, list) or len(values) != len(times):
             raise ValueError(f"{location['id']} {variable}: time/value length mismatch")
         for valid_time, value in zip(times, values):
             rows.append({
@@ -56,77 +60,121 @@ def normalize_hourly(location: dict[str, Any], payload: dict[str, Any], fetched_
                 "valid_time": valid_time, "fetched_at": fetched_at,
                 "source": source, "data_kind": kind,
                 "quality_status": "missing" if value is None else "unchecked",
-                "model_or_provider": "Open-Meteo Best Match",
+                "model_selection": "Best Match",
+                "generationtime_ms": payload.get("generationtime_ms"),
             })
     return rows
 
+def save_json(path: Path, payload: dict[str, Any]) -> None:
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
 def main() -> int:
-    p = argparse.ArgumentParser()
-    p.add_argument("--config", required=True)
-    p.add_argument("--out", default="output/open_meteo")
-    p.add_argument("--delay", type=float, default=1.0)
-    a = p.parse_args()
-    config = json.loads(Path(a.config).read_text(encoding="utf-8"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", required=True)
+    parser.add_argument("--out", default="output/open_meteo")
+    parser.add_argument("--delay", type=float, default=1.0)
+    args = parser.parse_args()
+    config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     locations = config.get("locations", [])
     if not locations:
         raise SystemExit("Config contains no locations")
+
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     fetched_at = datetime.now(timezone.utc).isoformat()
-    folder = Path(a.out) / run_id
+    folder = Path(args.out) / run_id
     folder.mkdir(parents=True, exist_ok=True)
     session = requests.Session()
     session.headers.update(HEADERS)
     rows: list[dict[str, Any]] = []
-    manifest: dict[str, Any] = {
-        "run_id": run_id, "fetched_at": fetched_at,
-        "provider": "Open-Meteo", "data_kind": "forecast/modelled",
-        "attribution": "Open-Meteo; underlying marine/weather model providers vary by variable and model selection.",
-        "documentation": "https://open-meteo.com/en/docs/marine-weather-api",
+    manifest = {
+        "run_id": run_id, "fetched_at": fetched_at, "provider": "Open-Meteo",
+        "data_kind": "forecast/modelled",
+        "attribution": "Open-Meteo and the underlying model providers; see https://open-meteo.com/en/docs/marine-weather-api",
         "locations": [],
     }
+
     for location in locations:
         lat, lon = float(location["latitude"]), float(location["longitude"])
-        common = {"latitude": lat, "longitude": lon,
-                  "timezone": config.get("timezone", "Asia/Taipei"),
-                  "forecast_days": int(config.get("forecast_days", 2)),
-                  "wind_speed_unit": "ms", "timeformat": "iso8601"}
-        entry = {"id": location["id"], "name": location["name"], "status": "ok"}
+        common = {
+            "latitude": lat, "longitude": lon,
+            "timezone": config.get("timezone", "Asia/Taipei"),
+            "forecast_days": int(config.get("forecast_days", 2)),
+            "wind_speed_unit": "ms", "timeformat": "iso8601",
+        }
+        entry: dict[str, Any] = {
+            "id": location["id"], "name": location["name"],
+            "marine": {"status": "not_attempted"},
+            "weather": {"status": "not_attempted"},
+        }
+
+        # Marine forecast is independent from atmospheric forecast.
         try:
-            marine_params = {**common, "hourly": ",".join(MARINE_FIELDS),
-                             "cell_selection": "sea"}
+            marine_params = {
+                **common, "hourly": ",".join(MARINE_FIELDS),
+                "cell_selection": "sea",
+            }
             marine = request_json(session, config["marine_base_url"], marine_params)
-            (folder / f"{location['id']}_marine_raw.json").write_text(
-                json.dumps(marine, ensure_ascii=False, indent=2), encoding="utf-8")
-            rows.extend(normalize_hourly(location, marine, fetched_at,
-                                         "open-meteo-marine", "modelled"))
-            entry["marine_grid"] = {"latitude": marine.get("latitude"), "longitude": marine.get("longitude")}
-            entry["marine_hourly_variables"] = list((marine.get("hourly") or {}).keys())
-            time.sleep(max(0.0, a.delay))
+            save_json(folder / f"{location['id']}_marine_raw.json", marine)
+            rows.extend(normalize_hourly(
+                location, marine, fetched_at, "open-meteo-marine", "modelled"
+            ))
+            entry["marine"] = {
+                "status": "success",
+                "grid": {"latitude": marine.get("latitude"), "longitude": marine.get("longitude")},
+                "variables": list(marine["hourly"].keys()),
+                "units": marine.get("hourly_units", {}),
+                "hour_count": len(marine["hourly"]["time"]),
+            }
+        except Exception as exc:
+            entry["marine"] = {"status": "error", "error": str(exc)}
+        time.sleep(max(0.0, args.delay))
+
+        # Atmospheric forecast still runs even when marine request failed.
+        try:
             weather_params = {**common, "hourly": ",".join(WEATHER_FIELDS)}
             weather = request_json(session, config["forecast_base_url"], weather_params)
-            (folder / f"{location['id']}_weather_raw.json").write_text(
-                json.dumps(weather, ensure_ascii=False, indent=2), encoding="utf-8")
-            rows.extend(normalize_hourly(location, weather, fetched_at,
-                                         "open-meteo-forecast", "forecast"))
-            entry["weather_grid"] = {"latitude": weather.get("latitude"), "longitude": weather.get("longitude")}
-            entry["weather_hourly_variables"] = list((weather.get("hourly") or {}).keys())
+            save_json(folder / f"{location['id']}_weather_raw.json", weather)
+            rows.extend(normalize_hourly(
+                location, weather, fetched_at, "open-meteo-forecast", "forecast"
+            ))
+            entry["weather"] = {
+                "status": "success",
+                "grid": {"latitude": weather.get("latitude"), "longitude": weather.get("longitude")},
+                "variables": list(weather["hourly"].keys()),
+                "units": weather.get("hourly_units", {}),
+                "hour_count": len(weather["hourly"]["time"]),
+            }
         except Exception as exc:
-            entry["status"] = "error"
-            entry["error"] = str(exc)
+            entry["weather"] = {"status": "error", "error": str(exc)}
+
+        entry["status"] = (
+            "success" if entry["marine"]["status"] == "success" and entry["weather"]["status"] == "success"
+            else "partial" if entry["marine"]["status"] == "success" or entry["weather"]["status"] == "success"
+            else "error"
+        )
         manifest["locations"].append(entry)
-        time.sleep(max(0.0, a.delay))
+        time.sleep(max(0.0, args.delay))
+
     if rows:
-        fields = list(dict.fromkeys(k for row in rows for k in row))
-        with (folder / "environmental_forecast.csv").open("w", encoding="utf-8-sig", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
+        fields = list(dict.fromkeys(key for row in rows for key in row))
+        with (folder / "environmental_forecast.csv").open("w", encoding="utf-8-sig", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fields)
             writer.writeheader()
             writer.writerows(rows)
+
     manifest["normalized_rows"] = len(rows)
-    manifest["successful_locations"] = sum(x["status"] == "ok" for x in manifest["locations"])
-    (folder / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Run {run_id}: {manifest['successful_locations']}/{len(locations)} locations; {len(rows)} normalized rows")
+    manifest["successful_locations"] = sum(item["status"] == "success" for item in manifest["locations"])
+    manifest["partial_locations"] = sum(item["status"] == "partial" for item in manifest["locations"])
+    manifest["failed_locations"] = sum(item["status"] == "error" for item in manifest["locations"])
+    manifest["marine_successes"] = sum(item["marine"]["status"] == "success" for item in manifest["locations"])
+    manifest["weather_successes"] = sum(item["weather"]["status"] == "success" for item in manifest["locations"])
+    save_json(folder / "manifest.json", manifest)
+
+    print(f"Run {run_id}: rows={len(rows)}")
+    print(f"Locations full={manifest['successful_locations']}, partial={manifest['partial_locations']}, failed={manifest['failed_locations']}")
+    print(f"Marine success={manifest['marine_successes']}/{len(locations)}; weather success={manifest['weather_successes']}/{len(locations)}")
     print("All Open-Meteo records are forecast/modelled data, not in-situ observations.")
-    return 0 if manifest["successful_locations"] == len(locations) else 1
+    return 0 if manifest["failed_locations"] == 0 else 1
 
 if __name__ == "__main__":
     raise SystemExit(main())
