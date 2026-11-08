@@ -13,15 +13,15 @@ import requests
 
 ENDPOINT = "https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-B0076-001"
 
-def find_station_nodes(obj: Any):
+def find_location_nodes(obj: Any):
     if isinstance(obj, dict):
-        if "StationID" in obj and ("StationName" in obj or "StationNameEN" in obj):
+        if isinstance(obj.get("Station"), dict):
             yield obj
         for value in obj.values():
-            yield from find_station_nodes(value)
+            yield from find_location_nodes(value)
     elif isinstance(obj, list):
         for value in obj:
-            yield from find_station_nodes(value)
+            yield from find_location_nodes(value)
 
 def find_status_node(obj: Any):
     if isinstance(obj, dict):
@@ -76,12 +76,11 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     (out / "O-B0076-001_raw.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    status_nodes = list(find_status_node(payload))
     rows = []
-    for station in find_station_nodes(payload):
-        sid = station.get("StationID")
-        related = next((x for x in status_nodes if x.get("StationID") == sid), None)
-        rows.append(flatten_station(station, related))
+    for location in find_location_nodes(payload):
+        station = location["Station"]
+        status = location.get("StationObsStatus")
+        rows.append(flatten_station(station, status))
     # Deduplicate station records by station ID, preserving first occurrence.
     unique = {row["station_id"]: row for row in rows if row["station_id"]}
     rows = sorted(unique.values(), key=lambda x: (x["county"] or "", x["station_name"] or ""))
