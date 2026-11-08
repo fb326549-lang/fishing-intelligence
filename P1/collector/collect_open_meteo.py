@@ -128,7 +128,7 @@ def main() -> int:
             all_rows += normalize_current(location["id"], marine, fetched_at,
                                           "open-meteo-marine",)
             all_rows += normalize_hourly(location["id"], marine, fetched_at,
-                                          "open-meteo-marine", "forecast_or_model")
+                                          "open-meteo-marine", "modelled")
             all_rows += normalize_current(location["id"], weather, fetched_at,
                                           "open-meteo-forecast")
             all_rows += normalize_hourly(location["id"], weather, fetched_at,
