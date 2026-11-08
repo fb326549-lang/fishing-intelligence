@@ -219,9 +219,9 @@ class CwaTideHistoryAnalysisTests(unittest.TestCase):
                 {"snapshot_id": "late", "location_id": "10002040", "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "80", "forecast_fetched_at_utc": "2026-11-09T02:00:00+00:00"},
             ]
             (history / "observed_tides.jsonl").write_text(
-                "".join(json.dumps(row, ensure_ascii=False) + "\\n" for row in observations), encoding="utf-8")
+                "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in observations), encoding="utf-8")
             (history / "forecast_vintages.jsonl").write_text(
-                "".join(json.dumps(row, ensure_ascii=False) + "\\n" for row in forecasts), encoding="utf-8")
+                "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in forecasts), encoding="utf-8")
             result = subprocess.run([
                 sys.executable, str(COLLECTOR / "analyze_cwa_tide_forecast_history.py"),
                 "--history-dir", str(history), "--out-dir", str(out)
@@ -306,7 +306,7 @@ class CwaTideHistoryArchiveTests(unittest.TestCase):
             root = Path(tmp)
             obs, fc, pair, history = [root / n for n in ("obs.csv", "fc.csv", "pair.csv", "history")]
             history.mkdir()
-            (history / "observed_tides.jsonl").write_text("{bad json\\n", encoding="utf-8")
+            (history / "observed_tides.jsonl").write_text("{bad json\n", encoding="utf-8")
             for path, row in [
                 (obs, {"station_id": "S1", "valid_time": "t", "TideHeight": "1"}),
                 (fc, {"location_id": "L1", "region_id": "taitung_south", "valid_time": "t", "tide": "滿潮"}),
