@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Aggregate CWA in-situ marine observations into six East Taiwan planning regions."""
-import argparse, csv, json
+import argparse, csv, json, math
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,6 +10,7 @@ REGIONS = {
     "hualien_south": "花蓮南段", "fengbin_shitiping": "豐濱、石梯坪",
     "chenggong_donghe": "成功、東河", "taitung_south": "台東南段",
 }
+DIRECTION_VARIABLES = {"wave_direction_deg", "wind_direction_deg", "current_direction_deg"}
 VARIABLES = {
     "wave_height_m": ("WaveHeight", "m", "浪高"),
     "wave_period_s": ("WavePeriod", "s", "浪週期"),
@@ -34,6 +35,18 @@ def num(value):
         return float(value)
     except (TypeError, ValueError):
         return None
+
+def mean_value(name, values):
+    if not values:
+        return None
+    if name in DIRECTION_VARIABLES:
+        radians = [math.radians(v) for v in values]
+        x = sum(math.cos(v) for v in radians) / len(radians)
+        y = sum(math.sin(v) for v in radians) / len(radians)
+        if abs(x) < 1e-12 and abs(y) < 1e-12:
+            return None
+        return round((math.degrees(math.atan2(y, x)) + 360) % 360, 1)
+    return round(sum(values) / len(values), 3)
 
 def main():
     p = argparse.ArgumentParser()
@@ -66,7 +79,7 @@ def main():
         r = {"region_id": region, "region_name": REGIONS[region], "valid_time": timestamp, "source": "CWA", "data_kind": "observed"}
         for name in VARIABLES:
             vals = values.get(name, [])
-            r[name] = round(sum(vals)/len(vals), 3) if vals else None
+            r[name] = mean_value(name, vals)
             r[name+"_sample_count"] = len(vals)
         series.append(r)
     fields = list(dict.fromkeys(k for r in series for k in r))
@@ -102,7 +115,7 @@ def main():
         "Missing values remain null; no zero-fill or interpolation.",
         "Coverage is station-based and variable-specific, not a guarantee of full spatial coverage.",
         "Latest available observation is not a forecast.",
-        "Wave direction is arithmetically averaged here; use circular statistics before directional interpretation.",
+        "Direction values use circular means; direction is undefined when vector components cancel.",
         "No fishing score or species activity is inferred."]}
     (outdir/"east_region_summary.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
     print("Input rows:",len(observations),"mapped stations:",len(report["mapped_station_ids"]),"unmapped IDs:",len(unmapped))
