@@ -110,7 +110,9 @@ def score_snapshot(forecasts, extrema, max_delta_minutes, pair, snapshot_id):
         if ft is None or issue is None or kind is None or height_cm is None:
             continue
         lead_hours = (ft - issue).total_seconds() / 3600
-        # Never score a forecast issued at/after its target event.
+        # Never score a forecast issued at or after its target event.
+        if lead_hours <= 0:
+            continue
         bucket = lead_bucket(lead_hours)
         if bucket is None:
             continue
