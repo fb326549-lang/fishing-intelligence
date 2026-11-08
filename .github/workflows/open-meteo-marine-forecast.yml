@@ -2,6 +2,12 @@ name: Open-Meteo marine forecast
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - p1-foundation
+    paths:
+      - 'P1/collector/**'
+      - '.github/workflows/open-meteo-marine-forecast.yml'
 
 permissions:
   contents: read
