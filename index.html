@@ -1,1 +1,63 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fishing Intelligence</title></head><body><h1>Fishing Intelligence｜智慧海釣助手</h1><p>GitHub 寫入權限測試成功。</p></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08283d"><title>Fishing Intelligence｜智慧海釣助手</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{color-scheme:dark;--bg:#071c2b;--panel:#102f43;--line:#28516a;--text:#edf7fc;--muted:#9bb7c8;--accent:#55c8e8}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#08283d,#061724);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{position:sticky;top:0;background:#08283df2;padding:14px 16px;border-bottom:1px solid var(--line);z-index:1000}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.brand{font-weight:800;letter-spacing:.4px}.sub,.small,.status{font-size:12px;color:var(--muted)}
+main{max-width:1000px;margin:auto;padding:14px;display:grid;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;min-width:0}.panel h2{font-size:16px;margin:0 0 12px}
+button,input,select{background:#19465e;color:var(--text);border:1px solid #39718d;border-radius:10px;padding:11px;font-size:14px}button{cursor:pointer}button:active{opacity:.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#163b51;border-radius:10px;padding:12px;min-width:0}.label{font-size:11px;color:var(--muted)}.value{font-size:21px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#map{height:330px;border-radius:12px;z-index:1}.wide{grid-column:1/-1}#settings{display:none}#settings.show{display:block}label{display:block;font-size:12px;color:var(--muted);margin-top:9px}input,select{width:100%;margin-top:5px}.notice{font-size:11px;line-height:1.5;color:var(--muted);background:#0a2333;padding:10px;border-radius:9px;margin-top:10px}.tag{display:inline-block;border:1px solid #39718d;border-radius:99px;padding:4px 8px;font-size:11px;color:#b9eafa}
+@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
+</style></head>
+<body>
+<header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">台灣海域優先・智慧海釣助手</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
+<main>
+<section class="panel wide"><div class="row"><h2>📍 選擇釣點</h2><span id="coords" class="small">尚未選點</span></div><div id="map"></div><div class="tools"><button id="gps">◎ 目前位置</button><button id="taiwan">回到台灣</button><button id="refresh">重新查詢</button></div><div id="pointStatus" class="status">點擊地圖選擇海域，或使用目前位置。</div></section>
+<section class="panel"><h2>🌊 海洋環境</h2><div class="grid"><div class="metric"><div class="label">海表溫度</div><div class="value" id="sst">—</div></div><div class="metric"><div class="label">海流速度</div><div class="value" id="current">—</div></div><div class="metric"><div class="label">浪高</div><div class="value" id="wave">—</div></div><div class="metric"><div class="label">浪週期</div><div class="value" id="period">—</div></div></div><div id="marineStatus" class="status">選擇釣點後查詢</div></section>
+<section class="panel"><h2>🌬️ 天氣與風況</h2><div class="grid"><div class="metric"><div class="label">風速</div><div class="value" id="wind">—</div></div><div class="metric"><div class="label">陣風</div><div class="value" id="gust">—</div></div><div class="metric"><div class="label">氣壓</div><div class="value" id="pressure">—</div></div><div class="metric"><div class="label">降雨機率</div><div class="value" id="rain">—</div></div></div><div id="weatherStatus" class="status">選擇釣點後查詢</div></section>
+<section class="panel"><h2>🐟 魚種活躍度</h2><div style="font-size:24px;font-weight:800" id="activity">尚未評估</div><p class="small" id="activityNote">目前先呈現實際取得的環境資料。分魚種活躍度尚未啟用；需整合潮汐、季節魚種分布、棲地與底質資料後才計算，避免以猜測值冒充預測。</p><label>釣法</label><select id="method"><option>不限釣法</option><option>岸釣</option><option>磯釣</option><option>堤防釣</option><option>船釣</option><option>路亞</option><option>沉底</option><option>浮游磯釣</option></select></section>
+<section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">目前潮位</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">漲退潮</div><div class="value" id="tidePhase">待串接</div></div></div><p class="small">下一階段整合中央氣象署潮汐預報與觀測站資料，依選點匹配鄰近測站；目前不以推估值代替官方潮汐資料。</p></section>
+<section class="panel"><h2>📡 資料來源與更新</h2><div class="small">海洋預報：Open-Meteo Marine；天氣預報：Open-Meteo Forecast。海底水深、底質、魚種分布及正式潮汐資料列入後續階段。</div><div id="updated" class="status">尚未查詢</div><div class="notice">海洋模式在近岸、港灣及複雜地形可能有誤差。出海前請另確認中央氣象署海象、海上警報及航安資訊，不可將本工具作為唯一安全依據。</div></section>
+<section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>潮汐 API 網址（下一階段啟用）<input id="tideUrl" autocomplete="url"></label><label>潮汐 API 授權碼（如資料源需要）<input id="tideKey" type="password" autocomplete="off"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">API 網址可在這裡修改，不必直接改程式碼。授權碼目前只存於本機瀏覽器；正式公開多人使用前，應改由安全後端保管私密金鑰。不同 API 若資料格式不同，仍需同步調整資料轉換方式。</div></section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'',tideKey:''},KEY='fishing_intelligence_config_v1';
+let point={lat:23.7,lon:121},pin=null;
+const map=L.map('map').setView([23.7,121],7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+function config(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}}
+function fillSettings(){const c=config();Object.keys(c).forEach(k=>$(k).value=c[k]||'')}
+function saveSettings(){const c={};Object.keys(defaults).forEach(k=>c[k]=$(k).value.trim());try{new URL(c.marineUrl);new URL(c.weatherUrl);if(c.tideUrl)new URL(c.tideUrl)}catch{$('configStatus').textContent='網址格式錯誤，請檢查後再儲存。';return false}localStorage.setItem(KEY,JSON.stringify(c));$('configStatus').textContent='設定已儲存；下次查詢將使用新設定。';return true}
+function choose(lat,lon){point={lat,lon};if(pin)pin.setLatLng([lat,lon]);else pin=L.marker([lat,lon]).addTo(map);$('coords').textContent=lat.toFixed(4)+', '+lon.toFixed(4);$('pointStatus').textContent='已選定座標，正在更新環境資料…';loadData()}
+map.on('click',e=>choose(e.latlng.lat,e.latlng.lng));
+$('gps').onclick=()=>{if(!navigator.geolocation){alert('此瀏覽器不支援定位');return}navigator.geolocation.getCurrentPosition(pos=>{map.setView([pos.coords.latitude,pos.coords.longitude],12);choose(pos.coords.latitude,pos.coords.longitude)},()=>alert('定位失敗，請確認 Safari 已允許定位，並使用 HTTPS。'))};
+$('taiwan').onclick=()=>map.setView([23.7,121],7);$('refresh').onclick=loadData;
+$('settingsBtn').onclick=()=>{$('settings').classList.toggle('show');if($('settings').classList.contains('show')){$('settings').scrollIntoView({behavior:'smooth'});fillSettings()}};
+$('save').onclick=saveSettings;$('restore').onclick=()=>{localStorage.removeItem(KEY);fillSettings();$('configStatus').textContent='已還原預設 API 設定。'};
+$('test').onclick=async()=>{if(!saveSettings())return;const c=config(),u=new URL(c.marineUrl);u.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature',forecast_days:'1'});try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);await r.json();$('configStatus').textContent='海洋 API 連線成功。'}catch(e){$('configStatus').textContent='連線失敗：'+e.message+'。可能是網路、CORS 或服務限制。'}};
+async function loadData(){const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
+const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,wave_height,wave_period',forecast_days:'2',timezone:'Asia/Taipei'});
+const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl',hourly:'precipitation_probability',forecast_days:'2',timezone:'Asia/Taipei'});
+const [mr,wr]=await Promise.all([fetch(mu),fetch(wu)]);if(!mr.ok)throw Error('Marine API HTTP '+mr.status);if(!wr.ok)throw Error('Weather API HTTP '+wr.status);
+const [m,w]=await Promise.all([mr.json(),wr.json()]),a=m.current||{},b=w.current||{};
+$('sst').textContent=a.sea_surface_temperature==null?'無資料':a.sea_surface_temperature+' °C';
+$('current').textContent=a.ocean_current_velocity==null?'無資料':a.ocean_current_velocity+' km/h';
+$('wave').textContent=a.wave_height==null?'無資料':a.wave_height+' m';
+$('period').textContent=a.wave_period==null?'無資料':a.wave_period+' 秒';
+$('wind').textContent=b.wind_speed_10m==null?'無資料':b.wind_speed_10m+' km/h';
+$('gust').textContent=b.wind_gusts_10m==null?'無資料':b.wind_gusts_10m+' km/h';
+$('pressure').textContent=b.pressure_msl==null?'無資料':b.pressure_msl+' hPa';
+const h=w.hourly||{},now=new Date(),idx=(h.time||[]).findIndex(t=>new Date(t)>=now);
+$('rain').textContent=idx>=0&&h.precipitation_probability?.[idx]!=null?h.precipitation_probability[idx]+'%':'無資料';
+$('marineStatus').textContent='海洋預報已取得；近岸網格可能有偏差。';$('weatherStatus').textContent='天氣預報已取得。';$('pointStatus').textContent='資料更新完成。';
+$('updated').textContent='資料時間：'+(b.time||a.time||'未知')+'；查詢時間：'+new Date().toLocaleString('zh-TW',{timeZone:'Asia/Taipei'});
+}catch(e){$('marineStatus').textContent='查詢失敗：'+e.message;$('weatherStatus').textContent='請檢查網路或 API 設定。';$('pointStatus').textContent='資料未完整取得，請稍後重試。'}}
+fillSettings();
+})();
+</script></body></html>
