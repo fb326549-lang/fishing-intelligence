@@ -282,7 +282,6 @@ function calculateFishing(){
  const humidity=num(w.relative_humidity_2m);if(Number.isFinite(humidity))add('濕度',humidity>=45&&humidity<=85?90:Math.max(45,90-Math.abs(humidity-65)*.8),.035);
  const cloud=num(w.cloud_cover);if(Number.isFinite(cloud))add('雲量',cloud<=80?88:Math.max(50,88-(cloud-80)*1.2),.025);
  const period=num(m.wave_period);if(Number.isFinite(period))add('浪週期',period>=6&&period<=11?92:Math.max(55,92-Math.min(Math.abs(period-8),8)*5),.035);
- const direction=num(m.ocean_current_direction);if(Number.isFinite(direction))add('海流方向資料',75,.01);
  const hourly=latest.hourlyWeather||{},ht=hourly.time||[],hp=hourly.pressure_msl||[],nowIndex=ht.findIndex(x=>new Date(x)>=new Date());
  if(nowIndex>=0&&nowIndex+3<hp.length&&Number.isFinite(Number(hp[nowIndex]))&&Number.isFinite(Number(hp[nowIndex+3]))){const delta=Number(hp[nowIndex+3])-Number(hp[nowIndex]);add('氣壓變化',delta>=-1.5?90:Math.max(40,90-Math.abs(delta+1.5)*12),.04)}
  const moonAge=((Date.now()/86400000+2440587.5-2451550.1)%29.530588+29.530588)%29.530588;const moonScore=70+30*Math.cos((moonAge-14.765)*2*Math.PI/29.530588);add('月相參考',moonScore,.025);
