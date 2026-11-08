@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import requests
 
 DATASET_ID = "F-A0021-001"
 ENDPOINT = f"https://opendata.cwa.gov.tw/api/v1/rest/datastore/{DATASET_ID}"
@@ -109,6 +108,7 @@ def normalize(payload: dict, fetched_at: str) -> list[dict]:
 
 
 def main() -> None:
+    import requests
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="output/cwa_tides")
     args = parser.parse_args()
