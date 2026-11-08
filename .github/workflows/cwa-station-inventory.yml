@@ -17,6 +17,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: cwa-tide-history-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   fetch-stations:
     runs-on: ubuntu-latest
@@ -63,10 +67,25 @@ jobs:
         run: |
           git -C tide-history config user.name "github-actions[bot]"
           git -C tide-history config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SNAPSHOT_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          COLLECTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git -C tide-history add data/
           if ! git -C tide-history diff --cached --quiet; then
             git -C tide-history commit -m "Archive CWA tide snapshot ${GITHUB_RUN_ID}"
-            git -C tide-history push origin HEAD:tide-history
+            pushed=0
+            for attempt in 1 2 3; do
+              if git -C tide-history push origin HEAD:tide-history; then
+                pushed=1
+                break
+              fi
+              echo "History branch moved during upload; refreshing and rebuilding append-only snapshot (attempt ${attempt})."
+              git -C tide-history fetch origin tide-history
+              git -C tide-history reset --hard origin/tide-history
+              python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --history-dir tide-history/data --snapshot-id "${SNAPSHOT_ID}" --collected-at "${COLLECTED_AT}"
+              git -C tide-history add data/
+              git -C tide-history commit -m "Archive CWA tide snapshot ${GITHUB_RUN_ID}"
+            done
+            test "$pushed" -eq 1
           else
             echo "No new tide history records to archive."
           fi
