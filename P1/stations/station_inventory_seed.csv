@@ -1,2 +1,2 @@
-station_id,station_name,station_name_en,longitude,latitude,station_type,provider,dataset_code,region_id,observation_status,verification_note
-46761F,成功浮球式波浪站,Chenggong Wave Station,121.4201,23.1325,波浪浮標,中央氣象署,O-MMC-0001,chenggong_donghe,metadata_sample_seen,官方即時海況資料範例含此站座標；正式啟用前仍須用最新測站清單及即時回傳狀態再次確認
+station_id,station_name,station_name_en,longitude,latitude,station_type,provider,dataset_code,region_id,station_status,available_variables,variable_status,verification_status,verification_note
+46761F,成功浮球式波浪站,Chenggong Wave Station,121.4201,23.1325,浮球站,中央氣象署,O-B0076-001;O-MMC-0001,chenggong_donghe,1,WaveHeight;WaveDirection;WaveDirectionDescription;WavePeriod;SeaTemperature,1,official_metadata_sample,官方資料樣本顯示測站狀態為傳送，且上述五項觀測狀態為1；仍須以執行當下 API 回傳確認
