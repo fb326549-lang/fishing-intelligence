@@ -106,6 +106,7 @@ def main() -> int:
         marine_params = {
             **common, "current": ",".join(MARINE_FIELDS),
             "hourly": ",".join(MARINE_FIELDS),
+            "cell_selection": "sea",
             "forecast_days": int(config.get("forecast_days", 2))
         }
         weather_params = {
