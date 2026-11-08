@@ -185,7 +185,7 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
             obs, fc, pair, out = [root / n for n in ("o.csv", "f.csv", "p.csv", "out.csv")]
             for path, row in [
                 (obs, {"station_id": "S1", "valid_time": "2026-11-09T00:00:00+08:00", "TideHeight": "0"}),
-                (fc, {"location_id": "L1", "valid_time": "2026-11-09T00:00:00+08:00", "tide": "滿潮", "height_above_chart_datum_cm": "0"}),
+                (fc, {"location_id": "L1", "valid_time": "2026-11-09T00:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "0"}),
                 (pair, {"station_id": "S1", "station_name": "S", "location_id": "L1", "location_name": "L", "region_id": "yilan_suao", "distance_m": "501", "matching_status": "matched", "comparison_datum": "TWVD2001"}),
             ]:
                 with path.open("w", encoding="utf-8-sig", newline="") as f:
