@@ -48,9 +48,16 @@ def main():
                 flatten("",elements,row)
                 # Sea currents are nested by measurement layer; expose layer-1
                 # fields as separate columns while preserving the original JSON.
-                current_layers = elements.get("SeaCurrents",{}).get("Layer",[])
-                if isinstance(current_layers,dict): current_layers=[current_layers]
-                if isinstance(current_layers,list) and current_layers:
+                # flatten() serializes XML repeated elements as JSON text.
+                # Decode that representation here and expose the first layer
+                # while retaining the original SeaCurrents_Layer column.
+                raw_layers = row.get("SeaCurrents_Layer")
+                try:
+                    current_layers = json.loads(raw_layers) if isinstance(raw_layers, str) else []
+                except (TypeError, json.JSONDecodeError):
+                    current_layers = []
+                if isinstance(current_layers, dict): current_layers=[current_layers]
+                if isinstance(current_layers, list) and current_layers:
                     layer = current_layers[0]
                     for key in ("LayerNumber","CurrentDirection","CurrentDirectionDescription","CurrentSpeed","CurrentSpeedInKnots"):
                         if key in layer: row[f"SeaCurrent_{key}"]=layer[key]
