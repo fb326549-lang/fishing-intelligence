@@ -61,8 +61,32 @@ const walk=(node,depth=0)=>{
  Object.values(node).forEach(v=>walk(v,depth+1));
 };
 walk(j);
-const locs=locations;
-if(!locs.length)throw Error('API 已回應，但 JSON 結構中找不到含座標與潮汐時段的測站；請確認資料集 F-A0021-001 回傳格式。');
+let locs=locations;
+// 部分 CWA JSON 匯出會將每個滿/乾潮事件攤平成單筆紀錄，而非巢狀 TimePeriods。
+if(!locs.length){
+ const rows=[];
+ const collect=(node,depth=0)=>{
+  if(!node||typeof node!=='object'||depth>14)return;
+  if(Array.isArray(node)){node.forEach(v=>collect(v,depth+1));return}
+  const lat=node.Latitude??node.latitude,lon=node.Longitude??node.longitude;
+  const dt=node.DateTime??node.dateTime??node.datetime;
+  const tide=node.Tide??node.tide;
+  if(lat!=null&&lon!=null&&dt&&tide)rows.push(node);
+  Object.values(node).forEach(v=>collect(v,depth+1));
+ };
+ collect(j);
+ const grouped=new Map();
+ rows.forEach(row=>{
+  const id=String(row.LocationId??row.locationId??row.LocationName??row.locationName??(row.Latitude+','+row.Longitude));
+  if(!grouped.has(id))grouped.set(id,{LocationId:id,LocationName:row.LocationName??row.locationName,Latitude:row.Latitude??row.latitude,Longitude:row.Longitude??row.longitude,TimePeriods:{Daily:[]}});
+  const station=grouped.get(id),day=String(row.Date??row.date??String(row.DateTime??row.dateTime).slice(0,10));
+  let daily=station.TimePeriods.Daily.find(d=>d.Date===day);
+  if(!daily){daily={Date:day,Time:[]};station.TimePeriods.Daily.push(daily)}
+  daily.Time.push({DateTime:row.DateTime??row.dateTime??row.datetime,Tide:row.Tide??row.tide,TideHeights:{AboveLocalMSL:row.AboveLocalMSL??row.aboveLocalMSL,AboveChartDatum:row.AboveChartDatum??row.aboveChartDatum}});
+ });
+ locs=[...grouped.values()];
+}
+if(!locs.length)throw Error('API 已回應，但找不到可辨識的測站或潮汐事件。JSON 頂層欄位：'+Object.keys(j||{}).join(', ')+'；請確認授權資料集 F-A0021-001。');
 const distance=(a,b)=>{const rad=x=>x*Math.PI/180,alat=Number(a.Latitude??a.latitude),alon=Number(a.Longitude??a.longitude),blat=Number(b.lat),blon=Number(b.lon),dl=rad(alat-blat),dn=rad(alon-blon),x=Math.sin(dl/2)**2+Math.cos(rad(blat))*Math.cos(rad(alat))*Math.sin(dn/2)**2;return 6371*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
 const station=locs.reduce((best,x)=>!best||distance(x,point)<distance(best,point)?x:best,null);
 if(!station)throw Error('官方資料沒有可配對的測站座標');
