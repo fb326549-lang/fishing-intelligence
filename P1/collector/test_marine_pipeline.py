@@ -2,6 +2,10 @@
 """Fast offline regression tests for CWA marine parsing and regional math."""
 import sys
 import unittest
+import csv
+import json
+import subprocess
+import tempfile
 from pathlib import Path
 
 COLLECTOR = Path(__file__).resolve().parents[1] / "collector"
@@ -64,6 +68,70 @@ class CwaTideForecastTests(unittest.TestCase):
             normalize_tides({"success": "false"}, "test")
         with self.assertRaises(ValueError):
             normalize_tides({"Records": {}}, "test")
+
+
+
+class CwaRegionalTideBuilderTests(unittest.TestCase):
+    def run_builder(self, tide_rows, mapping_rows):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tide_path, map_path, out_path = root / "tides.csv", root / "mapping.csv", root / "regional.csv"
+            with tide_path.open("w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=list(tide_rows[0]))
+                w.writeheader()
+                w.writerows(tide_rows)
+            with map_path.open("w", encoding="utf-8-sig", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=list(mapping_rows[0]))
+                w.writeheader()
+                w.writerows(mapping_rows)
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "build_cwa_regional_tide_forecast.py"),
+                "--input", str(tide_path), "--mapping", str(map_path), "--out", str(out_path)
+            ], capture_output=True, text=True)
+            return result, out_path
+
+    def test_six_region_mapping_keeps_site_events_separate_and_excludes_islands(self):
+        tide_rows = [
+            {"location_id": "10002030", "location_name": "宜蘭縣蘇澳鎮", "valid_time": "2026-11-09T06:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "40"},
+            {"location_id": "10002030", "location_name": "宜蘭縣蘇澳鎮", "valid_time": "2026-11-09T12:00:00+08:00", "tide": "乾潮", "height_above_twvd_cm": "-20"},
+            {"location_id": "10014110", "location_name": "臺東縣綠島鄉", "valid_time": "2026-11-09T08:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "50"},
+            {"location_id": "999999", "location_name": "未對照地點", "valid_time": "2026-11-09T09:00:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "10"},
+        ]
+        base = {"latitude": "24.5925", "longitude": "121.8669", "mapping_basis": "official_CWA_location_id_and_coordinate", "notes": "test"}
+        mapping_rows = [
+            dict(base, location_id="10002030", location_name="宜蘭縣蘇澳鎮", region_id="yilan_suao", mapping_status="mapped"),
+            dict(base, location_id="10014110", location_name="臺東縣綠島鄉", region_id="", mapping_status="excluded_offshore_context"),
+        ]
+        result, out_path = self.run_builder(tide_rows, mapping_rows)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        with out_path.open(encoding="utf-8-sig", newline="") as f:
+            output = list(csv.DictReader(f))
+        self.assertEqual(len(output), 2)
+        self.assertEqual({r["region_id"] for r in output}, {"yilan_suao"})
+        self.assertEqual({r["height_above_twvd_cm"] for r in output}, {"40", "-20"})
+        summary = json.loads(out_path.with_name("regional_tide_summary.json").read_text(encoding="utf-8"))
+        self.assertEqual(summary["mapped_event_rows"], 2)
+        self.assertEqual(summary["mapped_unique_locations"], 1)
+        self.assertEqual(summary["unmapped_or_excluded_location_count"], 2)
+
+    def test_duplicate_mapping_id_is_rejected(self):
+        tide_rows = [{"location_id": "X", "location_name": "測試", "valid_time": "t"}]
+        base = {"latitude": "1", "longitude": "2", "mapping_basis": "test", "notes": "test"}
+        mapping_rows = [
+            dict(base, location_id="X", location_name="測試", region_id="yilan_suao", mapping_status="mapped"),
+            dict(base, location_id="X", location_name="測試", region_id="yilan_suao", mapping_status="mapped"),
+        ]
+        result, _ = self.run_builder(tide_rows, mapping_rows)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Duplicate location_id", result.stderr)
+
+    def test_feed_location_name_mismatch_is_rejected(self):
+        tide_rows = [{"location_id": "X", "location_name": "不同名稱", "valid_time": "t"}]
+        base = {"latitude": "1", "longitude": "2", "mapping_basis": "test", "notes": "test"}
+        mapping_rows = [dict(base, location_id="X", location_name="原始名稱", region_id="yilan_suao", mapping_status="mapped")]
+        result, _ = self.run_builder(tide_rows, mapping_rows)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Location name mismatch", result.stderr)
 
 
 class MarineNormalizationTests(unittest.TestCase):
