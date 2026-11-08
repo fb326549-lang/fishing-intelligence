@@ -93,7 +93,6 @@ def main() -> int:
         entry = {"id": location["id"], "name": location["name"], "status": "ok"}
         try:
             marine_params = {**common, "hourly": ",".join(MARINE_FIELDS),
-                             "current": ",".join(MARINE_FIELDS),
                              "cell_selection": "sea"}
             marine = request_json(session, config["marine_base_url"], marine_params)
             (folder / f"{location['id']}_marine_raw.json").write_text(
@@ -103,8 +102,7 @@ def main() -> int:
             entry["marine_grid"] = {"latitude": marine.get("latitude"), "longitude": marine.get("longitude")}
             entry["marine_hourly_variables"] = list((marine.get("hourly") or {}).keys())
             time.sleep(max(0.0, a.delay))
-            weather_params = {**common, "hourly": ",".join(WEATHER_FIELDS),
-                              "current": ",".join(WEATHER_FIELDS)}
+            weather_params = {**common, "hourly": ",".join(WEATHER_FIELDS)}
             weather = request_json(session, config["forecast_base_url"], weather_params)
             (folder / f"{location['id']}_weather_raw.json").write_text(
                 json.dumps(weather, ensure_ascii=False, indent=2), encoding="utf-8")
