@@ -41,3 +41,12 @@
 - https://www.cwa.gov.tw/Data/data_catalog/4-1-1.pdf
 
 C1.1 已建立官方安全來源自動蒐集及六區警特報判斷；C1.2 新增海象觀測自動蒐集與六區彙整。兩者由 GitHub Actions 每 15 分鐘執行，並發布至 tide-history 分支。海象觀測需待本次 CI 與真實資料輸出驗證後，才算正式完成。
+
+## C1.3 六區海象暴露分析
+- 新增 `C1/collector/analyze_marine_exposure.py`，讀取 `latest_regional_marine_conditions.json`，按六區輸出 `latest_marine_risk_assessment.json`。
+- 只對 48 小時觀測窗內最新、未逾 180 分鐘的浪高與風速做內部環境暴露篩檢；分別保留因子、原始值、單位、測站覆蓋率及觀測年齡。
+- 內部篩檢門檻：浪高 1.0 / 1.5 / 2.5 m；風速 5 / 8 / 11 m/s。這些不是 CWA 官方警戒門檻、海岸安全標準或魚情門檻，未經使用者現場風險評估不得作為出釣許可。
+- 不把 30 天滾動資料最新快照誤稱為 30 天平均或氣候常態；不推算潮汐漲退、浪向相對岸線、離岸流、魚種活性或中魚率。
+- 花蓮南段無映射測站、觀測逾時、浪高與風速皆缺值時，均輸出 `insufficient_data / unknown`，不得將缺測當成平靜。
+- GitHub Actions 每 15 分鐘產生並發布 `tide-history/data/latest_marine_risk_assessment.json`；PWA 決策首頁新增「六區海象暴露分析」顯示區域結果、因子與觀測時效。
+- 測試涵蓋六區輸出、風浪分級、過期資料、缺測、未覆蓋區域、物理無效負值、方向不外推及 30 天資料語意。
