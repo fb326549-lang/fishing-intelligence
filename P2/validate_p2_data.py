@@ -12,12 +12,15 @@ PARAMETER_CODES = {"temperature_range","depth_range","habitat","wave_preference"
 
 def iso(value):
     if not isinstance(value,str): return False
-    try: datetime.fromisoformat(value.replace("Z","+00:00")); return True
+    try:
+        parsed=datetime.fromisoformat(value.replace("Z","+00:00"))
+        return parsed.tzinfo is not None
     except ValueError: return False
 
 def validate_environment(record):
     errors=[]
     required={"schema_version","region_id","valid_time","collected_at","data_type","source_records","completeness","quality"}
+    required.add("environment")
     missing=required-record.keys()
     if missing: errors.append("missing required fields: "+", ".join(sorted(missing)))
     if record.get("schema_version")!="1.0.0": errors.append("unsupported schema_version")
@@ -32,6 +35,9 @@ def validate_environment(record):
             if not all(isinstance(s.get(k),str) and s[k].strip() for k in ("source_id","dataset","url")): errors.append(f"source_records[{i}] requires source_id, dataset, url")
     env=record.get("environment",{})
     if not isinstance(env,dict): errors.append("environment must be an object"); env={}
+    allowed_environment={"wave_height_m","wave_period_s","wave_direction_deg","sea_surface_temperature_c","sea_level_height_msl_m","ocean_current_velocity_ms","ocean_current_direction_deg","wind_speed_10m_ms","wind_direction_10m_deg","tide_height_m","tide_phase","tide_turning","tidal_current_velocity_ms","tidal_current_direction_deg","precipitation_mm_h","showers_mm_h","precipitation_probability_pct","weather_code","thunderstorm_risk","sunrise","sunset"}
+    unknown=set(env)-allowed_environment
+    if unknown: errors.append("unknown environment fields: "+", ".join(sorted(unknown)))
     numeric={"wave_height_m":(0,None),"wave_period_s":(0,None),"wave_direction_deg":(0,360),"sea_surface_temperature_c":(-2,40),"ocean_current_velocity_ms":(0,None),"ocean_current_direction_deg":(0,360),"wind_speed_10m_ms":(0,None),"wind_direction_10m_deg":(0,360),"tidal_current_velocity_ms":(0,None),"tidal_current_direction_deg":(0,360),"precipitation_mm_h":(0,None),"showers_mm_h":(0,None),"precipitation_probability_pct":(0,100)}
     for key,(lo,hi) in numeric.items():
         v=env.get(key)
