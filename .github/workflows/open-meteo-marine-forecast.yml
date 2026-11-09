@@ -28,7 +28,7 @@ jobs:
       - name: Check out P1 branch
         uses: actions/checkout@v4
         with:
-          ref: p1-foundation
+          ref: ${{ github.ref }}
 
       - name: Check out CWA append-only observation history
         uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
           python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --cwa-tide-forecast-csv output/cwa_tides/regional_tide_forecast.csv --out "$latest_dir/hourly_environment_p2.jsonl"
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
  
-      - name: Build P2.4.6 live six-region fish outlook
+      - name: Build P2.6 live six-region fish outlook
         run: |
           latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
           test -n "$latest_dir"
