@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -37,6 +38,10 @@ class IntegratedActivityTests(unittest.TestCase):
         self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
         self.assertEqual(fish["activity_evidence_count"],"1")
         self.assertEqual(fish["seasonal_evidence_count"],"1")
+        seasonal_context=json.loads(fish["seasonal_evidence_context_json"])
+        self.assertEqual(seasonal_context[0]["id"],"SE003")
+        self.assertIn("Shimen coast",seasonal_context[0]["geographic_scope"])
+        self.assertTrue(seasonal_context[0]["limitations"])
         self.assertEqual(fish["activity_score"],"")
         self.assertEqual(fish["catch_probability"],"")
         self.assertEqual(fish["best_fishing_window_status"],"not_established")
