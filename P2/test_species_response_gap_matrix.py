@@ -7,6 +7,15 @@ sys.path.insert(0, str(Path(__file__).parent / "species"))
 from build_species_response_gap_matrix import build_matrix
 
 class SpeciesGapMatrixTests(unittest.TestCase):
+    def test_southern_drummer_literature_is_not_assigned_to_white_alias(self):
+        register = Path(__file__).parent / "species" / "species_response_literature_register.csv"
+        with register.open(encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        southern_records = [r for r in rows if r["taxon_scientific_name"] == "Kyphosus bigibbus"]
+        self.assertTrue(southern_records)
+        self.assertTrue(all(r["candidate_id"] == "c036" for r in southern_records))
+        self.assertFalse(any(r["candidate_id"] == "c002" for r in southern_records))
+
     def test_matrix_flags_taxonomy_and_distribution_gates(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
