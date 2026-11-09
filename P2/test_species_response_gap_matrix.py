@@ -45,7 +45,11 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c037,天竺舵魚,Kyphosus cinerascens\n"
                 "c039,正鰹,Katsuwonus pelamis\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
-            evidence.write_text("candidate_id,evidence_id,source_url\nc001,E1,https://example.org/e1\n",encoding="utf-8")
+            evidence.write_text(
+                "candidate_id,evidence_id,source_url\n"
+                "c001,E1,https://example.org/e1\n"
+                "c023,E001,https://fishdb.sinica.edu.tw/taxon/381638-fishdb\n"
+                "c023,E002,https://www.tfrin.gov.tw/theme_data.php?id=1382&theme=research\n",encoding="utf-8")
             literature=root/"literature.csv"
             literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
