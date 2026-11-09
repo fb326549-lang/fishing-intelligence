@@ -408,6 +408,9 @@ function renderP2FishOutlook(){
   const occurrenceEvidence=Number(r.occurrence_evidence_count)||0;
   const occurrenceIds=(r.occurrence_evidence_ids||'').split(';').filter(Boolean);
   const seasonalEvidence=(r.seasonal_evidence_ids||'').split(';').filter(Boolean).length;
+  let seasonalContext=[];
+  try{seasonalContext=JSON.parse(r.seasonal_evidence_context_json||'[]');if(!Array.isArray(seasonalContext))seasonalContext=[];}catch{seasonalContext=[];}
+  const seasonalHtml=seasonalContext.length?'<div class="small">歷史季節研究背景（非即時作釣預測）：</div>'+seasonalContext.map(x=>'<div class="small">'+escapeP2Text(x.id)+'｜'+escapeP2Text(x.reported_season)+'｜'+escapeP2Text(x.geographic_scope)+'</div>').join(''):'';
   const ednaRows=data.edna_occurrence_context&&Array.isArray(data.edna_occurrence_context.records)?data.edna_occurrence_context.records:[];
   const edna=ednaRows.find(x=>x.candidate_id===r.candidate_id&&x.region_id===region);
   let ednaHtml='<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
@@ -421,7 +424,7 @@ function renderP2FishOutlook(){
   const aliasNames={c001:'瓜子鱲（黑毛俗名候選）',c002:'白毛（舵魚屬，未鑑種）',c036:'南方舵魚（白毛俗名群成員）',c037:'天竺舵魚（白毛俗名群成員）'};
   const displayName=aliasNames[r.candidate_id]||r.common_name_zh;
   const taxonNote=r.candidate_id==='c001'?'黑毛為地方俗名群，個體仍須形態鑑種；不可將所有黑毛都視為瓜子鱲。':r.candidate_id==='c002'?'白毛已對應舵魚屬俗名群，但可能包含多個物種；需鑑種後才可套用物種級規則.':'';
-  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
+  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+seasonalHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
  }).join(''):'<div class="small">此區域／時段沒有對應候選資料。請確認最新展望是否已涵蓋此區。</div>';
  $('p2FishFreshness').textContent='分析基準：'+(data.as_of||'未知')+'｜資料產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜來源：P2 六區逐時展望';
 }
