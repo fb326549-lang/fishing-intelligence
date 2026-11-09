@@ -36,7 +36,6 @@ class TideCurrentContextTests(unittest.TestCase):
 
     def test_turning_flag_does_not_create_slack_phase(self):
         row=build_context(record({"tide_turning":True}))
-        self.assertIsNone(row["tide_turning"] if False else None)
         self.assertIsNone(row["tide_phase"] if row["tide_phase"]=="unknown" else "unexpected")
         self.assertTrue(row["tide_turning"])
 
