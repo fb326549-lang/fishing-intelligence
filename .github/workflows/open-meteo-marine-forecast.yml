@@ -13,6 +13,14 @@ on:
       - 'P1/species/**'
       - 'P2/**'
       - '.github/workflows/open-meteo-marine-forecast.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'P1/collector/**'
+      - 'P1/species/**'
+      - 'P2/**'
+      - '.github/workflows/open-meteo-marine-forecast.yml'
 
 concurrency:
   group: p2-hourly-history-archive
@@ -92,6 +100,7 @@ jobs:
           python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}" "${ecology_args[@]}"
 
       - name: Validate history and commit P2 history plus live outlook
+        if: github.event_name != 'pull_request'
         run: |
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
