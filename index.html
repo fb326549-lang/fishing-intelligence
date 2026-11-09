@@ -387,13 +387,13 @@ function renderDecisionHome(){
  $('decisionCurrent').textContent=fmt(m.ocean_current_velocity,'km/h');
  const marineRisk=latest.marineRisk?.regions?.[regionId];
  const riskLabels={low:'低',moderate:'中',high:'高',very_high:'極高',unknown:'無法判定'};
- $('decisionMarineRiskTag').textContent=marineRisk?riskLabels[marineRisk.exposure_level]||'無法判定':'資料暫不可用';
+ $('decisionMarineRiskTag').textContent=marineRisk?(marineRisk.state==='partial_data'?'資料不完整':riskLabels[marineRisk.exposure_level]||'無法判定'):'資料暫不可用';
  if(!marineRisk){
   $('decisionMarineRiskText').textContent='尚未取得六區海象暴露分析；不可將缺少資料解讀為海況平穩。';
   $('decisionMarineRiskTime').textContent='分析時間：無法取得';
  }else{
   const factorText=(marineRisk.factors||[]).map(x=>(x.factor==='wave_height_m'?'浪高':x.factor==='wind_speed_ms'?'風速':x.factor)+' '+x.value+' '+x.unit+'（'+x.label+'）').join('；');
-  $('decisionMarineRiskText').textContent=marineRisk.state==='assessed'?'本區環境暴露篩檢：'+marineRisk.exposure_label+'。'+(factorText?'依據：'+factorText+'。':'')+'測站 '+marineRisk.station_count+'/'+marineRisk.mapped_station_count+'；'+marineRisk.reason:'本區無法判定：'+marineRisk.reason;
+  $('decisionMarineRiskText').textContent=marineRisk.state==='assessed'?'本區環境暴露篩檢：'+marineRisk.exposure_label+'。'+(factorText?'依據：'+factorText+'。':'')+'測站 '+marineRisk.station_count+'/'+marineRisk.mapped_station_count+'；'+marineRisk.reason:marineRisk.state==='partial_data'?'本區資料不完整。'+(factorText?'已取得：'+factorText+'。':'')+marineRisk.reason:'本區無法判定：'+marineRisk.reason;
   $('decisionMarineRiskTime').textContent='最新觀測：'+cwaTime(marineRisk.latest_observation_time)+'｜觀測年齡：'+(marineRisk.observation_age_minutes===null?'未知':marineRisk.observation_age_minutes+' 分鐘')+'｜分析：'+cwaTime(latest.marineRisk.generated_at);
  }
  const safety=latest.safety?.regions?.[regionId];

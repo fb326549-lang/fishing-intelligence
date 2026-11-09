@@ -31,6 +31,12 @@ class MarineExposureTests(unittest.TestCase):
   r=build_assessment(snapshot({"yilan_suao":region(2.8,3.0)}),NOW)["regions"]["yilan_suao"]
   self.assertEqual(r["exposure_level"],"very_high")
   self.assertEqual({x["factor"] for x in r["factors"]},{"wave_height_m","wind_speed_ms"})
+ def test_single_available_factor_is_partial_not_overall_low(self):
+  r=build_assessment(snapshot({"chenggong_donghe":region(None,2.4)}),NOW)["regions"]["chenggong_donghe"]
+  self.assertEqual(r["state"],"partial_data")
+  self.assertEqual(r["exposure_level"],"unknown")
+  self.assertEqual(len(r["factors"]),1)
+  self.assertIn("僅取得其中一項",r["reason"])
  def test_stale_observation_is_insufficient_not_calm(self):
   r=build_assessment(snapshot({"yilan_suao":region(0.2,1.0,"2026-11-09T07:00:00+08:00")}),NOW)["regions"]["yilan_suao"]
   self.assertEqual(r["state"],"insufficient_data")
