@@ -10,7 +10,9 @@ import argparse,csv,json
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
+import sys
 import xml.etree.ElementTree as ET
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from safety_decision import REGIONS,decide_region
 
 TZ=ZoneInfo("Asia/Taipei")
