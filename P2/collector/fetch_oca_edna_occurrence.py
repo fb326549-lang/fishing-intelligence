@@ -285,6 +285,7 @@ def write_outputs(out_dir: Path, detections, summary, fetched_at):
         "source_datasets": [{"dataset_id": x[0], "name": x[1], "url": x[2]} for x in SOURCES],
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return manifest
 
 def main():
     parser = argparse.ArgumentParser()
@@ -303,7 +304,7 @@ def main():
     if not detections:
         raise SystemExit("No normalized eDNA detections found; refusing to publish an empty dataset.")
     summary = build_monthly_summary(detections)
-    write_outputs(args.out_dir, detections, summary, fetched_at)
+    manifest = write_outputs(args.out_dir, detections, summary, fetched_at)
     print(
         f"eDNA occurrence context built: {len(detections)} positive records; "
         f"{manifest['exact_candidate_record_count']} exact-candidate records; "
