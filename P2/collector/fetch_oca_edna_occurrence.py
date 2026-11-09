@@ -168,6 +168,21 @@ def candidate_index(path: Path):
                 result[sci] = cid
     return result
 
+def match_candidate(scientific_name: str, candidates):
+    """Exact binomials may map; slash-delimited multi-species labels stay ambiguous."""
+    scientific = str(scientific_name or "").strip().casefold()
+    if scientific in candidates:
+        return candidates[scientific], "exact_scientific_name", ""
+    if "/" in scientific:
+        parts = [part.strip() for part in scientific.split("/") if part.strip()]
+        if parts:
+            genus = parts[0].split()[0]
+            expanded = [parts[0]] + [part if " " in part else genus + " " + part for part in parts[1:]]
+            possible = sorted({candidates[name] for name in expanded if name in candidates})
+            if possible:
+                return "", "ambiguous_multi_species_taxon", ";".join(possible)
+    return "", "no_exact_candidate_match", ""
+
 def fetch_source(url: str, timeout: int):
     request = urllib.request.Request(url, headers={"User-Agent": "fishing-intelligence/1.0 (open-data research)", "Accept": "*/*"})
     with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -185,7 +200,7 @@ def collect(sources, stations, candidates, fetched_at):
             region, nearest_station, distance, mapping_status = nearest_region_context(lat, lon, stations)
             sample_time = fields["sampled_at"].strip()
             basis = parse_year_month(sample_time)
-            candidate_id = candidates.get(scientific.casefold(), "")
+            candidate_id, candidate_match_status, possible_candidate_ids = match_candidate(scientific, candidates)
             identity = "|".join((dataset_id, fields["station_name"], sample_time, scientific, str(depth), str(lat), str(lon)))
             record_id = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
             if record_id in seen:
@@ -210,6 +225,8 @@ def collect(sources, stations, candidates, fetched_at):
                 "family_zh": fields["family_zh"],
                 "project_type": fields["project_type"],
                 "candidate_id": candidate_id,
+                "candidate_match_status": candidate_match_status,
+                "possible_candidate_ids": possible_candidate_ids,
                 "region_id": region,
                 "nearest_reference_station_id": nearest_station,
                 "nearest_reference_distance_km": distance,
@@ -259,6 +276,10 @@ def write_outputs(out_dir: Path, detections, summary, fetched_at):
         "dataset_page": DATASET_PAGE,
         "generated_at_utc": fetched_at,
         "detection_record_count": len(detections),
+        "exact_candidate_record_count": sum(bool(r["candidate_id"]) for r in detections),
+        "ambiguous_taxon_record_count": sum(r["candidate_match_status"] == "ambiguous_multi_species_taxon" for r in detections),
+        "unmatched_taxon_record_count": sum(r["candidate_match_status"] == "no_exact_candidate_match" for r in detections),
+        "nearest_region_context_record_count": sum(r["region_mapping_status"] == "nearest_station_context_only" for r in detections),
         "candidate_month_region_summary_count": len(summary),
         "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
         "source_datasets": [{"dataset_id": x[0], "name": x[1], "url": x[2]} for x in SOURCES],
@@ -283,7 +304,12 @@ def main():
         raise SystemExit("No normalized eDNA detections found; refusing to publish an empty dataset.")
     summary = build_monthly_summary(detections)
     write_outputs(args.out_dir, detections, summary, fetched_at)
-    print(f"eDNA occurrence context built: {len(detections)} positive records; {len(summary)} candidate/month/region summaries.")
+    print(
+        f"eDNA occurrence context built: {len(detections)} positive records; "
+        f"{manifest['exact_candidate_record_count']} exact-candidate records; "
+        f"{manifest['ambiguous_taxon_record_count']} ambiguous multi-species records; "
+        f"{len(summary)} candidate/month/region summaries."
+    )
     print("All records remain context_only_edna_occurrence; no activity/catch scores are produced.")
     return 0
 
