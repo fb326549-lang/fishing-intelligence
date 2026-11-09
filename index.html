@@ -62,9 +62,9 @@ const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-in
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
 const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
-let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null};
+let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null};
 
-const map=L.map('map').setView([23.7,121],7);
+const map=L.map('map').setView([23.72,121.62],8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
 function config(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}}
 function fillSettings(){const c=config();Object.keys(c).forEach(k=>$(k).value=c[k]||'')}
@@ -629,8 +629,8 @@ $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFish
 $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
 renderFishOptions();
 initFavorites();
-loadSafetyDecision();
-loadP2FishOutlook();
+map.setView([point.lat,point.lon],8);
+choose(point.lat,point.lon);
 async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();loadP2FishOutlook();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,cloud_cover,visibility,wind_direction_10m',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m,pressure_msl',forecast_days:'2',timezone:'Asia/Taipei'});
