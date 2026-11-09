@@ -625,3 +625,14 @@ eDNA 蒐集器另輸出精簡的 `edna_candidate_region_context.json`，按候�
 - 每筆均固定 `context_only_edna_occurrence`，不輸出活動分數或中魚機率。
 
 每月 OCA workflow 將精簡 JSON 與資料 manifest 發布至 `p2-history/data/`；Open-Meteo/P2 四小時流程讀取該檔，將它嵌入 `latest_hourly_fish_outlook.json` 的 `edna_occurrence_context` 區塊。PWA 可依目前區域及候選魚種顯示歷史採樣背景。若尚未發布或沒有該候選/區域資料，前端必須明確說明「未找到精確檢出紀錄不代表魚不存在」，不能顯示為物種不存在。
+
+
+## P2.4.10 東部出現紀錄與活動研究證據分流
+
+活動證據登錄表中的 `activity_dimension=occurrence_record` 代表博物館標本、單次採集或單次釣獲等「曾在當地出現」紀錄，不是魚類活動研究。整合器現在將其獨立分流：
+- `activity_evidence_count/ids`：只計入活動、攝食、季節、遙測等活動研究資料；不含單次出現紀錄。
+- `occurrence_evidence_count/ids`：只列出經鑑種且具來源的地區出現紀錄。
+- 只有出現紀錄時，活動狀態仍為 context-only；活動分數、中魚機率與最佳時段保持空白/未建立。
+- 逐時展望將同一候選的出現紀錄去重後彙整，不因 6/12/24 小時內多筆 forecast row 而重複計數。
+
+PWA 分開顯示「活動研究」與「東部出現紀錄」，避免使用者將單筆標本或單次釣獲誤讀成活動證據或即時魚群訊號。
