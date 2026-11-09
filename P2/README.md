@@ -741,3 +741,19 @@ The priority species response-gap matrix now carries a JSON provenance bundle fo
 ## P2.7.2 環境比對分數的逐條證據追溯
 
 The environmental match engine now emits `rule_evidence_trace_json` for every candidate/region/hour. Each evaluated rule records its rule ID, environmental field, observed value, operator/range, match outcome, score/weight, evidence ID, source URL and confidence. Missing/non-numeric inputs are explicitly represented rather than silently disappearing. The trace is carried through the integrated assessment and aggregated into the published 6/12/24-hour outlook by rule and forecast hour; conflicting duplicate metadata is rejected. This is provenance for the environmental-match calculation only, not a fish-activity score or catch probability.
+
+
+## P2.8 環境反應規則審核報告
+
+新增 `P2/species/audit_environment_response_rules.py`，逐條檢查環境反應規則是否符合計分資格，並輸出可稽核 CSV。未核准、外地研究、低信心、未完成審查、魚種分類/分布資格未通過、環境欄位/區域/運算子錯誤、數值範圍或權重錯誤，都會列出明確排除原因，而不是只在引擎載入時被略過。
+
+執行：
+
+```bash
+python P2/species/audit_environment_response_rules.py \\
+  --rules-csv P2/species/environment_response_rules_template.csv \\
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \\
+  --out output/p2/environment_response_rule_audit.csv
+```
+
+`approved_for_scoring` 代表通過規則欄位與證據門檻審核；實際計分仍由 environment_match_engine 執行。此稽核不會替任何魚種創造研究數值、門檻或分數。CI 以單元測試涵蓋合格規則、外地/背景證據排除、魚種資格閘門、來源缺漏、數值錯誤及重複規則 ID。
