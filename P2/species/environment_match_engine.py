@@ -163,7 +163,7 @@ def main():
     environments = [json.loads(line) for line in args.environment_jsonl.read_text(encoding="utf-8").splitlines() if line.strip()]
     results = evaluate(environments, read_csv(args.candidates_csv), load_rules(args.rules_csv))
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["candidate_id", "region_id", "valid_time", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "reason", "interpretation"]
+    fields = ["candidate_id", "region_id", "valid_time", "data_type", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "reason", "interpretation"]
     with args.out.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
