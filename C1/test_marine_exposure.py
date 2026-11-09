@@ -1,4 +1,4 @@
-import sys, unittest
+import sys, unittest, json
 from datetime import datetime, timezone
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "collector"))
@@ -26,6 +26,7 @@ class MarineExposureTests(unittest.TestCase):
   self.assertEqual(result["regions"]["yilan_suao"]["state"],"assessed")
   self.assertEqual(result["regions"]["yilan_suao"]["exposure_level"],"moderate")
   self.assertFalse(result["regions"]["yilan_suao"]["safety_clearance"])
+  json.dumps(result,allow_nan=False)
  def test_highest_of_wave_and_wind_is_reported(self):
   r=build_assessment(snapshot({"yilan_suao":region(2.8,3.0)}),NOW)["regions"]["yilan_suao"]
   self.assertEqual(r["exposure_level"],"very_high")
