@@ -417,7 +417,9 @@ function renderP2FishOutlook(){
   const ecologyHtml=ecologyItems.length?'<div class="small">物種生態資料（非即時魚況／非作釣深度建議）：</div>'+ecologyItems.map(x=>'<div class="small">'+escapeP2Text(ecologyLabels[x.category]||x.category)+'：'+escapeP2Text(x.parameter_value)+(x.unit_or_format&& !['controlled_vocabulary','qualitative'].includes(x.unit_or_format)?' '+escapeP2Text(x.unit_or_format):'')+'｜'+escapeP2Text(x.geographic_scope)+'｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源：'+escapeP2Text(x.source_name)+'（'+escapeP2Text(x.evidence_id)+'）</a></div>').join(''):'';
   const ednaRows=data.edna_occurrence_context&&Array.isArray(data.edna_occurrence_context.records)?data.edna_occurrence_context.records:[];
   const edna=ednaRows.find(x=>x.candidate_id===r.candidate_id&&x.region_id===region);
-  let ednaHtml='<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
+  const ednaCoverage=data.edna_occurrence_context&&data.edna_occurrence_context.regional_reference_coverage;
+  const ednaCoverageMissing=!!(ednaCoverage&&Array.isArray(ednaCoverage.regions_without_active_reference_stations)&&ednaCoverage.regions_without_active_reference_stations.includes(region));
+  let ednaHtml=ednaCoverageMissing?'<div class="small">歷史環境 DNA：本區缺少有效參考站，暫無法可靠歸區；這是資料覆蓋缺口，不代表沒有魚。</div>':'<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
   if(edna){
    const exact=Number(edna.exact_positive_detection_record_count)||0,ambiguous=Number(edna.ambiguous_positive_detection_record_count)||0;
    const months=Number(edna.exact_sample_month_count)||0,stations=Number(edna.exact_distinct_station_count)||0;
