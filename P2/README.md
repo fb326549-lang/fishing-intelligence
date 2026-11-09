@@ -171,3 +171,22 @@ python P2/collector/validate_hourly_history.py --archive-root p2-history-data/da
 ```
 
 Open-Meteo 歸檔 workflow 已將此稽核放在提交 p2-history 之前；任何 checksum、分區、重複或索引錯誤都會讓該次歸檔 job 失敗，不會提交不一致的歷史索引。此稽核是資料完整性檢查，不取代 P2 JSON Schema / validator，也不代表觀測值本身已通過物理合理性校正。
+
+
+## P2.2.3 台灣野外研究證據擴充（首批）
+
+文獻登錄表新增 L008–L014，共 7 筆研究觀察，全部先標記為 context-only，不提供即時適合度門檻：
+
+- L008–L011：Lee & Huang (1981)，瓜子鱲（Girella punctata）北台灣基隆岩岸月採樣研究。241 尾成魚、5 尾幼魚；記載成魚冬季/早春群聚、繁殖約 2–3 月、幼魚夏季可見潮池，以及季節性食性變化。研究年代較早且只有北台灣單一岩岸，不能當作台東最佳月份、潮汐相位或釣餌偏好。
+- L012–L014：黑鯛（Acanthopagrus schlegelii）西台灣沿岸刺網漁業與遙測環境資料的 MaxEnt 棲地模型（2015–2018）。模型摘要指出 SST、海流與地形和季節棲地分布相關，漁場高適合度特徵包含 SST 約 20.6–28.9°C、海流約 0.28–0.83 m/s，並觀察到 12 月至翌年 4 月近岸漁獲較集中。這是西台灣刺網漁業空間模型，不能直接移植到東部磯釣，也不是中魚率模型。
+
+缺口矩陣已更新：
+- 瓜子鱲 activity_period：有北台灣野外季節群聚文獻，但仍是 context-only。
+- 黑鯛 temperature_response / ocean_current_response：有西台灣漁業棲地模型，但仍是 context-only。
+- 所有魚種的 model_use_policy 仍維持 not_model_eligible_until_direct_response_evidence_reviewed。
+
+文獻來源：
+- Lee & Huang (1981), *Some aspects of the biology of the nibblers, Girella punctata Gray from the northern coastal water of Taiwan*: https://zoolstud.sinica.edu.tw/Journals/20.1/17.pdf
+- Black sea bream habitat distribution model, *Journal of Marine Science and Engineering* 9(12), 1442 (2021): https://doi.org/10.3390/jmse9121442
+
+研究證據只用來更新證據登錄與研究缺口狀態；不得將西台灣、北台灣或養殖/圈養研究的數值直接轉成台灣東部魚情分數。
