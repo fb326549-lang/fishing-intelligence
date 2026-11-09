@@ -1,0 +1,27 @@
+name: P2 data contract tests
+on:
+  push:
+    branches: [p1-foundation]
+    paths:
+      - "P2/**"
+      - ".github/workflows/test-p2-data-contracts.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "P2/**"
+      - ".github/workflows/test-p2-data-contracts.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-p2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run P2 data contract tests
+        run: python -m unittest discover -s P2 -p 'test_*.py' -v
+      - name: Check validator CLI
+        run: python P2/validate_p2_data.py --help
