@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run eDNA collector contract tests
-        run: python -m unittest P2.test_oca_edna_occurrence -v
+        run: python -m unittest P2.test_oca_edna_occurrence P2.test_export_hourly_fish_outlook_json -v
       - name: Fetch and normalize OCA eDNA datasets
         run: |
           python P2/collector/fetch_oca_edna_occurrence.py \
