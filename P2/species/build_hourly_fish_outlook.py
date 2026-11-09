@@ -108,6 +108,20 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                 evidence_ids=sorted({x for r in joined for x in r.get("activity_evidence_ids","").split(";") if x})
                 occurrence_ids=sorted({x for r in joined for x in r.get("occurrence_evidence_ids","").split(";") if x})
                 seasonal_ids=sorted({x for r in joined for x in r.get("seasonal_evidence_ids","").split(";") if x})
+                seasonal_context_by_id={}
+                for row in joined:
+                    raw_context=row.get("seasonal_evidence_context_json","")
+                    if not raw_context:
+                        continue
+                    try:
+                        contexts=json.loads(raw_context)
+                    except (TypeError,ValueError):
+                        continue
+                    if isinstance(contexts,list):
+                        for context in contexts:
+                            if isinstance(context,dict) and context.get("id"):
+                                seasonal_context_by_id.setdefault(context["id"],context)
+                seasonal_context=[seasonal_context_by_id[key] for key in sorted(seasonal_context_by_id)]
                 output.append({
                     "candidate_id":cid,"common_name_zh":candidate.get("common_name_zh",""),
                     "scientific_name":candidate.get("scientific_name",""),"region_id":region,
@@ -132,6 +146,7 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                     "occurrence_evidence_count":str(len(occurrence_ids)),
                     "occurrence_evidence_ids":";".join(occurrence_ids),
                     "seasonal_evidence_ids":";".join(seasonal_ids),
+                    "seasonal_evidence_context_json":json.dumps(seasonal_context,ensure_ascii=False,separators=(",",":")),
                     "activity_score":"","catch_probability":"","best_fishing_window_status":"not_established",
                     "interpretation":"forecast_environment_summary_not_fish_activity_or_catch_probability",
                 })
@@ -153,7 +168,8 @@ def main():
         "tide_phase_known_hour_count","tide_phase_missing_hour_count","tide_phase_missing_forecast_hour_count",
         "tide_phase_coverage","tide_turning_hour_count","environment_match_hour_count",
         "environment_match_status","environment_match_mean","environment_match_min","environment_match_max",
-        "activity_evidence_status","activity_evidence_ids","occurrence_evidence_count","occurrence_evidence_ids","seasonal_evidence_ids","activity_score",
+        "activity_evidence_status","activity_evidence_ids","occurrence_evidence_count","occurrence_evidence_ids",
+        "seasonal_evidence_ids","seasonal_evidence_context_json","activity_score",
         "catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:

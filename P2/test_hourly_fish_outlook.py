@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from datetime import datetime
@@ -60,6 +61,24 @@ class HourlyFishOutlookTests(unittest.TestCase):
         self.assertEqual(result["occurrence_evidence_count"],"2")
         self.assertEqual(result["occurrence_evidence_ids"],"AE011;AE012")
         self.assertEqual(result["activity_evidence_ids"],"")
+        self.assertEqual(result["activity_score"],"")
+        self.assertEqual(result["catch_probability"],"")
+
+    def test_seasonal_context_is_deduplicated_and_preserved_in_outlook(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"") for h in range(10,16)]
+        context=[
+            {"id":"SE005","reported_season":"April–June and October–December","geographic_scope":"Eastern Taiwan offshore commercial longline grounds","model_use_status":"context_only_east_taiwan_commercial_fishery","limitations":"Not shore-angling catch data."},
+            {"id":"SE006","reported_season":"March–August spawning stage; peak April–July","geographic_scope":"Eastern Taiwan; Taitung XinGang fish market","model_use_status":"context_only_east_taiwan_reproductive_biology","limitations":"Not nearshore availability or catch probability."}
+        ]
+        for row in joined:
+            row["seasonal_evidence_ids"]="SE005;SE006"
+            row["seasonal_evidence_context_json"]=json.dumps(context,ensure_ascii=False)
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        saved=json.loads(result["seasonal_evidence_context_json"])
+        self.assertEqual([x["id"] for x in saved],["SE005","SE006"])
+        self.assertEqual(result["seasonal_evidence_ids"],"SE005;SE006")
         self.assertEqual(result["activity_score"],"")
         self.assertEqual(result["catch_probability"],"")
 

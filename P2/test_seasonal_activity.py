@@ -27,8 +27,8 @@ class SeasonalActivityTests(unittest.TestCase):
         row=next(r for r in rows if r["seasonal_evidence_id"]=="SE005")
         self.assertEqual(row["candidate_id"],"c023")
         self.assertEqual(row["taxon_scientific_name"],"Coryphaena hippurus")
-        self.assertIn("April–June",row["reported_season"])
-        self.assertIn("October–December",row["reported_season"])
+        self.assertIn("4–6月",row["reported_season"])
+        self.assertIn("10–12月",row["reported_season"])
         self.assertEqual(row["model_use_status"],"context_only_east_taiwan_commercial_fishery")
         self.assertIn("not shore-angling",row["limitations"].lower())
 
@@ -38,8 +38,8 @@ class SeasonalActivityTests(unittest.TestCase):
         row=next(r for r in rows if r["seasonal_evidence_id"]=="SE006")
         self.assertEqual(row["candidate_id"],"c039")
         self.assertEqual(row["taxon_scientific_name"],"Katsuwonus pelamis")
-        self.assertIn("March–August",row["reported_season"])
-        self.assertIn("April–July",row["reported_season"])
+        self.assertIn("3–8月",row["reported_season"])
+        self.assertIn("4–7月",row["reported_season"])
         self.assertEqual(row["model_use_status"],"context_only_east_taiwan_reproductive_biology")
         self.assertIn("not a fishing-activity",row["limitations"].lower())
 
