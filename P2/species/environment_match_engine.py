@@ -117,7 +117,7 @@ def evaluate(environment_records, candidate_rows, rules):
                 results.append({
                     "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""),
                     "status": "insufficient_evidence", "environment_match_score": "",
-                    "rule_coverage": "0", "rules_matched": "0", "rules_applicable": "0",
+                    "rule_coverage": "0", "rules_matched": "0", "rules_evaluated": "0", "rules_applicable": "0",
                     "reason": "no approved East Taiwan direct-field response rules",
                     "interpretation": "not_fish_activity_or_catch_probability",
                 })
