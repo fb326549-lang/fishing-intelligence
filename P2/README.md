@@ -614,4 +614,4 @@ python -m unittest P2.test_oca_edna_occurrence -v
 5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。
 6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
 
-資料流程會先通過三組來源蒐集、欄位正規化、逐筆 JSON Schema 驗證及 occurrence-only 語意檢查。此階段只建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
+資料流程會先通過三組來源蒐集、欄位正規化、逐筆 JSON Schema 驗證及 occurrence-only 語意檢查。此階段只建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。持久化月摘要供後續候選魚種區域出現背景查詢；不直接參與魚種排序、活動分數或中魚機率。
