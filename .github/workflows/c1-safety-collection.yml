@@ -42,6 +42,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: c1-official-safety-sources
-          path: |\n            output/c1_safety_sources/\n            output/c1_safety_decisions/
+          path: |
+            output/c1_safety_sources/
+            output/c1_safety_decisions/
           if-no-files-found: warn
           retention-days: 7
