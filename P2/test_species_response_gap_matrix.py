@@ -25,7 +25,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c030,點帶石斑魚,Epinephelus coioides\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
             evidence.write_text("candidate_id,evidence_id,source_url\nc001,E1,https://example.org/e1\n",encoding="utf-8")
-            rows=build_matrix(candidates,ecology,evidence)
+            literature=root/"literature.csv"
+            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\\n",encoding="utf-8")
+            rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),56)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
@@ -34,6 +36,10 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(grouper["evidence_status"],"regional_evidence_gate")
             self.assertEqual(black["evidence_status"],"evidence_gap")
             self.assertIn("habitat",black["existing_parameter_codes"])
+            rabbit=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="temperature_range")
+            self.assertEqual(rabbit["evidence_status"],"external_literature_found_context_only")
+            self.assertEqual(rabbit["literature_record_ids"],"L1")
+            self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(black["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
 
 if __name__ == "__main__":
