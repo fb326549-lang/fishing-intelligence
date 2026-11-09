@@ -55,7 +55,7 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
     by_region={}
     for row in forecast: by_region.setdefault(row.get("region_id",""),[]).append(row)
     output=[]
-    for region,region_rows in sorted(by_region.items()):
+    for region in REGIONS:\n        region_rows=by_region.get(region,[])
         for hours in HORIZONS:
             end=as_of+timedelta(hours=hours)
             window=[r for r in region_rows if as_of<=parse_dt(r["valid_time"],"valid_time")<end]
@@ -127,6 +127,6 @@ def main():
         "catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
-        w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=fields,lineterminator="\n");w.writeheader();w.writerows(rows)
     print(f"Built {len(rows)} 6/12/24-hour candidate-region summaries; best fishing windows remain unestablished.")
 if __name__=="__main__": main()
