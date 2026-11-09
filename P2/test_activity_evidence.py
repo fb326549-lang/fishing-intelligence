@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),7)
+        self.assertEqual(len(rows),9)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_scoring_eligibility_is_rejected(self):
