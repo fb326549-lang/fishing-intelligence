@@ -19,7 +19,7 @@ SOURCE_VARIABLES = {
     "sea_surface_temperature", "sea_level_height_msl",
     "ocean_current_velocity", "ocean_current_direction",
     "temperature_2m", "relative_humidity_2m", "precipitation",
-    "precipitation_probability", "pressure_msl", "wind_speed_10m",
+    "precipitation_probability", "showers", "weather_code", "pressure_msl", "wind_speed_10m",
     "wind_direction_10m", "wind_gusts_10m", "cloud_cover",
 }
 
@@ -107,7 +107,7 @@ def main() -> int:
         errors.append("source horizon CSV does not contain exactly all six-region/three-horizon groups")
     for key, variables in source_groups.items():
         if variables != SOURCE_VARIABLES:
-            errors.append(f"source group {key}: expected 22 unique variables, found {len(variables)}")
+            errors.append(f"source group {key}: expected {len(SOURCE_VARIABLES)} unique variables, found {len(variables)}")
 
     locations = manifest.get("locations", [])
     marine_partial = [x.get("id") for x in locations if x.get("marine", {}).get("status") == "partial"]
