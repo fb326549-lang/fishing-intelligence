@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/edna_candidate_region_context.schema.json",
+  "title": "eDNA candidate-region occurrence context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "dataset_page", "generated_at_utc", "interpretation", "records"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"type": "string"},
+    "dataset_page": {"type": "string", "format": "uri"},
+    "generated_at_utc": {"type": "string", "format": "date-time"},
+    "interpretation": {"type": "string"},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id", "region_id", "exact_positive_detection_record_count",
+          "ambiguous_positive_detection_record_count", "exact_sample_month_count",
+          "exact_distinct_station_count", "first_sampled_month", "last_sampled_month",
+          "min_sample_depth_m", "max_sample_depth_m", "dataset_ids",
+          "ambiguous_taxon_labels", "model_use_status"
+        ],
+        "properties": {
+          "candidate_id": {"type": "string", "minLength": 1},
+          "region_id": {"enum": ["yilan_suao", "hualien_north", "hualien_south", "fengbin_shitiping", "chenggong_donghe", "taitung_south"]},
+          "exact_positive_detection_record_count": {"type": "integer", "minimum": 0},
+          "ambiguous_positive_detection_record_count": {"type": "integer", "minimum": 0},
+          "exact_sample_month_count": {"type": "integer", "minimum": 0},
+          "exact_distinct_station_count": {"type": "integer", "minimum": 0},
+          "first_sampled_month": {"type": "string"},
+          "last_sampled_month": {"type": "string"},
+          "min_sample_depth_m": {"type": ["number", "null"]},
+          "max_sample_depth_m": {"type": ["number", "null"]},
+          "dataset_ids": {"type": "array", "items": {"type": "string"}},
+          "ambiguous_taxon_labels": {"type": "array", "items": {"type": "string"}},
+          "model_use_status": {"const": "context_only_edna_occurrence"}
+        }
+      }
+    }
+  }
+}
