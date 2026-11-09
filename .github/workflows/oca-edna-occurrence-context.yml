@@ -1,0 +1,66 @@
+name: OCA fish eDNA occurrence context
+on:
+  push:
+    branches: [p1-foundation]
+    paths:
+      - "P2/collector/fetch_oca_edna_occurrence.py"
+      - "P2/test_oca_edna_occurrence.py"
+      - "P2/schema/edna_occurrence_context.schema.json"
+      - "P1/stations/east_region_station_mapping.csv"
+      - "P1/species/species_candidate_register.csv"
+      - ".github/workflows/oca-edna-occurrence-context.yml"
+  pull_request:
+    branches: [p1-foundation]
+    paths:
+      - "P2/collector/fetch_oca_edna_occurrence.py"
+      - "P2/test_oca_edna_occurrence.py"
+      - "P2/schema/edna_occurrence_context.schema.json"
+      - "P1/stations/east_region_station_mapping.csv"
+      - "P1/species/species_candidate_register.csv"
+      - ".github/workflows/oca-edna-occurrence-context.yml"
+  schedule:
+    - cron: "17 3 1 * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  collect-edna-context:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run eDNA collector contract tests
+        run: python -m unittest P2.test_oca_edna_occurrence -v
+      - name: Fetch and normalize OCA eDNA datasets
+        run: |
+          python P2/collector/fetch_oca_edna_occurrence.py \
+            --mapping P1/stations/east_region_station_mapping.csv \
+            --candidates P1/species/species_candidate_register.csv \
+            --out-dir output/oca_edna_context
+      - name: Validate output contract and occurrence-only semantics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("output/oca_edna_context")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          assert manifest["detection_record_count"] > 0
+          assert manifest["source_datasets"] and len(manifest["source_datasets"]) == 3
+          rows = [json.loads(line) for line in (root / "edna_occurrence_context.jsonl").read_text(encoding="utf-8").splitlines() if line]
+          assert len(rows) == manifest["detection_record_count"]
+          assert all(row["model_use_status"] == "context_only_edna_occurrence" for row in rows)
+          assert all(row["detection_type"] == "positive_edna_detection_record" for row in rows)
+          assert all("fish_count" not in row and "activity_score" not in row and "catch_probability" not in row for row in rows)
+          print(f"Validated {len(rows)} positive eDNA records; no abundance or activity inference.")
+          PY
+      - name: Upload normalized occurrence context
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oca-edna-occurrence-context
+          path: output/oca_edna_context/
+          if-no-files-found: ignore
+          retention-days: 30
