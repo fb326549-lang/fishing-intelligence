@@ -89,11 +89,59 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
                 "activity_evidence_ids":";".join(sorted(r.get("activity_evidence_id","") for r in arows if r.get("activity_evidence_id"))),
                 "occurrence_evidence_ids":";".join(sorted(r.get("activity_evidence_id","") for r in orows if r.get("activity_evidence_id"))),
                 "seasonal_evidence_ids":";".join(sorted(r.get("seasonal_evidence_id","") for r in srows if r.get("seasonal_evidence_id"))),
+                "activity_evidence_context_json":json.dumps([
+                    {
+                        "id":r.get("activity_evidence_id",""),
+                        "dimension":r.get("activity_dimension",""),
+                        "evidence_kind":r.get("evidence_kind",""),
+                        "reported_pattern":r.get("reported_pattern",""),
+                        "geographic_scope":r.get("geographic_scope",""),
+                        "study_period":r.get("study_period",""),
+                        "sample_size":r.get("sample_size",""),
+                        "life_stage":r.get("life_stage",""),
+                        "method":r.get("method",""),
+                        "source_literature_id":r.get("source_literature_id",""),
+                        "source_url":r.get("source_url",""),
+                        "confidence":r.get("confidence",""),
+                        "transferability":r.get("transferability",""),
+                        "model_use_status":r.get("model_use_status",""),
+                        "limitations":r.get("limitations",""),
+                    }
+                    for r in sorted(arows,key=lambda x:x.get("activity_evidence_id",""))
+                    if r.get("activity_evidence_id")
+                ],ensure_ascii=False,separators=(",",":")),
+                "occurrence_evidence_context_json":json.dumps([
+                    {
+                        "id":r.get("activity_evidence_id",""),
+                        "evidence_kind":r.get("evidence_kind",""),
+                        "reported_pattern":r.get("reported_pattern",""),
+                        "geographic_scope":r.get("geographic_scope",""),
+                        "study_period":r.get("study_period",""),
+                        "sample_size":r.get("sample_size",""),
+                        "life_stage":r.get("life_stage",""),
+                        "method":r.get("method",""),
+                        "source_literature_id":r.get("source_literature_id",""),
+                        "source_url":r.get("source_url",""),
+                        "confidence":r.get("confidence",""),
+                        "transferability":r.get("transferability",""),
+                        "model_use_status":r.get("model_use_status",""),
+                        "limitations":r.get("limitations",""),
+                    }
+                    for r in sorted(orows,key=lambda x:x.get("activity_evidence_id",""))
+                    if r.get("activity_evidence_id")
+                ],ensure_ascii=False,separators=(",",":")),
                 "seasonal_evidence_context_json":json.dumps([
                     {
                         "id":r.get("seasonal_evidence_id",""),
                         "reported_season":r.get("reported_season",""),
                         "geographic_scope":r.get("geographic_scope",""),
+                        "study_period":r.get("study_period",""),
+                        "life_stage":r.get("life_stage",""),
+                        "method":r.get("method",""),
+                        "source_literature_id":r.get("source_literature_id",""),
+                        "source_url":r.get("source_url",""),
+                        "confidence":r.get("confidence",""),
+                        "transferability":r.get("transferability",""),
                         "model_use_status":r.get("model_use_status",""),
                         "limitations":r.get("limitations",""),
                     }
@@ -126,7 +174,7 @@ def main():
         read_csv(a.activity_csv),read_csv(a.seasonal_csv))
     fields=["candidate_id","common_name_zh","scientific_name","region_id","valid_time","data_type","taxon_gate",
         "environment_match_status","environment_match_score","environment_rule_coverage","activity_evidence_status",
-        "activity_evidence_count","occurrence_evidence_count","seasonal_evidence_count","activity_evidence_ids","occurrence_evidence_ids","seasonal_evidence_ids","seasonal_evidence_context_json",
+        "activity_evidence_count","occurrence_evidence_count","seasonal_evidence_count","activity_evidence_ids","occurrence_evidence_ids","seasonal_evidence_ids","activity_evidence_context_json","occurrence_evidence_context_json","seasonal_evidence_context_json",
         "activity_reason","activity_score","catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
