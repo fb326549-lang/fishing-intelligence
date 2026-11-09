@@ -62,7 +62,7 @@ class HourlyHistoryAuditTests(unittest.TestCase):
             folder.mkdir(parents=True)
             partition = folder / "2026-11-09.jsonl"
             row = make_record()
-            partition.write_text(json.dumps(row) + "\\n" + json.dumps(row) + "\\n", encoding="utf-8")
+            partition.write_text(json.dumps(row) + "\n" + json.dumps(row) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "exact duplicate"):
                 build_catalog(root)
 
