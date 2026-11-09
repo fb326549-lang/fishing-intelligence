@@ -385,7 +385,19 @@ function renderP2FishOutlook(){
  const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  const generated=new Date(data.generated_at),age=(Date.now()-generated.getTime())/3600000,stale=!Number.isFinite(age)||age>8||age< -0.25;
  $('p2FishStatus').textContent=stale?'資料可能過期':'已取得預報';
- $('p2FishSummary').textContent=names[region]+'｜未來 '+horizon+' 小時｜'+rows.length+' 個研究候選。'+(stale?'最新展望資料已超過 8 小時或時間異常，請視為過期。':'每個候選分別揭露預報完整度、物種資格與證據狀態。');
+ const tideRow=rows[0]||data.rows.find(r=>r.region_id===region&&String(r.horizon_hours)===horizon);
+ let tideSummary='潮汐階段摘要：尚未提供。';
+ if(tideRow&&tideRow.tide_phase_known_hour_count!==undefined){
+  const known=Number(tideRow.tide_phase_known_hour_count)||0;
+  const rise=Number(tideRow.tide_phase_rising_hours)||0;
+  const fall=Number(tideRow.tide_phase_falling_hours)||0;
+  const high=Number(tideRow.tide_phase_high_slack_hours)||0;
+  const low=Number(tideRow.tide_phase_low_slack_hours)||0;
+  const missing=Number(tideRow.tide_phase_missing_hour_count)||0;
+  const noForecast=Number(tideRow.tide_phase_missing_forecast_hour_count)||0;
+  tideSummary='潮勢預報：漲 '+rise+'h／退 '+fall+'h／高潮轉折窗 '+high+'h／低潮轉折窗 '+low+'h；已判定 '+known+'/'+horizon+'h'+(missing?'，潮勢未判定 '+missing+'h':'')+(noForecast?'，缺預報 '+noForecast+'h':'')+'。轉折窗依官方滿/乾潮預報事件推導，不代表實測潮流或停流。';
+ }
+ $('p2FishSummary').textContent=names[region]+'｜未來 '+horizon+' 小時｜'+rows.length+' 個研究候選。'+tideSummary+(stale?'最新展望資料已超過 8 小時或時間異常，請視為過期。':'每個候選分別揭露預報完整度、物種資格與證據狀態。');
  const envLabels={taxon_or_distribution_gate:'物種鑑定／分布資格尚未通過',insufficient_evidence:'缺少可核准的東部物種環境反應規則',insufficient_environment_data:'環境資料不足',no_forecast_records:'沒有預報資料',environment_match_unavailable:'環境匹配尚不可用',partial_environment_match_coverage:'環境規則覆蓋不完整',environment_match_summary_available:'已有環境規則匹配摘要'};
  const activityLabels={taxon_or_distribution_gate:'物種或分布資格尚未通過',context_only_evidence_available:'僅有背景研究，不能轉為即時活動分數',insufficient_east_taiwan_activity_evidence:'缺少東部物種級直接活動證據',direct_evidence_requires_activity_rule_review:'直接證據仍待規則審查',missing_activity_assessment:'尚無活動評估'};
  $('p2FishCards').innerHTML=rows.length?rows.map(r=>{
