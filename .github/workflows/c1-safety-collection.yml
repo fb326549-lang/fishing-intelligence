@@ -11,6 +11,8 @@ on:
       - "C1/test_normalize_cwa_safety.py"
       - "C1/test_safety_decision.py"
       - "C1/test_marine_regions.py"
+      - "C1/test_marine_exposure.py"
+      - "C1/collector/analyze_marine_exposure.py"
       - "P1/collector/fetch_cwa_stations.py"
       - "P1/collector/normalize_cwa_marine.py"
       - "P1/collector/build_east_region_conditions.py"
@@ -59,6 +61,7 @@ jobs:
           python P1/collector/build_east_region_conditions.py --input output/c1_marine_normalized/O-B0075-001.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/c1_cwa_stations/stations.csv --out output/c1_east_region_48h
           python P1/collector/build_east_region_conditions.py --input output/c1_marine_normalized/O-B0075-002.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/c1_cwa_stations/stations.csv --out output/c1_east_region_30d --historical
           python P1/collector/build_latest_regional_marine_snapshot.py --observed-48h output/c1_east_region_48h/east_region_summary.json --observed-30d output/c1_east_region_30d/east_region_summary.json --out output/c1_marine_decisions/latest_regional_marine_conditions.json
+          python C1/collector/analyze_marine_exposure.py --input output/c1_marine_decisions/latest_regional_marine_conditions.json --out output/c1_marine_decisions/latest_marine_risk_assessment.json
       - name: Publish normalized safety decision snapshots
         run: |
           mkdir -p tide-history-data/data
@@ -66,9 +69,10 @@ jobs:
           cp output/c1_safety_decisions/source_status.json tide-history-data/data/latest_safety_source_status.json
           cp output/c1_marine_decisions/latest_marine_conditions.json tide-history-data/data/latest_marine_conditions.json
           cp output/c1_marine_decisions/latest_regional_marine_conditions.json tide-history-data/data/latest_regional_marine_conditions.json
+          cp output/c1_marine_decisions/latest_marine_risk_assessment.json tide-history-data/data/latest_marine_risk_assessment.json
           git -C tide-history-data config user.name "github-actions[bot]"
           git -C tide-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C tide-history-data add data/latest_safety_decisions.json data/latest_safety_source_status.json data/latest_marine_conditions.json data/latest_regional_marine_conditions.json
+          git -C tide-history-data add data/latest_safety_decisions.json data/latest_safety_source_status.json data/latest_marine_conditions.json data/latest_regional_marine_conditions.json data/latest_marine_risk_assessment.json
           if git -C tide-history-data diff --cached --quiet; then
             echo "No change in normalized safety and marine observation snapshots."
           else
@@ -85,6 +89,7 @@ jobs:
             output/c1_safety_decisions/
             output/c1_marine_sources/
             output/c1_marine_decisions/
+            output/c1_marine_decisions/latest_marine_risk_assessment.json
             output/c1_cwa_stations/
             output/c1_marine_normalized/
             output/c1_east_region_48h/
