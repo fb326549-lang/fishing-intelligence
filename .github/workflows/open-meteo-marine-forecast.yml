@@ -101,6 +101,15 @@ jobs:
           fi
           python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}" "${ecology_args[@]}"
 
+      - name: Archive hourly forecasts and build retrospective forecast verification
+        if: github.event_name != 'pull_request'
+        run: |
+          latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          test -n "$latest_dir"
+          python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+          python P1/collector/evaluate_forecast_skill.py --archive-root p2-history-data/data --out p2-history-data/data/forecast_verification/latest.json
+          cp p2-history-data/data/forecast_verification/latest.json "$latest_dir/forecast_verification.json"
+
       - name: Validate history and commit P2 history plus live outlook
         if: github.event_name != 'pull_request'
         run: |
@@ -108,7 +117,7 @@ jobs:
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
+          git -C p2-history-data add data/hourly_environment data/forecast_verification/latest.json data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
           if git -C p2-history-data diff --cached --quiet; then
             echo "No new hourly records or outlook changes."
           else
