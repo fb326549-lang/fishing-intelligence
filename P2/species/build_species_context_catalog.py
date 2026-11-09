@@ -53,8 +53,8 @@ def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path
         source = evidence.get(eid)
         if not source or not source.get("source_url"):
             raise ValueError(f"missing traceable evidence/source URL for {row.get('ecology_record_id')}")
-        if row.get("model_use_status") not in {"eligible_as_species_context", "context_only"}:
-            raise ValueError(f"unsupported species context use status for {row.get('ecology_record_id')}")
+        if not row.get("model_use_status", "").strip():
+            raise ValueError(f"missing model_use_status for {row.get('ecology_record_id')}")
         candidate = candidates[cid]
         records.append({
             "ecology_record_id": row.get("ecology_record_id", ""),
