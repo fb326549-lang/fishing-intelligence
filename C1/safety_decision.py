@@ -40,6 +40,10 @@ def decide_region(region_id,alerts,source_status,now,max_age_minutes=90):
     for dataset in REQUIRED_SOURCES:
         s=source_status.get(dataset,{})
         if s.get("status")!="ok": missing.append(dataset); continue
+        coverage=s.get("region_coverage")
+        if isinstance(coverage,dict) and coverage.get(region_id) is not True:
+            missing.append(dataset+"（本區無監測站覆蓋）")
+            continue
         t=parse_time(s.get("collected_at"))
         if t is None or t>now or (now-t).total_seconds()>max_age_minutes*60: stale.append(dataset)
     unmapped=[a for a in alerts if a.get("unmapped_area")]
