@@ -6,6 +6,7 @@ This is a research planning register only. It never manufactures response values
 from __future__ import annotations
 import argparse
 import csv
+import json
 from pathlib import Path
 
 PRIORITY = {
@@ -44,7 +45,7 @@ FIELDS = [
     "candidate_id", "common_name_zh", "scientific_name", "response_domain",
     "parameter_code", "evidence_status", "eligibility_gate",
     "existing_parameter_codes", "evidence_ids", "literature_record_ids", "literature_use_status", "source_urls",
-    "research_requirement", "model_use_policy",
+    "literature_context_json", "research_requirement", "model_use_policy",
 ]
 
 def read_rows(path):
@@ -70,8 +71,20 @@ def build_matrix(candidate_path: Path, ecology_path: Path, evidence_path: Path, 
             evidence_ids = sorted({r.get("evidence_id", "") for r in candidate_evidence if r.get("evidence_id")})
         urls = sorted({evidence_by_id[eid].get("source_url", "") for eid in evidence_ids if eid in evidence_by_id and evidence_by_id[eid].get("source_url")})
         for domain, code in DOMAINS:
-            literature_code = {"temperature_range":"temperature_response","wave_preference":"wave_response","current_preference":"ocean_current_response","tide_response":"tide_response","wind_sensitivity":"wind_response","activity_period":"activity_period","salinity_preference":"salinity_response"}[domain]
-            domain_literature = [r for r in literature if r.get("candidate_id") == candidate_id and r.get("parameter_code") == literature_code]
+            literature_codes = {
+                "temperature_range": {"temperature_response"},
+                "wave_preference": {"wave_response"},
+                "current_preference": {"ocean_current_response"},
+                "tide_response": {"tide_response"},
+                "wind_sensitivity": {"wind_response"},
+                # Seasonal commercial distribution remains context only.
+                "activity_period": {"activity_period", "seasonal_activity"},
+                "salinity_preference": {"salinity_response"},
+            }[domain]
+            domain_literature = [
+                r for r in literature
+                if r.get("candidate_id") == candidate_id and r.get("parameter_code") in literature_codes
+            ]
             literature_ids = sorted({r.get("literature_record_id", "") for r in domain_literature if r.get("literature_record_id")})
             literature_urls = {r.get("source_url", "") for r in domain_literature if r.get("source_url")}
             if gate.startswith("white_hair"):
@@ -97,6 +110,25 @@ def build_matrix(candidate_path: Path, ecology_path: Path, evidence_path: Path, 
                 "literature_record_ids": ";".join(literature_ids),
                 "literature_use_status": ";".join(sorted({r.get("model_use_status", "") for r in domain_literature if r.get("model_use_status")})),
                 "source_urls": ";".join(sorted(set(urls) | literature_urls)),
+                "literature_context_json": json.dumps([
+                    {
+                        "literature_record_id": r.get("literature_record_id", ""),
+                        "response_domain": r.get("response_domain", ""),
+                        "parameter_code": r.get("parameter_code", ""),
+                        "reported_observation": r.get("reported_observation", ""),
+                        "reported_value": r.get("reported_value", ""),
+                        "unit": r.get("unit", ""),
+                        "study_design": r.get("study_design", ""),
+                        "geographic_scope": r.get("geographic_scope", ""),
+                        "study_period": r.get("study_period", ""),
+                        "source_name": r.get("source_name", ""),
+                        "source_url": r.get("source_url", ""),
+                        "confidence": r.get("confidence", ""),
+                        "model_use_status": r.get("model_use_status", ""),
+                        "limitations": r.get("limitations", ""),
+                    }
+                    for r in sorted(domain_literature, key=lambda x: x.get("literature_record_id", ""))
+                ], ensure_ascii=False, separators=(",", ":")),
                 "research_requirement": "Find direct species-specific evidence for response direction/range, study region, season, life stage, method and uncertainty; do not infer a numeric threshold from habitat/depth descriptions.",
                 "model_use_policy": "not_model_eligible_until_direct_response_evidence_reviewed",
             })

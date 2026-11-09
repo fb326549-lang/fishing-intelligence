@@ -60,7 +60,8 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c023,E001,https://fishdb.sinica.edu.tw/taxon/381638-fishdb\n"
                 "c023,E002,https://www.tfrin.gov.tw/theme_data.php?id=1382&theme=research\n",encoding="utf-8")
             literature=root/"literature.csv"
-            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n",encoding="utf-8")
+            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n"
+                "L6,c023,seasonal_activity,https://example.org/l6,context_only_east_taiwan_commercial_fishery\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),147)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -97,6 +98,13 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(white_alias["evidence_status"],"species_identification_required")
             self.assertEqual(white_alias["literature_record_ids"],"")
             self.assertEqual(len([r for r in rows if r["candidate_id"] in {"c036","c037"}]),14)
+            seasonal_fishery=next(r for r in rows if r["candidate_id"]=="c023" and r["response_domain"]=="activity_period")
+            self.assertEqual(seasonal_fishery["evidence_status"],"external_literature_found_context_only")
+            self.assertEqual(seasonal_fishery["literature_record_ids"],"L6")
+            self.assertEqual(seasonal_fishery["literature_use_status"],"context_only_east_taiwan_commercial_fishery")
+            context=__import__("json").loads(seasonal_fishery["literature_context_json"])
+            self.assertEqual(context[0]["model_use_status"],"context_only_east_taiwan_commercial_fishery")
+            self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
 
 if __name__ == "__main__":
     unittest.main()

@@ -732,3 +732,7 @@ The window builder deduplicates repeated evidence IDs across forecast hours. If 
 ## P2.4.6 PWA evidence-source inspection
 
 The P2 outlook cards now expose expandable, source-traceable evidence sections for activity/ecology studies, East Taiwan occurrence/specimen records, and seasonal research. Each entry shows its geography, study period, life stage, method/sample context, confidence, transferability, model-use status and limitations when present, with an HTTPS source link when available. The UI keeps these evidence classes separate and explicitly labels occurrence as historical presence only; none of these sections creates an activity score, catch probability, or best-fishing-time claim. The hourly outlook schema now explicitly includes the seasonal evidence context field.
+
+## P2.7.1 季節漁業證據與逐時活動證據分層
+
+The priority species response-gap matrix now carries a JSON provenance bundle for each matched literature domain (study design, geography, study period, reported observation/value, source, confidence, use status and limitations). East Taiwan commercial seasonal-distribution records (seasonal_activity) are visible under the seasonal/activity research domain as context-only literature, without becoming approved nearshore activity rules or hourly catch predictions. The matrix preserves the not_model_eligible_until_direct_response_evidence_reviewed policy. This prevents offshore commercial longline seasonality from being misrepresented as shore-angling activity.
