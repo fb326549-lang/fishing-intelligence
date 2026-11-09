@@ -111,7 +111,11 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
         self.assertEqual(rows[0]["status"], "insufficient_environment_data")
         self.assertEqual(rows[0]["rule_coverage"], "0.0000")
         self.assertEqual(rows[0]["rules_evaluated"], "0")
-        self.assertEqual(json.loads(rows[0]["rule_evidence_trace_json"]), [])
+        trace = json.loads(rows[0]["rule_evidence_trace_json"])
+        self.assertEqual(len(trace), 1)
+        self.assertEqual(trace[0]["rule_id"], "R1")
+        self.assertEqual(trace[0]["evaluation_status"], "missing")
+        self.assertIsNone(trace[0]["observed_value"])
 
     def test_approved_rule_requires_review_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:
