@@ -38,7 +38,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(row["activity_dimension"],"feeding_activity")
         self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
         self.assertIn("護卵雄魚",row["limitations"])
-        self.assertIn("未測量",row["limitations"])
+        self.assertIn("沒有測量",row["limitations"])
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
