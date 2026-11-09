@@ -231,6 +231,28 @@
             "null"
           ],
           "format": "date-time"
+        },
+        "showers_mm_h": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "precipitation_probability_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "weather_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
         }
       }
     },
