@@ -47,7 +47,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_missing_hours_are_not_filled_and_coverage_is_reduced(self):
         env=[forecast(10),forecast(11),forecast(13)]
         joined=[integrated(h,"70") for h in (10,11,13)]
-        row=build_window_summaries(env,[candidate()],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["forecast_hour_count"],"3")
         self.assertEqual(row["expected_hour_count"],"6")
         self.assertEqual(row["forecast_coverage"],"0.5000")
@@ -56,7 +56,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_no_environment_score_does_not_create_one_from_activity_evidence(self):
         env=[forecast(h) for h in range(10,16)]
         joined=[integrated(h,"",activity="context_only_evidence_available") for h in range(10,16)]
-        row=build_window_summaries(env,[candidate()],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["environment_match_mean"],"")
         self.assertEqual(row["activity_evidence_status"],"context_only_evidence_available")
         self.assertEqual(row["activity_score"],"")
@@ -64,7 +64,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_taxon_gate_is_preserved(self):
         env=[forecast(h) for h in range(10,16)]
         joined=[integrated(h,"",activity="taxon_or_distribution_gate",cid="c002") for h in range(10,16)]
-        row=build_window_summaries(env,[candidate("c002","white_hair_is_kyphosus_genus_group_species_identification_required")],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate("c002","white_hair_is_kyphosus_genus_group_species_identification_required")],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["activity_evidence_status"],"taxon_or_distribution_gate")
 
     def test_as_of_must_be_hour_aligned(self):
