@@ -18,7 +18,7 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),6)
+        self.assertEqual(len(rows),7)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_dolphinfish_commercial_seasonality_remains_context_only(self):
@@ -42,6 +42,17 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertIn("4–7月",row["reported_season"])
         self.assertEqual(row["model_use_status"],"context_only_east_taiwan_reproductive_biology")
         self.assertIn("not a fishing-activity",row["limitations"].lower())
+
+    def test_damselfish_nesting_season_remains_northern_taiwan_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        row=next(r for r in rows if r["seasonal_evidence_id"]=="SE007")
+        self.assertEqual(row["candidate_id"],"c027")
+        self.assertIn("5–10月",row["reported_season"])
+        self.assertIn("5月與7月",row["reported_season"])
+        self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
+        self.assertIn("北台灣",row["geographic_scope"])
+        self.assertIn("不可外推",row["limitations"])
 
     def test_seasonal_score_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
