@@ -72,22 +72,33 @@ def find_observed_extrema(rows):
     return points, extrema, sampling_minutes
 
 def match_events(forecasts, extrema, max_delta_minutes):
+    """Match only forecasts issued strictly before their target tide event."""
     candidates = []
     for fi, forecast in enumerate(forecasts):
         ft = parse_time(forecast.get("valid_time"))
+        issue_raw = (
+            forecast.get("forecast_fetched_at_utc")
+            or forecast.get("fetched_at_utc")
+            or forecast.get("collected_at")
+        )
+        issue = parse_time(issue_raw)
         kind = tide_kind(forecast.get("tide"))
         height_cm = num(forecast.get("height_above_twvd_cm"))
-        if ft is None or kind is None or height_cm is None:
+        if ft is None or issue is None or kind is None or height_cm is None:
+            continue
+        lead_hours = (ft - issue).total_seconds() / 3600
+        # A forecast issued at/after its target event is not a forecast skill sample.
+        if lead_hours <= 0:
             continue
         for oi, observed in enumerate(extrema):
             if observed["kind"] != kind:
                 continue
             delta = (observed["time"] - ft).total_seconds() / 60
             if abs(delta) <= max_delta_minutes:
-                candidates.append((abs(delta), fi, oi, delta, height_cm / 100.0))
+                candidates.append((abs(delta), fi, oi, delta, height_cm / 100.0, issue, lead_hours))
     candidates.sort(key=lambda x: x[0])
     used_f, used_o, matches = set(), set(), []
-    for abs_delta, fi, oi, delta, forecast_m in candidates:
+    for abs_delta, fi, oi, delta, forecast_m, issue, lead_hours in candidates:
         if fi in used_f or oi in used_o:
             continue
         used_f.add(fi)
@@ -95,7 +106,9 @@ def match_events(forecasts, extrema, max_delta_minutes):
         f, o = forecasts[fi], extrema[oi]
         error = o["height_m"] - forecast_m
         matches.append({
+            "forecast_issue_time_utc": issue.isoformat(),
             "forecast_time": f["valid_time"],
+            "lead_time_hours": round(lead_hours, 2),
             "observed_extremum_time": o["time"].isoformat(),
             "tide_type": f["tide"],
             "forecast_above_twvd_m": round(forecast_m, 3),
@@ -159,6 +172,17 @@ def main():
             if (parse_time(f.get("valid_time")) is not None
                 and start <= parse_time(f["valid_time"]) <= end)
         ]
+        issue_times = [
+            parse_time(f.get("forecast_fetched_at_utc") or f.get("fetched_at_utc") or f.get("collected_at"))
+            for f in window_forecasts
+        ]
+        missing_issue_time_count = sum(issue is None for issue in issue_times)
+        issued_after_target_count = sum(
+            1 for f, issue in zip(window_forecasts, issue_times)
+            if issue is not None and parse_time(f.get("valid_time")) is not None
+            and issue >= parse_time(f.get("valid_time"))
+        )
+        eligible_forecast_count = len(window_forecasts) - missing_issue_time_count - issued_after_target_count
         matches = match_events(window_forecasts, extrema, a.max_delta_minutes)
         for m in matches:
             m.update({
@@ -182,8 +206,11 @@ def main():
             "observation_sampling_interval_median_minutes": sampling_minutes,
             "observed_extrema_count": len(extrema),
             "forecast_events_in_observation_window": len(window_forecasts),
+            "forecast_events_missing_issue_time": missing_issue_time_count,
+            "forecast_events_issued_at_or_after_target": issued_after_target_count,
+            "forecast_events_eligible_for_verification": eligible_forecast_count,
             "matched_events": len(matches),
-            "unmatched_forecast_events": max(0, len(window_forecasts) - len(matches)),
+            "unmatched_eligible_forecast_events": max(0, eligible_forecast_count - len(matches)),
             "mean_absolute_height_error_m": round(mean(abs_h), 3) if abs_h else None,
             "median_absolute_height_error_m": round(median(abs_h), 3) if abs_h else None,
             "mean_absolute_timing_error_minutes": round(mean(abs_t), 1) if abs_t else None,
@@ -195,7 +222,7 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     match_fields = [
         "station_id", "station_name", "location_id", "location_name", "region_id", "region_name",
-        "pair_distance_m", "forecast_time", "observed_extremum_time", "tide_type",
+        "pair_distance_m", "forecast_issue_time_utc", "forecast_time", "lead_time_hours", "observed_extremum_time", "tide_type",
         "forecast_above_twvd_m", "observed_tide_height_m",
         "height_error_observed_minus_forecast_m", "absolute_height_error_m",
         "timing_error_observed_minus_forecast_minutes", "absolute_timing_error_minutes",
@@ -217,6 +244,7 @@ def main():
             "Only explicit station-to-location pairs are evaluated; no nearest-neighbour pairing is generated automatically.",
             "Observed extrema are detected from the sampled observations, so timing precision is limited by the observation sampling interval.",
             "Only forecast events within the observed time window are evaluated.",
+            "Forecasts without a recorded issue/fetch time, or issued at/after the target event, are excluded from verification.",
             "A match within the time tolerance is a diagnostic pairing, not proof of exact forecast verification.",
             "The current rolling observation window is short and selected stations do not represent all six regions.",
             "No regional averaging, interpolation, fish activity score or catch probability is produced.",
