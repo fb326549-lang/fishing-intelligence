@@ -33,6 +33,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install marine collector dependencies
+        run: python -m pip install --disable-pip-version-check -r P1/collector/requirements.txt
       - name: Run offline marine pipeline regression tests
         run: python -m unittest discover -s P1/collector -p "test_*.py" -v
       - name: Validate PWA inline JavaScript syntax
