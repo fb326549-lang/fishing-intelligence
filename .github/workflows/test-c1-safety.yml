@@ -39,5 +39,14 @@ jobs:
           Path("/tmp/fishing-intelligence-pwa.js").write_text(inline, encoding="utf-8")
           PY
           node --check /tmp/fishing-intelligence-pwa.js
+      - name: Assert PWA accepts the live P2.6 feed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html = Path("index.html").read_text(encoding="utf-8")
+          expected = "['fishing-intelligence-p2.4.6','fishing-intelligence-p2.6'].includes(data.source)"
+          if expected not in html:
+              raise SystemExit("PWA does not accept the live P2.6 fish outlook source")
+          PY
       - name: Run C1 safety decision tests
         run: python -m unittest discover -s C1 -p 'test_*.py' -v
