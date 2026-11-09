@@ -24,10 +24,10 @@ class IntegratedActivityTests(unittest.TestCase):
         ]
         self.activity=[
             {"candidate_id":"c003","activity_evidence_id":"AE003","model_use_status":"context_only_captive_feeding","transferability":"low_for_wild_east_taiwan_angler_prediction"},
-            {"candidate_id":"c027","activity_evidence_id":"AE011","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
-            {"candidate_id":"c036","activity_evidence_id":"AE014","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
-            {"candidate_id":"c037","activity_evidence_id":"AE015","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
-            {"candidate_id":"c001","activity_evidence_id":"AE013","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
+            {"candidate_id":"c027","activity_evidence_id":"AE011","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
+            {"candidate_id":"c036","activity_evidence_id":"AE014","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
+            {"candidate_id":"c037","activity_evidence_id":"AE015","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
+            {"candidate_id":"c001","activity_evidence_id":"AE013","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
         ]
         self.seasonal=[{"candidate_id":"c003","seasonal_evidence_id":"SE003","model_use_status":"context_only_northern_taiwan_field_study","transferability":"low_for_east_taiwan"}]
 
@@ -45,7 +45,9 @@ class IntegratedActivityTests(unittest.TestCase):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c027")
         self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
-        self.assertEqual(fish["activity_evidence_count"],"1")
+        self.assertEqual(fish["activity_evidence_count"],"0")
+        self.assertEqual(fish["occurrence_evidence_count"],"1")
+        self.assertEqual(fish["occurrence_evidence_ids"],"AE011")
         self.assertEqual(fish["activity_score"],"")
         self.assertEqual(fish["catch_probability"],"")
         self.assertEqual(fish["best_fishing_window_status"],"not_established")
@@ -55,6 +57,8 @@ class IntegratedActivityTests(unittest.TestCase):
         for cid in ("c036","c037"):
             fish=next(r for r in rows if r["candidate_id"]==cid)
             self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
+            self.assertEqual(fish["activity_evidence_count"],"0")
+            self.assertEqual(fish["occurrence_evidence_count"],"1")
             self.assertEqual(fish["activity_score"],"")
             self.assertEqual(fish["catch_probability"],"")
             self.assertEqual(fish["best_fishing_window_status"],"not_established")
@@ -63,12 +67,13 @@ class IntegratedActivityTests(unittest.TestCase):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c001")
         self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
-        self.assertEqual(fish["activity_evidence_count"],"1")
+        self.assertEqual(fish["activity_evidence_count"],"0")
+        self.assertEqual(fish["occurrence_evidence_count"],"1")
         self.assertEqual(fish["activity_score"],"")
         self.assertEqual(fish["catch_probability"],"")
         self.assertEqual(fish["best_fishing_window_status"],"not_established")
 
-    def test_taxonomy_gate_remains_blocked_even_with_no_match_score(self):
+    def test_taxonomy_gate_remains_blocked_even_with_no_match_score):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c002")
         self.assertEqual(fish["activity_evidence_status"],"taxon_or_distribution_gate")

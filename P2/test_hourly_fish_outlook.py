@@ -49,6 +49,20 @@ class HourlyFishOutlookTests(unittest.TestCase):
         self.assertEqual(row["activity_score"],"")
         self.assertEqual(row["catch_probability"],"")
 
+    def test_occurrence_records_are_aggregated_separately_from_activity_evidence(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"") for h in range(10,16)]
+        for row in joined:
+            row["activity_evidence_ids"]=""
+            row["occurrence_evidence_ids"]="AE011;AE012"
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        self.assertEqual(result["occurrence_evidence_count"],"2")
+        self.assertEqual(result["occurrence_evidence_ids"],"AE011;AE012")
+        self.assertEqual(result["activity_evidence_ids"],"")
+        self.assertEqual(result["activity_score"],"")
+        self.assertEqual(result["catch_probability"],"")
+
     def test_latest_forecast_vintage_before_as_of_is_selected(self):
         old=forecast(10,collected="2026-11-09T08:00:00+08:00")
         new=forecast(10,collected="2026-11-09T09:30:00+08:00")
