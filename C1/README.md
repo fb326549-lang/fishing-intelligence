@@ -30,6 +30,7 @@
 - CWA OpenData O-B0075-002：30 天浮標站與潮位站海況監測資料。
 - 使用 P1/stations/east_region_station_mapping.csv 的明確 station_id → region_id 對照，只納入 station_status=1 的測站。
 - 輸出 tide-history/data/latest_marine_conditions.json，按六區保留測站、最新觀測時間、48 小時筆數及 30 天筆數。
+- 同時重用 P1 已驗證的區域彙整器，更新 tide-history/data/latest_regional_marine_conditions.json；PWA 既有「中央氣象署實測海象」面板讀取此檔，保留 48 小時即時窗、30 天歷史窗及變數覆蓋率。
 - 單站資料不外推到其他區域；缺測不等於平靜或安全。
 - 最新觀測超過 180 分鐘標記 stale；資料欄位原樣保留，不猜測波浪欄位名稱或單位。
 - 此資料是「觀測」不是「預報」，目前不計算魚活性、中魚率或安全許可。
