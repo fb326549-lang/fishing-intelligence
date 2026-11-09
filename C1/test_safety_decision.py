@@ -15,6 +15,8 @@ class SafetyTests(unittest.TestCase):
  def test_stale_source_is_unknown(self): self.assertEqual(decide_region("taitung_south",[],statuses(at="2026-11-09T09:00:00+00:00"),NOW)["state"],"insufficient_data")
  def test_typhoon_high_risk(self): self.assertEqual(decide_region("taitung_south",[alert("typhoon")],statuses(),NOW)["state"],"high_risk")
  def test_other_alert_warning(self): self.assertEqual(decide_region("taitung_south",[alert()],statuses(),NOW)["state"],"warning")
+ def test_long_wave_is_warning(self): self.assertEqual(decide_region("taitung_south",[alert("long_wave")],statuses(),NOW)["state"],"warning")
+ def test_giant_wave_is_high_risk(self): self.assertEqual(decide_region("taitung_south",[alert("high_wave")],statuses(),NOW)["state"],"high_risk")
  def test_expired_alert_not_active(self): self.assertEqual(decide_region("taitung_south",[alert(end="2026-11-09T11:59:00+00:00")],statuses(),NOW)["state"],"no_active_alerts_reported")
  def test_other_region_not_affected(self): self.assertEqual(decide_region("taitung_south",[alert(region=("yilan_suao",))],statuses(),NOW)["active_alert_count"],0)
  def test_unmapped_area_means_unknown(self):
