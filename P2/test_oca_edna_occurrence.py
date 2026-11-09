@@ -109,8 +109,11 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
                 "station_name": "A", "depth_m": None,
             })
             summary = build_monthly_summary(detections)
-            write_outputs(Path(tmp), detections, summary, "2026-11-09T00:00:00+00:00")
-            manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
+            manifest = write_outputs(Path(tmp), detections, summary, "2026-11-09T00:00:00+00:00")
+            disk_manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest, disk_manifest)
+            self.assertEqual(manifest["exact_candidate_record_count"], 1)
+            self.assertEqual(manifest["ambiguous_taxon_record_count"], 0)
             self.assertIn("do not measure fish abundance", manifest["interpretation"])
             self.assertTrue((Path(tmp) / "edna_occurrence_context.jsonl").exists())
             self.assertTrue((Path(tmp) / "edna_species_monthly_summary.csv").exists())
