@@ -1,9 +1,11 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-11-09T04:37:45Z",
+  "updated_at": "2026-11-09T04:41:04Z",
   "observation_history_records": 324,
-  "forecast_vintage_records": 36100,
-  "collection_run_count": 10,
+  "forecast_vintage_records": 40029,
+  "regional_48h_history_records": 240,
+  "regional_30d_history_records": 3595,
+  "collection_run_count": 11,
   "matched_station_ids": [
     "1566",
     "1586",
@@ -55,19 +57,29 @@
     "O01300"
   ],
   "latest_run": {
-    "snapshot_id": "42562797347-1",
-    "collected_at": "2026-11-09T04:37:45Z",
+    "snapshot_id": "42563062296-1",
+    "collected_at": "2026-11-09T04:41:04Z",
     "observation_rows_seen": 4165,
     "forecast_rows_seen": 3929,
     "new_observation_revisions": 0,
     "new_forecast_vintage_events": 3929,
+    "regional_48h_records_seen": 240,
+    "new_regional_48h_revisions": 240,
+    "regional_48h_history_records": 240,
+    "regional_30d_records_seen": 3595,
+    "new_regional_30d_revisions": 3595,
+    "regional_30d_history_records": 3595,
     "matched_station_count": 6,
     "matched_forecast_location_count": 6,
     "archived_forecast_location_count": 32,
     "observation_history_records": 324,
-    "forecast_history_records": 36100,
+    "forecast_history_records": 40029,
     "observation_file": "observed_tides.jsonl",
     "forecast_file": "forecast_vintages.jsonl"
+  },
+  "regional_marine_files": {
+    "rolling_48_hour": "regional_marine_observations_48h.jsonl",
+    "rolling_30_day": "regional_marine_observations_30d.jsonl"
   },
   "policy": [
     "CWA observed TideHeight records are appended when station/time/value is new.",
@@ -75,6 +87,8 @@
     "Each forecast collection run is retained as a distinct vintage using snapshot_id.",
     "Only explicitly paired mainland tide stations and forecast locations are archived.",
     "All vertical datum fields are preserved separately; do not mix them.",
+    "Regional marine observations are archived as region/time/value revisions; identical daily repeats are deduplicated and changed values are retained.",
+    "The rolling 30-day regional feed is a historical context source; its records are not treated as 30 independent days of new samples.",
     "No interpolation, regional averaging, or catch probability is generated."
   ]
 }
