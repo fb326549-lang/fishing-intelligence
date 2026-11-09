@@ -15,7 +15,7 @@ def candidate(cid="c003",gate="verified_taxon"):
     return {"candidate_id":cid,"common_name_zh":"臭肚","scientific_name":"Siganus fuscescens","eligibility_gate":gate}
 
 def integrated(hour,score="",activity="context_only_evidence_available",cid="c003"):
-    return {"candidate_id":cid,"region_id":"taitung_south",
+    return {"candidate_id":cid,"region_id":"taitung_south","data_type":"forecast",
         "valid_time":f"2026-11-09T{hour:02d}:00:00+08:00",
         "environment_match_score":score,"environment_match_status":"scored" if score!="" else "insufficient_evidence",
         "activity_evidence_status":activity,"activity_evidence_ids":"AE003","seasonal_evidence_ids":"SE003"}
@@ -24,7 +24,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_generates_three_horizons_and_never_best_fishing_window(self):
         env=[forecast(h) for h in range(10,22)]
         joined=[integrated(h,"72") for h in range(10,22)]
-        rows=build_window_summaries(env,[candidate()],joined,AS_OF)
+        rows=[r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south"]
         self.assertEqual([r["horizon_hours"] for r in rows],["6","12","24"])
         self.assertEqual([r["forecast_hour_count"] for r in rows],["6","12","12"])
         self.assertTrue(all(r["best_fishing_window_status"]=="not_established" for r in rows))
@@ -47,7 +47,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_missing_hours_are_not_filled_and_coverage_is_reduced(self):
         env=[forecast(10),forecast(11),forecast(13)]
         joined=[integrated(h,"70") for h in (10,11,13)]
-        row=build_window_summaries(env,[candidate()],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["forecast_hour_count"],"3")
         self.assertEqual(row["expected_hour_count"],"6")
         self.assertEqual(row["forecast_coverage"],"0.5000")
@@ -56,7 +56,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_no_environment_score_does_not_create_one_from_activity_evidence(self):
         env=[forecast(h) for h in range(10,16)]
         joined=[integrated(h,"",activity="context_only_evidence_available") for h in range(10,16)]
-        row=build_window_summaries(env,[candidate()],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["environment_match_mean"],"")
         self.assertEqual(row["activity_evidence_status"],"context_only_evidence_available")
         self.assertEqual(row["activity_score"],"")
@@ -64,11 +64,20 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_taxon_gate_is_preserved(self):
         env=[forecast(h) for h in range(10,16)]
         joined=[integrated(h,"",activity="taxon_or_distribution_gate",cid="c002") for h in range(10,16)]
-        row=build_window_summaries(env,[candidate("c002","white_hair_is_kyphosus_genus_group_species_identification_required")],joined,AS_OF)[0]
+        row=next(r for r in build_window_summaries(env,[candidate("c002","white_hair_is_kyphosus_genus_group_species_identification_required")],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
         self.assertEqual(row["activity_evidence_status"],"taxon_or_distribution_gate")
 
     def test_as_of_must_be_hour_aligned(self):
         with self.assertRaisesRegex(ValueError,"aligned to the start of an hour"):
             build_window_summaries([], [candidate()], [], datetime.fromisoformat("2026-11-09T10:30:00+08:00"))
+
+    def test_all_six_regions_are_reported_even_without_forecast_records(self):
+        rows=build_window_summaries([], [candidate()], [], AS_OF)
+        self.assertEqual(len(rows),18)
+        self.assertEqual({r["region_id"] for r in rows},{
+            "yilan_suao","hualien_north","hualien_south",
+            "fengbin_shitiping","chenggong_donghe","taitung_south"})
+        self.assertTrue(all(r["environment_match_status"]=="no_forecast_records" for r in rows))
+        self.assertTrue(all(r["forecast_coverage"]=="0.0000" for r in rows))
 
 if __name__=="__main__": unittest.main()

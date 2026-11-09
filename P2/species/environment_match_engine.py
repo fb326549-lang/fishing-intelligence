@@ -105,7 +105,7 @@ def evaluate(environment_records, candidate_rows, rules):
             gate = gate_for(cid, candidates)
             if gate in BLOCKED_TAXON_GATES or gate != "verified_taxon":
                 results.append({
-                    "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""),
+                    "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                     "status": "taxon_or_distribution_gate", "environment_match_score": "",
                     "rule_coverage": "0", "rules_matched": "0", "rules_evaluated": "0", "rules_applicable": "0",
                     "reason": "candidate identity or regional occurrence is not cleared",
@@ -115,7 +115,7 @@ def evaluate(environment_records, candidate_rows, rules):
             applicable = [r for r in rules if r["candidate_id"] == cid and r["region_scope"] in {region, "all_east_taiwan"}]
             if not applicable:
                 results.append({
-                    "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""),
+                    "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                     "status": "insufficient_evidence", "environment_match_score": "",
                     "rule_coverage": "0", "rules_matched": "0", "rules_evaluated": "0", "rules_applicable": "0",
                     "reason": "no approved East Taiwan direct-field response rules",
@@ -145,7 +145,7 @@ def evaluate(environment_records, candidate_rows, rules):
                 status = "scored" if not missing else "partial_environment_data"
                 reason = "explicit reviewed response rules only; non-matching conditions contribute zero; missing rules are excluded and coverage is reported"
             results.append({
-                "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""),
+                "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                 "status": status, "environment_match_score": "" if score == "" else f"{score:.2f}",
                 "rule_coverage": f"{coverage:.4f}", "rules_matched": str(sum(1 for _, matched in evaluated if matched)),
                 "rules_evaluated": str(len(evaluated)), "rules_applicable": str(len(applicable)), "reason": reason,
@@ -163,7 +163,7 @@ def main():
     environments = [json.loads(line) for line in args.environment_jsonl.read_text(encoding="utf-8").splitlines() if line.strip()]
     results = evaluate(environments, read_csv(args.candidates_csv), load_rules(args.rules_csv))
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["candidate_id", "region_id", "valid_time", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "reason", "interpretation"]
+    fields = ["candidate_id", "region_id", "valid_time", "data_type", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "reason", "interpretation"]
     with args.out.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         writer.writeheader()

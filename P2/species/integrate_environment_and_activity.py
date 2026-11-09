@@ -22,7 +22,7 @@ def unique_candidates(rows):
 def index_matches(rows):
     indexed={}
     for row in rows:
-        key=(row.get("candidate_id",""),row.get("region_id",""),row.get("valid_time",""))
+        key=(row.get("candidate_id",""),row.get("region_id",""),row.get("valid_time",""),row.get("data_type",""))
         if key in indexed: raise ValueError(f"duplicate environment match result: {key}")
         indexed[key]=row
     return indexed
@@ -41,7 +41,7 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
         region=env.get("region_id","")
         valid=env.get("valid_time","")
         for cid,candidate in sorted(candidates.items()):
-            match=matches.get((cid,region,valid))
+            match=matches.get((cid,region,valid,env.get("data_type","")))
             gate=candidate.get("eligibility_gate","")
             arows=activity_by[cid]
             srows=seasonal_by[cid]
@@ -107,6 +107,6 @@ def main():
         "activity_reason","activity_score","catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
-        w=csv.DictWriter(f,fieldnames=fields,lineterminator="\\n");w.writeheader();w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=fields,lineterminator="\n");w.writeheader();w.writerows(rows)
     print(f"Integrated {len(rows)} candidate-region-hour rows; activity scores and catch probabilities remain unassigned.")
 if __name__=="__main__": main()

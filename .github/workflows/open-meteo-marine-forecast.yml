@@ -61,19 +61,30 @@ jobs:
           python P1/species/build_species_environment_context.py --species-dir P1/species --regional-forecast "$latest_dir/regional_forecast_conditions_6_12_24.csv" --out "$latest_dir/species_environment_context.csv"
           python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --out "$latest_dir/hourly_environment_p2.jsonl"
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
-          python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+ 
+      - name: Build P2.4.6 live six-region fish outlook
+        run: |
+          latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          test -n "$latest_dir"
+          python P2/species/validate_activity_evidence.py --activity-csv P2/species/species_activity_evidence_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
+          python P2/species/validate_seasonal_activity.py --seasonal-csv P2/species/species_seasonal_activity_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
+          python P2/species/environment_match_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/environment_response_rules_template.csv --out "$latest_dir/environment_match.csv"
+          python P2/species/integrate_environment_and_activity.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --environment-match-csv "$latest_dir/environment_match.csv" --activity-csv P2/species/species_activity_evidence_register.csv --seasonal-csv P2/species/species_seasonal_activity_register.csv --out "$latest_dir/integrated_hourly_fish_assessment.csv"
+          as_of=$(python -c 'from datetime import datetime,timedelta; from zoneinfo import ZoneInfo; n=datetime.now(ZoneInfo("Asia/Taipei")); h=n.replace(minute=0,second=0,microsecond=0); print((h+timedelta(hours=1) if n!=h else h).isoformat())')
+          python P2/species/build_hourly_fish_outlook.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --integrated-csv "$latest_dir/integrated_hourly_fish_assessment.csv" --as-of "$as_of" --out "$latest_dir/hourly_fish_outlook.csv"
+          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json
+
+      - name: Validate history and commit P2 history plus live outlook
+        run: |
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
-
-      - name: Commit append-only P2 hourly history
-        run: |
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment
+          git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json
           if git -C p2-history-data diff --cached --quiet; then
-            echo "No new hourly records to archive."
+            echo "No new hourly records or outlook changes."
           else
-            git -C p2-history-data commit -m "Archive P2 hourly marine environment records"
+            git -C p2-history-data commit -m "Archive P2 hourly environment and publish current fish outlook"
             git -C p2-history-data push origin HEAD:p2-history
           fi
 
