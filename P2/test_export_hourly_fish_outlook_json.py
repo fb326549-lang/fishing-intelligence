@@ -65,7 +65,7 @@ class ExportHourlyFishOutlookTests(unittest.TestCase):
         record=payload["species_ecology_context"]["records"][0]
         self.assertEqual(record["candidate_id"],"c027")
         self.assertEqual(record["parameter_value"],"reef; coastal")
-        self.assertIn("fish abundance",payload["species_ecology_context"]["interpretation"])
+        self.assertEqual(payload["species_ecology_context"]["interpretation"],"Natural-history context only.")
 
     def test_species_context_requires_source_provenance(self):
         context={"schema_version":1,"records":[{"candidate_id":"c027","parameter_code":"habitat"}]}
