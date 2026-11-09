@@ -183,8 +183,18 @@ def build_assessment(snapshot, now, stale_after_minutes=180):
         "stale_after_minutes": stale_after_minutes,
         "threshold_policy": {
             "type": "internal_screening_only",
-            "wave_height_m": [{"below_m": x, "level": y} for x, y, _ in BANDS["wave_height_m"]],
-            "wind_speed_ms": [{"below_ms": x, "level": y} for x, y, _ in BANDS["wind_speed_ms"]],
+            "wave_height_m": [
+                {"upper_exclusive_m": 1.0, "level": "low"},
+                {"upper_exclusive_m": 1.5, "level": "moderate"},
+                {"upper_exclusive_m": 2.5, "level": "high"},
+                {"lower_inclusive_m": 2.5, "level": "very_high"},
+            ],
+            "wind_speed_ms": [
+                {"upper_exclusive_ms": 5.0, "level": "low"},
+                {"upper_exclusive_ms": 8.0, "level": "moderate"},
+                {"upper_exclusive_ms": 11.0, "level": "high"},
+                {"lower_inclusive_ms": 11.0, "level": "very_high"},
+            ],
             "notice": "These bands are not official CWA warning thresholds, local shoreline safety limits, or fishing-success thresholds.",
         },
         "regions": {
@@ -214,7 +224,7 @@ def main():
     snapshot = json.loads(args.input.read_text(encoding="utf-8"))
     result = build_assessment(snapshot, now, args.stale_after_minutes)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.out.write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     print(json.dumps({
         "regions": len(result["regions"]),
         "states": {key: value["state"] for key, value in result["regions"].items()},
