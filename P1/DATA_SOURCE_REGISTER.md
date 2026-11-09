@@ -73,3 +73,10 @@ The following official CWA products are now implemented in the P1 collector work
 - API quota and credential FAQ: https://opendata.cwa.gov.tw/faq
 - CWA usage rules: https://opendata.cwa.gov.tw/about/rules
 
+
+
+## PWA consumption of regional observations
+
+The deployed PWA reads `tide-history/data/latest_regional_marine_conditions.json` from the public repository branch. The compact snapshot contains the six P1 planning regions, separate 48-hour and 30-day observed summaries, valid observation times, station counts, per-variable coverage, and explicit no-coverage status. It contains no CWA authorization token.
+
+Open-Meteo remains the modelled forecast source. CWA O-B0075 values are displayed separately as in-situ station observations. The PWA does not blend them into its heuristic fish score pending a validated environmental response model.

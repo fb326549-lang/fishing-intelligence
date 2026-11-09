@@ -128,3 +128,16 @@ python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir path/to/t
 The history branch also stores regional 48-hour and 30-day marine observation series with append-only revision tracking. The verifier uses only reviewed mainland station/location pairs and TWVD2001 heights. Forecast lead time is calculated from the original CWA fetch timestamp. Forecasts fetched at or after the target event are excluded. It reports descriptive MAE and timing errors only after valid matches exist; no fish activity score or catch probability is inferred from a small or empty sample.
 
 The CWA workflow is configured for 07:00 Taiwan-time daily collection. It is now present on the repository default branch, so the schedule is enabled. The workflow checks out `p1-foundation` for its collector code; keep that branch synchronized with the reviewed `main` version.
+
+
+## PWA CWA observation panel
+
+The existing PWA now reads the compact public snapshot at:
+
+`https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json`
+
+The panel shows O-B0075-001 48-hour observations and O-B0075-002 rolling 30-day latest observations separately from Open-Meteo model forecasts. It displays observation time, station coverage, wave height/period, sea temperature, current speed, wind speed, and tide height.
+
+The PWA can estimate a P1 planning region from the selected coordinate or allow manual region selection. This automatic mapping is approximate and is not an official CWA marine boundary. Hualien South is explicitly marked as having no CWA station coverage; the UI does not substitute another region's values.
+
+CWA observed values are currently displayed as a separate evidence layer. They are not blended into the existing heuristic fish score. The existing score is not a calibrated catch probability or a trained local fish-activity model.
