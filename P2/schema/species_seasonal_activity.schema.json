@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/species_seasonal_activity.schema.json",
+  "title": "Species seasonal activity evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "seasonal_evidence_id",
+    "candidate_id",
+    "taxon_scientific_name",
+    "seasonal_dimension",
+    "evidence_kind",
+    "reported_season",
+    "reported_pattern",
+    "geographic_scope",
+    "study_period",
+    "life_stage",
+    "method",
+    "source_literature_id",
+    "source_url",
+    "confidence",
+    "transferability",
+    "model_use_status",
+    "limitations"
+  ],
+  "properties": {
+    "seasonal_evidence_id": {
+      "type": "string",
+      "pattern": "^SE[0-9]{3}$"
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^c[0-9]{3}$"
+    },
+    "taxon_scientific_name": {
+      "type": "string",
+      "minLength": 3
+    },
+    "seasonal_dimension": {
+      "enum": [
+        "seasonal_aggregation",
+        "seasonal_nearshore_aggregation",
+        "seasonal_distribution",
+        "seasonal_feeding",
+        "seasonal_activity_proxy",
+        "spawning_timing"
+      ]
+    },
+    "evidence_kind": {
+      "enum": [
+        "direct_field_observation",
+        "underwater_visual_survey",
+        "natural_history_observation",
+        "fishery_catch_model",
+        "telemetry_proxy",
+        "captive_trial",
+        "taxonomic_summary"
+      ]
+    },
+    "reported_season": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reported_pattern": {
+      "type": "string",
+      "minLength": 10
+    },
+    "geographic_scope": {
+      "type": "string",
+      "minLength": 2
+    },
+    "study_period": {
+      "type": "string",
+      "minLength": 1
+    },
+    "life_stage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_literature_id": {
+      "type": "string",
+      "pattern": "^L[0-9]{3}$"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "transferability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_use_status": {
+      "type": "string",
+      "pattern": "^context_only_"
+    },
+    "limitations": {
+      "type": "string",
+      "minLength": 20
+    }
+  }
+}
