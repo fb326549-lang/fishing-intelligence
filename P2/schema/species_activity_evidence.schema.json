@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/species_activity_evidence.schema.json",
+  "title": "Fishing Intelligence species activity evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "activity_evidence_id",
+    "candidate_id",
+    "taxon_scientific_name",
+    "activity_dimension",
+    "evidence_kind",
+    "activity_measure",
+    "reported_pattern",
+    "time_basis",
+    "geographic_scope",
+    "study_period",
+    "sample_size",
+    "life_stage",
+    "method",
+    "source_literature_id",
+    "source_url",
+    "confidence",
+    "transferability",
+    "model_use_status",
+    "limitations"
+  ],
+  "properties": {
+    "activity_evidence_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^c[0-9]{3}$"
+    },
+    "taxon_scientific_name": {
+      "type": "string",
+      "minLength": 3
+    },
+    "activity_dimension": {
+      "enum": [
+        "diel_activity",
+        "diel_feeding",
+        "seasonal_aggregation",
+        "seasonal_distribution",
+        "spawning_timing",
+        "feeding_activity",
+        "movement_activity",
+        "diel_activity_proxy"
+      ]
+    },
+    "evidence_kind": {
+      "enum": [
+        "direct_field_observation",
+        "telemetry_proxy",
+        "captive_feeding_trial",
+        "fishery_catch_model",
+        "taxonomic_summary"
+      ]
+    },
+    "activity_measure": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reported_pattern": {
+      "type": "string",
+      "minLength": 1
+    },
+    "time_basis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "geographic_scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "study_period": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sample_size": {
+      "type": "string"
+    },
+    "life_stage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_literature_id": {
+      "type": "string",
+      "pattern": "^L[0-9]{3}$"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "transferability": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_use_status": {
+      "enum": [
+        "context_only_northern_taiwan_field_study",
+        "context_only_taxonomic_database",
+        "context_only_captive_feeding",
+        "context_only_western_taiwan_fishery_model",
+        "context_only_external_region"
+      ]
+    },
+    "limitations": {
+      "type": "string",
+      "minLength": 10
+    }
+  }
+}

@@ -258,3 +258,35 @@ L015–L017 的用途為 context_only_taxonomic_database；L019–L020 的用途
 - 花蓮東堤瓜子鱲標本 FRIP22025：https://www.tfrin.gov.tw/theme_data.php?id=1395&sub_theme=kuroshio&theme=collection
 
 CI 會重建 70 列矩陣並逐位元比對；測試確認南方舵魚文獻不再掛在白毛俗名群組，且兩種舵魚各自保有物種級候選紀錄。
+
+
+## P2.4.1 魚種活動證據登錄（不產生活性分數）
+
+新增：
+- `species/species_activity_evidence_register.csv`：活動證據標準化登錄。
+- `schema/species_activity_evidence.schema.json`：單筆活動證據 JSON Schema 契約。
+- `species/validate_activity_evidence.py`：驗證候選物種、文獻編號、來源 URL、證據用途及分類。
+- `test_activity_evidence.py`：測試來源對應、物種對應及禁止升格計分。
+
+第一批 7 筆活動相關證據依研究方法與時間尺度分開保存：
+- AE001：瓜子鱲北台灣野外冬季/早春成魚群聚（L008）；不是東部釣獲率。
+- AE002：瓜子鱲資料庫日行性概述（L015）；不是東部逐時觀測。
+- AE003：臭肚控制/養殖條件下藻類攝食日週期（L005）；不是野外咬況。
+- AE004：黑鯛西台灣刺網季節漁獲/棲地模型（L014）；不是東部磯釣時段。
+- AE005：南方舵魚日本海藻場生物遙測訊號與夜間未檢出（L003）；遙測訊號是活動代理，不是攝食或中魚率。
+- AE006：南方舵魚資料庫日行性概述（L016）。
+- AE007：天竺舵魚資料庫日行性概述（L017）。
+
+目前所有紀錄均維持各自的 `context_only_*` 用途，不得輸出活動分數或最佳作釣時段。候選 c001（黑毛俗名）仍要求個體形態鑑種；白毛屬群組 c002 不因其他舵魚物種資料而自動取得活動參數。日行性、攝食時間、季節群聚、繁殖季及遙測訊號是不同觀測概念，不可互相替代。
+
+驗證：
+```bash
+python P2/species/validate_activity_evidence.py \\
+  --activity-csv P2/species/species_activity_evidence_register.csv \\
+  --candidates-csv P1/species/species_candidate_register.csv \\
+  --literature-csv P2/species/species_response_literature_register.csv
+python -m unittest P2.test_activity_evidence -v
+python -m unittest discover -s P2 -p 'test_*.py' -v
+```
+
+本工作僅完成活動證據資料層與品質閘門，尚未建立日出/日落、晨昏、季節、潮汐或海流對逐時活動的已驗證權重。下一步 P2.4.2 才會建立日夜/晨昏特徵；在缺乏直接東部活動資料前，時間特徵僅作上下文，不可當成魚活性分數。
