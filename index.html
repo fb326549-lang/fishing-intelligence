@@ -47,6 +47,7 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 <section class="panel wide"><div class="row"><h2>📍 選擇釣點</h2><span id="coords" class="small">尚未選點</span></div><div id="map"></div><div class="tools"><button id="gps">◎ 目前位置</button><button id="taiwan">回到台灣</button><button id="refresh">重新查詢</button><button id="saveFavorite">☆ 收藏目前釣點</button></div><div class="metric" style="margin-top:10px"><div class="row"><strong>⭐ 我的最愛釣點</strong><span class="small" id="favoriteCount">0 個收藏</span></div><div id="favoriteList" class="favorite-list"><div class="small">尚未收藏釣點。先點選地圖，再按「收藏目前釣點」。</div></div></div><div id="pointStatus" class="status">點擊地圖選擇海域，或使用目前位置。</div></section>
 <section class="panel"><h2>🌊 海洋預報（Open-Meteo）</h2><div class="grid"><div class="metric"><div class="label">海表溫度</div><div class="value" id="sst">—</div></div><div class="metric"><div class="label">海流速度</div><div class="value" id="current">—</div></div><div class="metric"><div class="label">浪高</div><div class="value" id="wave">—</div></div><div class="metric"><div class="label">浪週期</div><div class="value" id="period">—</div></div></div><div id="marineStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel wide" id="cwaObservedPanel"><div class="row"><h2>📡 中央氣象署實測海象</h2><span class="tag">測站觀測</span></div><div class="grid"><div><label>東部規劃區域</label><select id="cwaRegion"><option value="auto">依釣點座標自動選區</option><option value="yilan_suao">宜蘭、蘇澳</option><option value="hualien_north">花蓮北段</option><option value="hualien_south">花蓮南段</option><option value="fengbin_shitiping">豐濱、石梯坪</option><option value="chenggong_donghe">成功、東河</option><option value="taitung_south">台東南段</option></select></div><div class="metric"><div class="label">48小時最新觀測時間</div><div class="value" id="cwaObservedTime">等待資料</div></div></div><div class="grid" style="margin-top:8px"><div class="metric"><div class="label">實測浪高</div><div class="value" id="cwaWave">—</div></div><div class="metric"><div class="label">實測浪週期</div><div class="value" id="cwaPeriod">—</div></div><div class="metric"><div class="label">實測海溫</div><div class="value" id="cwaSst">—</div></div><div class="metric"><div class="label">實測海流速度</div><div class="value" id="cwaCurrent">—</div></div><div class="metric"><div class="label">實測風速</div><div class="value" id="cwaWind">—</div></div><div class="metric"><div class="label">實測潮位</div><div class="value" id="cwaTide">—</div></div></div><div class="small" id="cwaObservedMeta">等待中央氣象署區域實測摘要。</div><div class="metric" style="margin-top:9px"><div class="row"><strong>30天資料最新觀測（歷史窗）</strong><span class="small" id="cwa30dTime">—</span></div><div class="grid" style="margin-top:8px"><div><div class="label">浪高</div><div class="value" id="cwa30dWave">—</div></div><div><div class="label">海溫</div><div class="value" id="cwa30dSst">—</div></div><div><div class="label">海流速度</div><div class="value" id="cwa30dCurrent">—</div></div></div></div><div id="cwaStatus" class="status">取得中央氣象署實測摘要中…</div><div class="notice">CWA 數值為規劃區域內測站觀測彙整，不是地圖選點的現場實測；自動選區依 P1 規劃區域中心緯度估算，並非官方海域邊界，可手動改選。缺測欄位保持無資料。30天資料顯示歷史窗內最新觀測，不是30日平均或預報。這些實測值目前獨立顯示，尚未直接混入魚情分數。</div></section>
+<section class="panel wide" id="forecastVerificationPanel"><div class="row"><h2>📊 海象預報可信度驗證</h2><span class="tag" id="forecastVerificationStatus">等待資料</span></div><div class="grid"><div class="metric"><div class="label">同區域／同有效小時配對</div><div class="value" id="forecastPairCount">—</div></div><div class="metric"><div class="label">預報版本配對</div><div class="value" id="forecastVintageCount">—</div></div><div class="metric"><div class="label">達探索樣本門檻變數</div><div class="value" id="forecastMetricCount">—</div></div></div><div id="forecastVerificationMetrics" class="small" style="margin-top:10px;line-height:1.7">等待歷史預報與中央氣象署實測資料完成時間配對。</div><div id="forecastVerificationNote" class="notice">資料完整度不等於預報準確度。只有同區域、同有效小時的預報與實測配對才會計算誤差；樣本不足時不會顯示準確度結論。</div><div id="forecastVerificationFreshness" class="small" style="margin-top:8px;color:#9fb4ae">驗證更新時間：等待資料</div></section>
 <section class="panel"><h2>🌬️ 天氣與風況</h2><div class="grid"><div class="metric"><div class="label">風速</div><div class="value" id="wind">—</div></div><div class="metric"><div class="label">陣風</div><div class="value" id="gust">—</div></div><div class="metric"><div class="label">氣壓</div><div class="value" id="pressure">—</div></div><div class="metric"><div class="label">降雨機率</div><div class="value" id="rain">—</div></div><div class="metric"><div class="label">相對濕度</div><div class="value" id="humidity">—</div></div><div class="metric"><div class="label">雲量</div><div class="value" id="cloud">—</div></div><div class="metric"><div class="label">能見度</div><div class="value" id="visibility">—</div></div><div class="metric"><div class="label">風向</div><div class="value" id="windDirection">—</div></div></div><div id="weatherStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel wide"><h2>🐟 台灣常見魚種・智慧魚情</h2><div class="grid"><div><label>海域區域</label><select id="fishRegion"><option value="auto">依釣點自動判斷</option><option value="north">北部／東北角</option><option value="east">東部</option><option value="west">西部／中部</option><option value="south">南部</option></select></div><div><label>目標魚種</label><select id="targetFish"><option value="all">不限魚種（綜合環境）</option></select></div></div><div class="row" style="margin-top:12px"><div><div class="label">舊版通用環境分數（已停用）</div><div class="value" id="activity" style="font-size:34px">已停用</div></div><span class="tag" id="activityGrade">不作魚情判斷</span></div><p class="small" id="activityNote">舊版通用權重缺少台灣東部物種級直接反應證據，已停止計分，避免產生誤導性分數。</p><div id="activityBreakdown" class="small" style="line-height:1.8;margin-top:8px">請以「P2 智慧魚情展望」中的物種資格、環境證據與活動證據狀態為準。</div><div class="notice">指數是依海流、潮汐、風浪、氣壓及魚種習性建立的環境參考值，不代表魚群即時偵測或保證漁獲。魚種名單依台灣沿岸棲地與常見垂釣對象整理；各地季節、禁漁規定及實際出現情況仍須確認。</div></section>
 <section class="panel wide" id="recommendations"><h2>🎯 魚種推薦與最佳時段</h2><p class="small">舊版通用環境排序已停用。只有具備足夠的東部物種級直接證據、通過模型驗證後，才會提供魚種排名與最佳作釣時段。</p><div id="topFish" class="grid"><div class="metric">尚未建立可驗證的魚種排名；請查看 P2 智慧魚情展望中的證據狀態。</div></div><div class="metric" style="margin-top:10px"><div class="label">最佳作釣時段</div><div class="value" id="bestWindow">尚未建立</div><div class="small" id="bestWindowNote">不以風浪較平穩的時段直接推論魚類活性或中魚機率。</div></div></section><section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">下一個滿潮／乾潮</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">目前潮勢</div><div class="value" id="tidePhase">待串接</div></div></div><div style="margin-top:10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="small">今日潮差 <strong id="tideRangeToday">計算中</strong></span><strong id="tideRangeGrade" style="font-size:24px;line-height:1.2;color:#35c7a0;letter-spacing:1px">判定中</strong></div><div class="metric" style="margin-top:8px"><div class="row"><span class="label">目前潮汐進度</span><strong id="tideProgressText">等待資料</strong></div><div style="height:10px;background:#0a2333;border-radius:99px;overflow:hidden;margin-top:8px"><div id="tideProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#2aa8d8,#5bd5a0);border-radius:99px"></div></div><div class="row small" style="margin-top:5px"><span>轉折點（滿潮／乾潮）</span><span id="tideRangeText">—</span></div></div><p class="small" id="tideDetail">依選定座標自動比對最近的中央氣象署潮汐預報地點。</p></section>
@@ -62,7 +63,8 @@ const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-in
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
 const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
-let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null};
+const FORECAST_VERIFICATION_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/latest.json";
+let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null,forecastVerification:null};
 
 const map=L.map('map').setView([23.72,121.62],8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
@@ -447,6 +449,49 @@ async function loadP2FishOutlook(){
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
 }
+function renderForecastVerification(){
+ const data=latest.forecastVerification;
+ if(!data)return;
+ const labels={awaiting_time_aligned_observations:'等待同時刻實測資料',matched_hours_without_comparable_variables:'已有時間配對，尚無可比較欄位',exploratory_metrics_available:'已有初步誤差指標',exploratory_pairs_below_minimum_sample:'已有配對，樣本仍不足'};
+ $('forecastVerificationStatus').textContent=labels[data.status]||'驗證狀態未知';
+ $('forecastPairCount').textContent=String(data.forecast_observation_hour_pairs??0);
+ $('forecastVintageCount').textContent=String(data.forecast_vintages_with_any_comparable_variable??0);
+ $('forecastMetricCount').textContent=String(data.variables_with_exploratory_metrics??0)+' / '+String(Object.keys(data.variables||{}).length);
+ const names={wave_height_m:['浪高','m'],wave_period_s:['浪週期','秒'],sea_surface_temperature_c:['海表溫度','°C'],wind_speed_ms:['風速','m/s'],wind_direction_deg:['風向','°'],current_speed_ms:['海流速度','m/s'],current_direction_deg:['海流方向','°']};
+ const rows=Object.entries(data.variables||{}).map(([key,v])=>{
+  const label=names[key]||[key,''];
+  if(v.status!=='exploratory_metrics'||v.mae==null)return '<div>'+escapeP2Text(label[0])+'：樣本不足（'+String(v.unique_region_valid_hours??0)+' 個有效時刻；至少 '+String(data.minimum_unique_region_valid_hours_for_exploratory_metrics??5)+' 個）</div>';
+  return '<div>'+escapeP2Text(label[0])+'：MAE '+Number(v.mae).toFixed(2)+' '+label[1]+'｜RMSE '+Number(v.rmse).toFixed(2)+' '+label[1]+'｜有效時刻 '+String(v.unique_region_valid_hours??0)+'</div>';
+ });
+ $('forecastVerificationMetrics').innerHTML=rows.length?rows.join(''):'目前尚無可用的誤差統計。';
+ if(data.status==='awaiting_time_aligned_observations'){
+  $('forecastVerificationNote').textContent='目前尚無同區域、同有效小時的預報／實測配對。系統不以最近時間替代、不插值，也不推估預報準確度；持續累積資料後才會開始計算。';
+ }else if(data.status==='exploratory_metrics_available'){
+  $('forecastVerificationNote').textContent='目前僅為探索性歷史誤差指標，不保證未來預報準確，也不代表近岸釣點的實際海況；各區樣本量與預報提前時間仍須分開檢視。';
+ }else{
+  $('forecastVerificationNote').textContent='目前資料尚未達到探索性指標的最低有效時刻數。配對筆數與獨立有效時刻數分開呈現，避免重複預報版本灌大樣本。';
+ }
+ const generated=new Date(data.generated_at_utc||'');
+ $('forecastVerificationFreshness').textContent='驗證更新時間：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜觀測有效時刻 '+String(data.observation_valid_hours_available??0)+'｜預報有效時刻 '+String(data.forecast_valid_hours_with_vintages??0);
+}
+async function loadForecastVerification(){
+ try{
+  const response=await fetch(FORECAST_VERIFICATION_URL+'?t='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.schema_version!=='1.0.0'||!data.status||!data.variables)throw Error('驗證資料格式不符');
+  latest.forecastVerification=data;
+  renderForecastVerification();
+ }catch(e){
+  latest.forecastVerification=null;
+  $('forecastVerificationStatus').textContent='尚未發布';
+  $('forecastPairCount').textContent='—';
+  $('forecastVintageCount').textContent='—';
+  $('forecastMetricCount').textContent='—';
+  $('forecastVerificationMetrics').textContent='目前尚未取得已發布的歷史預報驗證報告；這不代表預報準確或不準確。';
+  $('forecastVerificationFreshness').textContent='驗證更新時間：無資料';
+ }
+}
 function renderP2EvidenceContext(title,raw,kind){
  let items=[];
  try{items=JSON.parse(raw||'[]');if(!Array.isArray(items))items=[];}catch{items=[];}
@@ -651,7 +696,7 @@ renderFishOptions();
 initFavorites();
 map.setView([point.lat,point.lon],8);
 choose(point.lat,point.lon);
-async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();loadP2FishOutlook();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
+async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();loadP2FishOutlook();loadForecastVerification();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,cloud_cover,visibility,wind_direction_10m',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m,pressure_msl',forecast_days:'2',timezone:'Asia/Taipei'});
 const [mr,wr]=await Promise.all([fetch(mu),fetch(wu)]);if(!mr.ok)throw Error('Marine API HTTP '+mr.status);if(!wr.ok)throw Error('Weather API HTTP '+wr.status);
