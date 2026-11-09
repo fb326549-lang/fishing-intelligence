@@ -35,7 +35,7 @@ def select_forecast_vintages(records,as_of):
 def index_integrated(rows):
     result={}
     for row in rows:
-        key=(row.get("candidate_id",""),row.get("region_id",""),row.get("valid_time",""))
+        key=(row.get("candidate_id",""),row.get("region_id",""),row.get("valid_time",""),row.get("data_type",""))
         if key in result: raise ValueError(f"duplicate integrated assessment row: {key}")
         result[key]=row
     return result
@@ -62,7 +62,7 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
             window=[r for r in region_rows if as_of<=parse_dt(r["valid_time"],"valid_time")<end]
             # Keep one record per hour after forecast vintage selection; absent hours remain absent.
             for cid,candidate in sorted(candidates.items()):
-                joined=[integrated.get((cid,region,r.get("valid_time",""))) for r in window]
+                joined=[integrated.get((cid,region,r.get("valid_time",""),"forecast")) for r in window]
                 joined=[r for r in joined if r is not None]
                 scores=[]
                 for row in joined:
