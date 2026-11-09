@@ -50,6 +50,8 @@ jobs:
               "本區缺少有效參考站",
               "CWA_TIDE_SNAPSHOT_URL",
               "當地平均海面基準",
+              "let point={lat:23.72,lon:121.62}",
+              "choose(point.lat,point.lon)",
           ]
           missing = [item for item in expected if item not in html]
           if missing:
