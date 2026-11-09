@@ -204,16 +204,19 @@ def main():
  if item["status"]=="ok":alerts.extend(cap_alerts(a.input/item["file"],item["collected_at"]))
  for ds in ("O-B0069-001","O-B0070-001"):
   item=next(x for x in manifest["datasets"] if x["dataset_id"]==ds)
-  for r in COVERAGE[ds]:status[ds]["region_coverage"][r]=False
+  for r in REGIONS:status[ds]["region_coverage"][r]=False
   if item["status"]=="ok":
    marine,covered=marine_alerts(ds,json.loads((a.input/item["file"]).read_text(encoding="utf-8")),item["collected_at"])
    alerts.extend(marine)
    for r in covered:status[ds]["region_coverage"][r]=True
- # Deduplicate repeated hazard representations while retaining source provenance.
+ # Merge duplicate representations of the same alert from county, detail and CAP feeds.
+ # Prefer the most descriptive message while retaining one canonical safety event.
  unique={}
  for x in alerts:
-  key=(x["dataset_id"],x["alert_id"],tuple(x["region_ids"]))
-  unique[key]=x
+  key=(x["alert_type"],tuple(x["region_ids"]),x["effective_start"],x["effective_end"])
+  current=unique.get(key)
+  if current is None or len(x.get("message",""))>len(current.get("message","")):
+   unique[key]=x
  alerts=list(unique.values())
  decisions={"schema_version":"1.0.0","as_of":collected,"regions":{r:decide_region(r,alerts,status,parse_time(collected)) for r in REGIONS}}
  a.out.mkdir(parents=True,exist_ok=True)
