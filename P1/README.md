@@ -141,3 +141,19 @@ The panel shows O-B0075-001 48-hour observations and O-B0075-002 rolling 30-day 
 The PWA can estimate a P1 planning region from the selected coordinate or allow manual region selection. This automatic mapping is approximate and is not an official CWA marine boundary. Hualien South is explicitly marked as having no CWA station coverage; the UI does not substitute another region's values.
 
 CWA observed values are currently displayed as a separate evidence layer. They are not blended into the existing heuristic fish score. The existing score is not a calibrated catch probability or a trained local fish-activity model.
+
+## Archived marine forecast verification against CWA observations
+
+The scheduled Open-Meteo workflow now appends each normalized hourly forecast/observation batch to the P2 history branch before rebuilding the history catalog. Exact duplicate records are skipped; forecast vintages and observation revisions are retained.
+
+The workflow also runs:
+```bash
+python P1/collector/evaluate_forecast_skill.py \
+  --archive-root p2-history-data/data \
+  --out p2-history-data/data/forecast_verification/latest.json
+```
+
+Verification joins only the same region and exact valid hour. It uses the latest archived CWA observation revision and every eligible forecast vintage issued before that valid time. It never substitutes a nearby hour. Wind/current direction errors use circular angular distance. Per-variable MAE, RMSE, bias, and lead-time bands are reported only as exploratory descriptive metrics; variables with fewer than five paired samples remain marked `insufficient_sample`.
+
+If no time-aligned observation exists yet, the report status is `awaiting_time_aligned_observations`; this is a waiting state, not a zero-error or zero-skill result. CWA regional station aggregates are not point measurements at a fishing spot, and these verification metrics do not validate fish activity or catch probability.
+
