@@ -21,7 +21,7 @@ MARINE_FIELDS = [
 ]
 WEATHER_FIELDS = [
     "temperature_2m", "relative_humidity_2m", "precipitation",
-    "precipitation_probability", "pressure_msl", "wind_speed_10m",
+    "precipitation_probability", "showers", "weather_code", "pressure_msl", "wind_speed_10m",
     "wind_direction_10m", "wind_gusts_10m", "cloud_cover",
 ]
 TIMEOUT = 45
@@ -140,7 +140,7 @@ def main() -> int:
 
         # Atmospheric forecast still runs even when marine request failed.
         try:
-            weather_params = {**common, "hourly": ",".join(WEATHER_FIELDS)}
+            weather_params = {**common, "hourly": ",".join(WEATHER_FIELDS), "daily": "sunrise,sunset"}
             weather = request_json(session, config["forecast_base_url"], weather_params)
             save_json(folder / f"{location['id']}_weather_raw.json", weather)
             rows.extend(normalize_hourly(

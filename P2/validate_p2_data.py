@@ -8,16 +8,19 @@ from pathlib import Path
 REGIONS = {"yilan_suao","hualien_north","hualien_south","fengbin_shitiping","chenggong_donghe","taitung_south"}
 DATA_TYPES = {"forecast","observation","hindcast","derived"}
 CONFIDENCE = {"high","medium","low","unknown"}
-PARAMETER_CODES = {"temperature_range","depth_range","habitat","wave_preference","current_preference","tide_response","wind_sensitivity","activity_period","salinity_preference"}
+PARAMETER_CODES = {"temperature_range","depth_range","habitat","wave_preference","current_preference","tide_response","wind_sensitivity","activity_period","salinity_preference","vertical_movement","activity_water_layer","diel_activity","diet","spawning_period","feeding","aggregation","reproductive_behavior","seasonal_diet","regional_fishery_season","typical_habitat_depth_min","typical_habitat_depth_max","foraging_behavior","typical_depth_min","typical_depth_max","juvenile_habitat","social_behavior","sex_change","substrate","salinity_tolerance","fishery_occurrence","foraging_aggregation","sex_specific_social_behavior","juvenile_aggregation","movement_behavior","adult_social_behavior","juvenile_social_behavior","juvenile_diet","adult_diet","adult_aggregation","nocturnal_social_behavior","conservation_status","reported_depth_min","reported_depth_max"}
 
 def iso(value):
     if not isinstance(value,str): return False
-    try: datetime.fromisoformat(value.replace("Z","+00:00")); return True
+    try:
+        parsed=datetime.fromisoformat(value.replace("Z","+00:00"))
+        return parsed.tzinfo is not None
     except ValueError: return False
 
 def validate_environment(record):
     errors=[]
     required={"schema_version","region_id","valid_time","collected_at","data_type","source_records","completeness","quality"}
+    required.add("environment")
     missing=required-record.keys()
     if missing: errors.append("missing required fields: "+", ".join(sorted(missing)))
     if record.get("schema_version")!="1.0.0": errors.append("unsupported schema_version")
@@ -32,11 +35,16 @@ def validate_environment(record):
             if not all(isinstance(s.get(k),str) and s[k].strip() for k in ("source_id","dataset","url")): errors.append(f"source_records[{i}] requires source_id, dataset, url")
     env=record.get("environment",{})
     if not isinstance(env,dict): errors.append("environment must be an object"); env={}
-    numeric={"wave_height_m":(0,None),"wave_period_s":(0,None),"wave_direction_deg":(0,360),"sea_surface_temperature_c":(-2,40),"ocean_current_velocity_ms":(0,None),"ocean_current_direction_deg":(0,360),"wind_speed_10m_ms":(0,None),"wind_direction_10m_deg":(0,360),"tidal_current_velocity_ms":(0,None),"tidal_current_direction_deg":(0,360),"precipitation_mm_h":(0,None)}
+    allowed_environment={"wave_height_m","wave_period_s","wave_direction_deg","sea_surface_temperature_c","sea_level_height_msl_m","ocean_current_velocity_ms","ocean_current_direction_deg","wind_speed_10m_ms","wind_direction_10m_deg","tide_height_m","tide_phase","tide_turning","tidal_current_velocity_ms","tidal_current_direction_deg","precipitation_mm_h","showers_mm_h","precipitation_probability_pct","weather_code","thunderstorm_risk","sunrise","sunset"}
+    unknown=set(env)-allowed_environment
+    if unknown: errors.append("unknown environment fields: "+", ".join(sorted(unknown)))
+    numeric={"wave_height_m":(0,None),"wave_period_s":(0,None),"wave_direction_deg":(0,360),"sea_surface_temperature_c":(-2,40),"ocean_current_velocity_ms":(0,None),"ocean_current_direction_deg":(0,360),"wind_speed_10m_ms":(0,None),"wind_direction_10m_deg":(0,360),"tidal_current_velocity_ms":(0,None),"tidal_current_direction_deg":(0,360),"precipitation_mm_h":(0,None),"showers_mm_h":(0,None),"precipitation_probability_pct":(0,100)}
     for key,(lo,hi) in numeric.items():
         v=env.get(key)
-        if v is not None and (isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or (lo is not None and (v<lo if key not in ("wave_period_s",) else v<=lo)) or (hi is not None and v>=hi)):
+        if v is not None and (isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or (lo is not None and (v<lo if key not in ("wave_period_s",) else v<=lo)) or (hi is not None and (v>hi if key in {"wave_direction_deg","sea_surface_temperature_c","ocean_current_direction_deg","wind_direction_10m_deg","tidal_current_direction_deg","precipitation_probability_pct"} else v>=hi))):
             errors.append(f"environment.{key} has invalid value")
+    weather_code=env.get("weather_code")
+    if weather_code is not None and (isinstance(weather_code,bool) or not isinstance(weather_code,int) or weather_code<0): errors.append("environment.weather_code must be a non-negative integer or null")
     if env.get("tide_phase") not in (None,"rising","falling","high_slack","low_slack","unknown"): errors.append("invalid tide_phase")
     if env.get("thunderstorm_risk") not in (None,"none","low","moderate","high","unknown"): errors.append("invalid thunderstorm_risk")
     for key in ("tide_turning",):

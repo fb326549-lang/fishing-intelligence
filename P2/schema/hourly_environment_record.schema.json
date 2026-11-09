@@ -12,7 +12,8 @@
     "data_type",
     "source_records",
     "completeness",
-    "quality"
+    "quality",
+    "environment"
   ],
   "properties": {
     "schema_version": {
@@ -110,7 +111,7 @@
             "null"
           ],
           "minimum": 0,
-          "exclusiveMaximum": 360
+          "maximum": 360
         },
         "sea_surface_temperature_c": {
           "type": [
@@ -139,7 +140,7 @@
             "null"
           ],
           "minimum": 0,
-          "exclusiveMaximum": 360
+          "maximum": 360
         },
         "wind_speed_10m_ms": {
           "type": [
@@ -154,7 +155,7 @@
             "null"
           ],
           "minimum": 0,
-          "exclusiveMaximum": 360
+          "maximum": 360
         },
         "tide_height_m": {
           "type": [
@@ -195,7 +196,7 @@
             "null"
           ],
           "minimum": 0,
-          "exclusiveMaximum": 360
+          "maximum": 360
         },
         "precipitation_mm_h": {
           "type": [
@@ -231,6 +232,28 @@
             "null"
           ],
           "format": "date-time"
+        },
+        "showers_mm_h": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "precipitation_probability_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "weather_code": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
         }
       }
     },
