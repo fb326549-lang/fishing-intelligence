@@ -70,6 +70,22 @@ class ForecastSkillTests(unittest.TestCase):
             self.assertEqual(wave["status"],"exploratory_metrics")
             self.assertEqual(result["minimum_unique_region_valid_hours_for_exploratory_metrics"],2)
 
+    def test_equivalent_timezone_offsets_count_as_one_region_valid_hour(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            rows=[
+                self.row("observation","2026-11-09T12:00:00+08:00","2026-11-09T13:10:00+08:00",env={"wave_height_m":2.0}),
+                self.row("forecast","2026-11-09T12:00:00+08:00","2026-11-09T06:00:00+08:00",env={"wave_height_m":3.0}),
+                # Same instant as 12:00+08:00, expressed in UTC.
+                self.row("forecast","2026-11-09T04:00:00+00:00","2026-11-09T03:00:00+00:00",env={"wave_height_m":2.5}),
+            ]
+            self.write_rows(root,rows)
+            result=build_verification(root,minimum_pairs=2)
+            wave=result["variables"]["wave_height_m"]
+            self.assertEqual(wave["sample_count"],2)
+            self.assertEqual(wave["unique_region_valid_hours"],1)
+            self.assertEqual(wave["status"],"insufficient_sample")
+
     def test_no_time_aligned_observations_is_reported_as_waiting_not_zero_skill(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
