@@ -12,7 +12,7 @@ class IntegratedActivityTests(unittest.TestCase):
             {"candidate_id":"c002","common_name_zh":"白毛","scientific_name":"Kyphosus spp.","eligibility_gate":"white_hair_is_kyphosus_genus_group_species_identification_required"},
         ]
         self.matches=[
-            {"candidate_id":"c003","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
+            {"candidate_id":"c003","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
             {"candidate_id":"c002","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","status":"taxon_or_distribution_gate","environment_match_score":"","rule_coverage":"0"},
         ]
         self.activity=[{"candidate_id":"c003","activity_evidence_id":"AE003","model_use_status":"context_only_captive_feeding","transferability":"low_for_wild_east_taiwan_angler_prediction"}]
