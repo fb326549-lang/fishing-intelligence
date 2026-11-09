@@ -1,0 +1,912 @@
+{
+  "schema_version": "1.0.0",
+  "source": "CWA_OPENDATA",
+  "data_kind": "observations_not_forecast",
+  "generated_at": "2026-11-09T11:46:11.938807+00:00",
+  "dataset_status": {
+    "O-B0075-001": {
+      "status": "ok",
+      "station_count": 13,
+      "observation_count": 637,
+      "unmapped_station_ids": [
+        "11781",
+        "11881",
+        "12540",
+        "1456",
+        "1496",
+        "1596",
+        "1676",
+        "1786",
+        "1956",
+        "1966",
+        "46694A",
+        "46708A",
+        "46714D",
+        "46735A",
+        "46757B",
+        "46759A",
+        "46778A",
+        "46787A",
+        "4A",
+        "4F",
+        "4J21",
+        "4Q11",
+        "4S21",
+        "4W21",
+        "A6S01",
+        "C4A01",
+        "C4A02",
+        "C4A03",
+        "C4A05",
+        "C4A06",
+        "C4B01",
+        "C4B03",
+        "C4C01",
+        "C4D01",
+        "C4E01",
+        "C4F01",
+        "C4G01",
+        "C4J01",
+        "C4L01",
+        "C4L02",
+        "C4N01",
+        "C4P01",
+        "C4P02",
+        "C4P03",
+        "C4P09",
+        "C4Q01",
+        "C4Q02",
+        "C4Q03",
+        "C4S01",
+        "C4W01",
+        "C4W02",
+        "C4W03",
+        "C4W04",
+        "C4W05",
+        "C6AH2",
+        "C6B01",
+        "C6D01",
+        "C6F01",
+        "C6G01",
+        "C6N01",
+        "C6S94",
+        "C6V27",
+        "C6W08",
+        "C6W10",
+        "COMC08",
+        "NTU01",
+        "NTU02",
+        "OAC003",
+        "OAC004",
+        "OAC006",
+        "OAC007",
+        "WRA005"
+      ]
+    },
+    "O-B0075-002": {
+      "status": "ok",
+      "station_count": 13,
+      "observation_count": 9373,
+      "unmapped_station_ids": [
+        "11781",
+        "11881",
+        "12540",
+        "1456",
+        "1496",
+        "1596",
+        "1676",
+        "1786",
+        "1956",
+        "1966",
+        "46694A",
+        "46708A",
+        "46714D",
+        "46735A",
+        "46757B",
+        "46759A",
+        "46778A",
+        "46787A",
+        "4A",
+        "4F",
+        "4J21",
+        "4Q11",
+        "4S21",
+        "4W21",
+        "A6S01",
+        "C4A01",
+        "C4A02",
+        "C4A03",
+        "C4A05",
+        "C4A06",
+        "C4B01",
+        "C4B03",
+        "C4C01",
+        "C4D01",
+        "C4E01",
+        "C4F01",
+        "C4G01",
+        "C4J01",
+        "C4L01",
+        "C4L02",
+        "C4N01",
+        "C4P01",
+        "C4P02",
+        "C4P03",
+        "C4P09",
+        "C4Q01",
+        "C4Q02",
+        "C4Q03",
+        "C4S01",
+        "C4W01",
+        "C4W02",
+        "C4W03",
+        "C4W04",
+        "C4W05",
+        "C6AH2",
+        "C6B01",
+        "C6D01",
+        "C6F01",
+        "C6G01",
+        "C6N01",
+        "C6S94",
+        "C6V27",
+        "C6W08",
+        "C6W10",
+        "COMC08",
+        "NTU01",
+        "NTU02",
+        "OAC003",
+        "OAC004",
+        "OAC006",
+        "OAC007",
+        "WRA005"
+      ]
+    }
+  },
+  "regions": {
+    "yilan_suao": {
+      "region_id": "yilan_suao",
+      "station_count": 4,
+      "stations_with_recent_observation": 4,
+      "stations_with_fresh_observation": 4,
+      "coverage_status": "observed",
+      "freshness_threshold_minutes": 180,
+      "stations": [
+        {
+          "station_id": "C4U02",
+          "station_name": "烏石潮位站",
+          "station_type": "tide",
+          "county": "宜蘭縣",
+          "latitude": 24.8686,
+          "longitude": 121.8396,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.61",
+              "TideLevel": "退潮",
+              "SeaTemperature": "23.9",
+              "Temperature": "None",
+              "StationPressure": "1024.2",
+              "PrimaryAnemometer": {
+                "WindSpeed": "None",
+                "WindScale": "None",
+                "WindDirection": "None",
+                "WindDirectionDescription": "None",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.61",
+              "TideLevel": "退潮",
+              "SeaTemperature": "23.9",
+              "Temperature": null,
+              "StationPressure": "1024.2",
+              "PrimaryAnemometer.WindSpeed": null,
+              "PrimaryAnemometer.WindScale": null,
+              "PrimaryAnemometer.WindDirection": null,
+              "PrimaryAnemometer.WindDirectionDescription": null,
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "C4U01",
+          "station_name": "蘇澳潮位站",
+          "station_type": "tide",
+          "county": "宜蘭縣",
+          "latitude": 24.5925,
+          "longitude": 121.8658,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.63",
+              "TideLevel": "退潮",
+              "SeaTemperature": "25.7",
+              "Temperature": "None",
+              "StationPressure": "1025.9",
+              "PrimaryAnemometer": {
+                "WindSpeed": "5.2",
+                "WindScale": "3",
+                "WindDirection": "353.0",
+                "WindDirectionDescription": "N",
+                "MaximumWindSpeed": "8.8",
+                "MaximumWindScale": "5"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.63",
+              "TideLevel": "退潮",
+              "SeaTemperature": "25.7",
+              "Temperature": null,
+              "StationPressure": "1025.9",
+              "PrimaryAnemometer.WindSpeed": "5.2",
+              "PrimaryAnemometer.WindScale": "3",
+              "PrimaryAnemometer.WindDirection": "353.0",
+              "PrimaryAnemometer.WindDirectionDescription": "N",
+              "PrimaryAnemometer.MaximumWindSpeed": "8.8",
+              "PrimaryAnemometer.MaximumWindScale": "5"
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "46706A",
+          "station_name": "蘇澳資料浮標",
+          "station_type": "marine_buoy",
+          "county": "宜蘭縣",
+          "latitude": 24.6247,
+          "longitude": 121.8758,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "None",
+              "TideLevel": "-",
+              "WaveHeight": "2.0",
+              "WaveDirection": "33.0",
+              "WaveDirectionDescription": "NNE",
+              "WavePeriod": "5.7",
+              "SeaTemperature": "None",
+              "Temperature": "18.9",
+              "StationPressure": "1026.4",
+              "PrimaryAnemometer": {
+                "WindSpeed": "11.5",
+                "WindScale": "6",
+                "WindDirection": "356.0",
+                "WindDirectionDescription": "N",
+                "MaximumWindSpeed": "15.4",
+                "MaximumWindScale": "7"
+              },
+              "SeaCurrents": {
+                "Layer": [
+                  {
+                    "LayerNumber": "1",
+                    "CurrentDirection": "265",
+                    "CurrentDirectionDescription": "W",
+                    "CurrentSpeed": "0.25",
+                    "CurrentSpeedInKnots": "0.49"
+                  }
+                ]
+              }
+            },
+            "flattened": {
+              "TideHeight": null,
+              "TideLevel": null,
+              "WaveHeight": "2.0",
+              "WaveDirection": "33.0",
+              "WaveDirectionDescription": "NNE",
+              "WavePeriod": "5.7",
+              "SeaTemperature": null,
+              "Temperature": "18.9",
+              "StationPressure": "1026.4",
+              "PrimaryAnemometer.WindSpeed": "11.5",
+              "PrimaryAnemometer.WindScale": "6",
+              "PrimaryAnemometer.WindDirection": "356.0",
+              "PrimaryAnemometer.WindDirectionDescription": "N",
+              "PrimaryAnemometer.MaximumWindSpeed": "15.4",
+              "PrimaryAnemometer.MaximumWindScale": "7",
+              "SeaCurrents.Layer": [
+                {
+                  "LayerNumber": "1",
+                  "CurrentDirection": "265",
+                  "CurrentDirectionDescription": "W",
+                  "CurrentSpeed": "0.25",
+                  "CurrentSpeedInKnots": "0.49"
+                }
+              ]
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "OAC005",
+          "station_name": "蜜月灣浮標",
+          "station_type": "marine_buoy",
+          "county": "宜蘭縣",
+          "latitude": 24.9488,
+          "longitude": 121.9291,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "None",
+              "TideLevel": "-",
+              "WaveHeight": "None",
+              "WaveDirection": "None",
+              "WaveDirectionDescription": "None",
+              "WavePeriod": "None",
+              "SeaTemperature": "None",
+              "Temperature": "None",
+              "StationPressure": "None",
+              "PrimaryAnemometer": {
+                "WindSpeed": "None",
+                "WindScale": "None",
+                "WindDirection": "None",
+                "WindDirectionDescription": "None",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              },
+              "SeaCurrents": {
+                "Layer": [
+                  {
+                    "LayerNumber": "1",
+                    "CurrentDirection": "None",
+                    "CurrentDirectionDescription": "None",
+                    "CurrentSpeed": "None",
+                    "CurrentSpeedInKnots": "None"
+                  }
+                ]
+              }
+            },
+            "flattened": {
+              "TideHeight": null,
+              "TideLevel": null,
+              "WaveHeight": null,
+              "WaveDirection": null,
+              "WaveDirectionDescription": null,
+              "WavePeriod": null,
+              "SeaTemperature": null,
+              "Temperature": null,
+              "StationPressure": null,
+              "PrimaryAnemometer.WindSpeed": null,
+              "PrimaryAnemometer.WindScale": null,
+              "PrimaryAnemometer.WindDirection": null,
+              "PrimaryAnemometer.WindDirectionDescription": null,
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null,
+              "SeaCurrents.Layer": [
+                {
+                  "LayerNumber": "1",
+                  "CurrentDirection": "None",
+                  "CurrentDirectionDescription": "None",
+                  "CurrentSpeed": "None",
+                  "CurrentSpeedInKnots": "None"
+                }
+              ]
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        }
+      ]
+    },
+    "hualien_north": {
+      "region_id": "hualien_north",
+      "station_count": 2,
+      "stations_with_recent_observation": 2,
+      "stations_with_fresh_observation": 2,
+      "coverage_status": "observed",
+      "freshness_threshold_minutes": 180,
+      "stations": [
+        {
+          "station_id": "C4T01",
+          "station_name": "花蓮潮位站",
+          "station_type": "tide",
+          "county": "花蓮縣",
+          "latitude": 23.9806,
+          "longitude": 121.6236,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.73",
+              "TideLevel": "退潮",
+              "SeaTemperature": "27.0",
+              "Temperature": "None",
+              "StationPressure": "1021.8",
+              "PrimaryAnemometer": {
+                "WindSpeed": "12.5",
+                "WindScale": "6",
+                "WindDirection": "34.0",
+                "WindDirectionDescription": "NE",
+                "MaximumWindSpeed": "17.1",
+                "MaximumWindScale": "7"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.73",
+              "TideLevel": "退潮",
+              "SeaTemperature": "27.0",
+              "Temperature": null,
+              "StationPressure": "1021.8",
+              "PrimaryAnemometer.WindSpeed": "12.5",
+              "PrimaryAnemometer.WindScale": "6",
+              "PrimaryAnemometer.WindDirection": "34.0",
+              "PrimaryAnemometer.WindDirectionDescription": "NE",
+              "PrimaryAnemometer.MaximumWindSpeed": "17.1",
+              "PrimaryAnemometer.MaximumWindScale": "7"
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "46699A",
+          "station_name": "花蓮資料浮標",
+          "station_type": "marine_buoy",
+          "county": "花蓮縣",
+          "latitude": 24.0314,
+          "longitude": 121.6328,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "None",
+              "TideLevel": "-",
+              "WaveHeight": "2.9",
+              "WaveDirection": "33.0",
+              "WaveDirectionDescription": "NNE",
+              "WavePeriod": "5.7",
+              "SeaTemperature": "27.1",
+              "Temperature": "22.3",
+              "StationPressure": "1023.0",
+              "PrimaryAnemometer": {
+                "WindSpeed": "14.1",
+                "WindScale": "7",
+                "WindDirection": "44.0",
+                "WindDirectionDescription": "NE",
+                "MaximumWindSpeed": "19.6",
+                "MaximumWindScale": "8"
+              },
+              "SeaCurrents": {
+                "Layer": [
+                  {
+                    "LayerNumber": "1",
+                    "CurrentDirection": "122",
+                    "CurrentDirectionDescription": "ESE",
+                    "CurrentSpeed": "0.18",
+                    "CurrentSpeedInKnots": "0.35"
+                  }
+                ]
+              }
+            },
+            "flattened": {
+              "TideHeight": null,
+              "TideLevel": null,
+              "WaveHeight": "2.9",
+              "WaveDirection": "33.0",
+              "WaveDirectionDescription": "NNE",
+              "WavePeriod": "5.7",
+              "SeaTemperature": "27.1",
+              "Temperature": "22.3",
+              "StationPressure": "1023.0",
+              "PrimaryAnemometer.WindSpeed": "14.1",
+              "PrimaryAnemometer.WindScale": "7",
+              "PrimaryAnemometer.WindDirection": "44.0",
+              "PrimaryAnemometer.WindDirectionDescription": "NE",
+              "PrimaryAnemometer.MaximumWindSpeed": "19.6",
+              "PrimaryAnemometer.MaximumWindScale": "8",
+              "SeaCurrents.Layer": [
+                {
+                  "LayerNumber": "1",
+                  "CurrentDirection": "122",
+                  "CurrentDirectionDescription": "ESE",
+                  "CurrentSpeed": "0.18",
+                  "CurrentSpeedInKnots": "0.35"
+                }
+              ]
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        }
+      ]
+    },
+    "hualien_south": {
+      "region_id": "hualien_south",
+      "station_count": 0,
+      "stations_with_recent_observation": 0,
+      "stations_with_fresh_observation": 0,
+      "coverage_status": "no_recent_observation",
+      "freshness_threshold_minutes": 180,
+      "stations": []
+    },
+    "fengbin_shitiping": {
+      "region_id": "fengbin_shitiping",
+      "station_count": 2,
+      "stations_with_recent_observation": 2,
+      "stations_with_fresh_observation": 2,
+      "coverage_status": "observed",
+      "freshness_threshold_minutes": 180,
+      "stations": [
+        {
+          "station_id": "4T21",
+          "station_name": "石梯",
+          "station_type": "coastal_station",
+          "county": "花蓮縣",
+          "latitude": 23.4947,
+          "longitude": 121.5061,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "Temperature": "None",
+              "StationPressure": "1022.4",
+              "PrimaryAnemometer": {
+                "WindSpeed": "10.8",
+                "WindScale": "6",
+                "WindDirection": "20.0",
+                "WindDirectionDescription": "NNE",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              }
+            },
+            "flattened": {
+              "Temperature": null,
+              "StationPressure": "1022.4",
+              "PrimaryAnemometer.WindSpeed": "10.8",
+              "PrimaryAnemometer.WindScale": "6",
+              "PrimaryAnemometer.WindDirection": "20.0",
+              "PrimaryAnemometer.WindDirectionDescription": "NNE",
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "1566",
+          "station_name": "石梯潮位站",
+          "station_type": "tide",
+          "county": "花蓮縣",
+          "latitude": 23.4947,
+          "longitude": 121.5061,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.68",
+              "TideLevel": "退潮",
+              "SeaTemperature": "None",
+              "Temperature": "None",
+              "StationPressure": "None",
+              "PrimaryAnemometer": {
+                "WindSpeed": "None",
+                "WindScale": "None",
+                "WindDirection": "None",
+                "WindDirectionDescription": "None",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.68",
+              "TideLevel": "退潮",
+              "SeaTemperature": null,
+              "Temperature": null,
+              "StationPressure": null,
+              "PrimaryAnemometer.WindSpeed": null,
+              "PrimaryAnemometer.WindScale": null,
+              "PrimaryAnemometer.WindDirection": null,
+              "PrimaryAnemometer.WindDirectionDescription": null,
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        }
+      ]
+    },
+    "chenggong_donghe": {
+      "region_id": "chenggong_donghe",
+      "station_count": 3,
+      "stations_with_recent_observation": 3,
+      "stations_with_fresh_observation": 3,
+      "coverage_status": "observed",
+      "freshness_threshold_minutes": 180,
+      "stations": [
+        {
+          "station_id": "46761F",
+          "station_name": "成功浮球式波浪站",
+          "station_type": "wave_buoy",
+          "county": "臺東縣",
+          "latitude": 23.1325,
+          "longitude": 121.4201,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "WaveHeight": "None",
+              "WaveDirection": "None",
+              "WaveDirectionDescription": "None",
+              "WavePeriod": "None",
+              "SeaTemperature": "None"
+            },
+            "flattened": {
+              "WaveHeight": null,
+              "WaveDirection": null,
+              "WaveDirectionDescription": null,
+              "WavePeriod": null,
+              "SeaTemperature": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "C4S02",
+          "station_name": "成功潮位站",
+          "station_type": "tide",
+          "county": "臺東縣",
+          "latitude": 23.0972,
+          "longitude": 121.3799,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.90",
+              "TideLevel": "退潮",
+              "SeaTemperature": "26.4",
+              "Temperature": "None",
+              "StationPressure": "1023.1",
+              "PrimaryAnemometer": {
+                "WindSpeed": "2.4",
+                "WindScale": "2",
+                "WindDirection": "351.0",
+                "WindDirectionDescription": "N",
+                "MaximumWindSpeed": "7.2",
+                "MaximumWindScale": "4"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.90",
+              "TideLevel": "退潮",
+              "SeaTemperature": "26.4",
+              "Temperature": null,
+              "StationPressure": "1023.1",
+              "PrimaryAnemometer.WindSpeed": "2.4",
+              "PrimaryAnemometer.WindScale": "2",
+              "PrimaryAnemometer.WindDirection": "351.0",
+              "PrimaryAnemometer.WindDirectionDescription": "N",
+              "PrimaryAnemometer.MaximumWindSpeed": "7.2",
+              "PrimaryAnemometer.MaximumWindScale": "4"
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "4I",
+          "station_name": "小港潮位站",
+          "station_type": "tide",
+          "county": "臺東縣",
+          "latitude": 23.1589,
+          "longitude": 121.4036,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.82",
+              "TideLevel": "退潮",
+              "SeaTemperature": "None",
+              "Temperature": "None",
+              "StationPressure": "None",
+              "PrimaryAnemometer": {
+                "WindSpeed": "None",
+                "WindScale": "None",
+                "WindDirection": "None",
+                "WindDirectionDescription": "None",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.82",
+              "TideLevel": "退潮",
+              "SeaTemperature": null,
+              "Temperature": null,
+              "StationPressure": null,
+              "PrimaryAnemometer.WindSpeed": null,
+              "PrimaryAnemometer.WindScale": null,
+              "PrimaryAnemometer.WindDirection": null,
+              "PrimaryAnemometer.WindDirectionDescription": null,
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        }
+      ]
+    },
+    "taitung_south": {
+      "region_id": "taitung_south",
+      "station_count": 2,
+      "stations_with_recent_observation": 2,
+      "stations_with_fresh_observation": 2,
+      "coverage_status": "observed",
+      "freshness_threshold_minutes": 180,
+      "stations": [
+        {
+          "station_id": "1586",
+          "station_name": "富岡潮位站",
+          "station_type": "tide",
+          "county": "臺東縣",
+          "latitude": 22.7907,
+          "longitude": 121.1921,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "0.80",
+              "TideLevel": "退潮",
+              "SeaTemperature": "None",
+              "Temperature": "None",
+              "StationPressure": "None",
+              "PrimaryAnemometer": {
+                "WindSpeed": "None",
+                "WindScale": "None",
+                "WindDirection": "None",
+                "WindDirectionDescription": "None",
+                "MaximumWindSpeed": "None",
+                "MaximumWindScale": "None"
+              }
+            },
+            "flattened": {
+              "TideHeight": "0.80",
+              "TideLevel": "退潮",
+              "SeaTemperature": null,
+              "Temperature": null,
+              "StationPressure": null,
+              "PrimaryAnemometer.WindSpeed": null,
+              "PrimaryAnemometer.WindScale": null,
+              "PrimaryAnemometer.WindDirection": null,
+              "PrimaryAnemometer.WindDirectionDescription": null,
+              "PrimaryAnemometer.MaximumWindSpeed": null,
+              "PrimaryAnemometer.MaximumWindScale": null
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        },
+        {
+          "station_id": "WRA007",
+          "station_name": "臺東資料浮標",
+          "station_type": "marine_buoy",
+          "county": "臺東縣",
+          "latitude": 22.7222,
+          "longitude": 121.14,
+          "latest_observation": {
+            "observed_at": "2026-11-09T19:00:00+08:00",
+            "observed_at_epoch": 1794222000.0,
+            "weather_elements": {
+              "TideHeight": "None",
+              "TideLevel": "-",
+              "WaveHeight": "2.1",
+              "WaveDirection": "56.0",
+              "WaveDirectionDescription": "NE",
+              "WavePeriod": "6.0",
+              "SeaTemperature": "None",
+              "Temperature": "None",
+              "StationPressure": "1022.3",
+              "PrimaryAnemometer": {
+                "WindSpeed": "14.2",
+                "WindScale": "7",
+                "WindDirection": "38.0",
+                "WindDirectionDescription": "NE",
+                "MaximumWindSpeed": "18.0",
+                "MaximumWindScale": "8"
+              },
+              "SeaCurrents": {
+                "Layer": [
+                  {
+                    "LayerNumber": "1",
+                    "CurrentDirection": "201",
+                    "CurrentDirectionDescription": "SSW",
+                    "CurrentSpeed": "0.11",
+                    "CurrentSpeedInKnots": "0.21"
+                  }
+                ]
+              }
+            },
+            "flattened": {
+              "TideHeight": null,
+              "TideLevel": null,
+              "WaveHeight": "2.1",
+              "WaveDirection": "56.0",
+              "WaveDirectionDescription": "NE",
+              "WavePeriod": "6.0",
+              "SeaTemperature": null,
+              "Temperature": null,
+              "StationPressure": "1022.3",
+              "PrimaryAnemometer.WindSpeed": "14.2",
+              "PrimaryAnemometer.WindScale": "7",
+              "PrimaryAnemometer.WindDirection": "38.0",
+              "PrimaryAnemometer.WindDirectionDescription": "NE",
+              "PrimaryAnemometer.MaximumWindSpeed": "18.0",
+              "PrimaryAnemometer.MaximumWindScale": "8",
+              "SeaCurrents.Layer": [
+                {
+                  "LayerNumber": "1",
+                  "CurrentDirection": "201",
+                  "CurrentDirectionDescription": "SSW",
+                  "CurrentSpeed": "0.11",
+                  "CurrentSpeedInKnots": "0.21"
+                }
+              ]
+            }
+          },
+          "observations_48h": 49,
+          "observations_30d": 721,
+          "history_30d_latest_at": "2026-11-08T23:00:00+08:00",
+          "latest_age_minutes": 46.2,
+          "status": "fresh"
+        }
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "These are station observations, not a forecast for the whole fishing region.",
+    "No station measurement is spatially extrapolated to another coast or subregion.",
+    "Provider values and nested field names are preserved; units must follow CWA field metadata.",
+    "A latest 48-hour observation older than 180 minutes is marked stale, not current.",
+    "Missing or stale station observations are not interpreted as calm sea or safe conditions.",
+    "This feed does not calculate fish activity, catch probability, or a safety clearance."
+  ]
+}
