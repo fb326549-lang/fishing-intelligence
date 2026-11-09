@@ -140,3 +140,16 @@ python P2/species/build_species_response_gap_matrix.py \
 ```
 
 CI 會重建並逐位元比對矩陣，確保候選魚種及 P1 證據更新時，研究缺口登錄可追溯更新。
+
+
+### P2.2.2 首批外部研究文獻
+
+`P2/species/species_response_literature_register.csv` 新增 7 筆有來源的研究結果，涵蓋瓜子鱲（Girella punctata）、臭肚（Siganus fuscescens）及白毛俗名候選中的南方舵魚（Kyphosus bigibbus）。
+
+重要限制：
+- 南方舵魚在日本消波塊的冬春群聚研究，及生物遙測研究的水溫關聯，只能標記為外地、特定物種與特定棲地的 context-only 證據；不能直接當作台東磯釣溫度門檻，也不能推廣到所有 Kyphosus。
+- 臭肚的 20°C 遙測訊號變化是活動代理指標，不是中魚率；26–29°C 與日間攝食時段來自特定藻類攝食控制試驗，不是野外釣獲最佳溫度/時段。
+- 瓜子鱲的 18–23°C 養殖生長適溫及圈養繁殖研究，不能代替野外成魚活動反應。
+- 目前 7 筆文獻全數不具備直接作為台灣東部魚情模型門檻的資格。
+
+缺口矩陣已改為同時讀取 P1 生態背景與 P2 外部文獻登錄表；有外部文獻的領域標記為 `external_literature_found_context_only`，白毛物種級鑑定限制及點帶石斑東部分布衝突仍優先於文獻存在狀態。CI 會重建矩陣並逐位元比對。
