@@ -309,8 +309,16 @@ def build_candidate_region_context(detections):
     return sorted(result, key=lambda x: (x["region_id"], x["candidate_id"]))
 
 
-def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at):
+def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at, reference_regions=None):
     out_dir.mkdir(parents=True, exist_ok=True)
+    active_regions = sorted(set(reference_regions or ()))
+    coverage = {
+        "region_ids": sorted(REGIONS),
+        "active_reference_regions": active_regions,
+        "regions_without_active_reference_stations": sorted(REGIONS - set(active_regions)),
+        "assignment_method": "nearest_active_reference_station_within_35km",
+        "interpretation": "Nearest-station region is geographic context only; it is not proof that the sample belongs to a fishing spot or that every region has equal reference coverage.",
+    }
     with (out_dir / "edna_occurrence_context.jsonl").open("w", encoding="utf-8", newline="") as handle:
         for row in detections:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
@@ -331,6 +339,7 @@ def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at
         "nearest_region_context_record_count": sum(r["region_mapping_status"] == "nearest_station_context_only" for r in detections),
         "candidate_month_region_summary_count": len(summary),
         "candidate_region_context_count": len(region_context),
+        "regional_reference_coverage": coverage,
         "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
         "source_datasets": [{"dataset_id": x[0], "name": x[1], "url": x[2]} for x in SOURCES],
     }
@@ -340,6 +349,7 @@ def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at
         "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
         "dataset_page": DATASET_PAGE,
         "generated_at_utc": fetched_at,
+        "regional_reference_coverage": coverage,
         "interpretation": "Historical positive eDNA occurrence context only; not abundance, current presence, catch rate, activity, or absence.",
         "records": region_context,
     }
@@ -366,7 +376,7 @@ def main():
         raise SystemExit("No normalized eDNA detections found; refusing to publish an empty dataset.")
     summary = build_monthly_summary(detections)
     region_context = build_candidate_region_context(detections)
-    manifest = write_outputs(args.out_dir, detections, summary, region_context, fetched_at)
+    manifest = write_outputs(args.out_dir, detections, summary, region_context, fetched_at, reference_regions={s['region_id'] for s in stations})
     print(
         f"eDNA occurrence context built: {len(detections)} positive records; "
         f"{manifest['exact_candidate_record_count']} exact-candidate records; "
