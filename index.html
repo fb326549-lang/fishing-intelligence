@@ -196,7 +196,7 @@ async function loadTide(){
   const now=Date.now();
   const future=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const past=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()<now).sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!future.length)throw Error('最近測站「'+(prop(station.node,'LocationName')||'')+'」沒有未來潮汐資料');
+  if(!future.length)throw Error('最近預報地點「'+(station.node.LocationName||'')+'」沒有未來潮汐資料');
   const next=future[0];
   const prev=past[0];
   const label=next.tide;
