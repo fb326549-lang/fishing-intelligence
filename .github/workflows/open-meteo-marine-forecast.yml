@@ -79,7 +79,11 @@ jobs:
           python P2/species/integrate_environment_and_activity.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --environment-match-csv "$latest_dir/environment_match.csv" --activity-csv P2/species/species_activity_evidence_register.csv --seasonal-csv P2/species/species_seasonal_activity_register.csv --out "$latest_dir/integrated_hourly_fish_assessment.csv"
           as_of=$(python -c 'from datetime import datetime,timedelta; from zoneinfo import ZoneInfo; n=datetime.now(ZoneInfo("Asia/Taipei")); h=n.replace(minute=0,second=0,microsecond=0); print((h+timedelta(hours=1) if n!=h else h).isoformat())')
           python P2/species/build_hourly_fish_outlook.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --integrated-csv "$latest_dir/integrated_hourly_fish_assessment.csv" --as-of "$as_of" --out "$latest_dir/hourly_fish_outlook.csv"
-          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json
+          edna_args=()
+          if [ -f p2-history-data/data/edna_candidate_region_context.json ]; then
+            edna_args+=(--edna-context-json p2-history-data/data/edna_candidate_region_context.json)
+          fi
+          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}"
 
       - name: Validate history and commit P2 history plus live outlook
         run: |
