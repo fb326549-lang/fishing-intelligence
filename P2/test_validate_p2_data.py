@@ -14,8 +14,12 @@ class P2ValidationTests(unittest.TestCase):
         x=sample(); x["environment"]["tidal_current_velocity_ms"]=x["environment"]["tide_height_m"]
         self.assertEqual(validate_environment(x),[])
     def test_invalid_direction_rejected(self):
-        x=sample(); x["environment"]["wave_direction_deg"]=360
+        x=sample(); x["environment"]["wave_direction_deg"]=361
         self.assertTrue(any("wave_direction_deg" in e for e in validate_environment(x)))
+    def test_direction_360_and_probability_100_are_valid(self):
+        x=sample(); x["environment"]["wave_direction_deg"]=360
+        x["environment"]["precipitation_probability_pct"]=100
+        self.assertEqual(validate_environment(x),[])
     def test_inconsistent_completeness_rejected(self):
         x=sample(); x["completeness"]["ratio"]=0.9
         self.assertTrue(any("completeness" in e for e in validate_environment(x)))
