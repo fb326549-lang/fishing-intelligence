@@ -553,3 +553,33 @@ python P2/collector/build_hourly_environment_records.py \
 - 條紋豆娘魚 `Abudefduf vaigiensis`：FRIP21009，台東成功，2005-04-02，一支釣，幼魚標本。
 
 這些資料用於補強東部物種出現證據與資料來源可追溯性；每筆只代表單一典藏標本/採集事件，不能推論當地族群密度、季節性、逐時活動、潮汐/海象反應或中魚率。活動證據維持 `context_only_east_taiwan_occurrence`，不進入環境規則、活動分數或最佳時段模型。P1 證據 ID 全域唯一，這三筆新增標本紀錄使用 E047–E049。P2 整合狀態可以顯示「已有東部出現背景資料」，但仍不視為已具備魚種活動預測證據。
+
+
+## P2.6 海保署魚類 eDNA 出現背景（非魚群數量／非釣況預測）
+
+資料來源：海洋保育署「110–113年臺灣鄰近海域魚類 eDNA 調查分析」政府資料開放資料集（資料集 172487），包含潛水調查、船舶調查及海洋保護區站點三組資料。欄位包含站點、座標、深度、採樣時間、學名、中文學名、科別及計畫類別。
+
+新增：
+- `collector/fetch_oca_edna_occurrence.py`：下載三組官方資料，支援 CSV、JSON 及 ZIP 包裝，統一欄位與採樣年月。
+- `schema/edna_occurrence_context.schema.json`：單筆 eDNA 陽性偵測資料契約。
+- `test_oca_edna_occurrence.py`：測試資料格式解析、民國年月、六區最近參考站距離、物種候選對應及出現資料限制。
+- `.github/workflows/oca-edna-occurrence-context.yml`：每月蒐集一次，並支援手動執行；原始標準化輸出以 Actions artifact 保存，待資料品質審查後才考慮接入 P2 展望。
+
+執行：
+```bash
+python P2/collector/fetch_oca_edna_occurrence.py \
+  --mapping P1/stations/east_region_station_mapping.csv \
+  --candidates P1/species/species_candidate_register.csv \
+  --out-dir output/oca_edna_context
+python -m unittest P2.test_oca_edna_occurrence -v
+```
+
+資料解讀與防誤用規則：
+1. eDNA 陽性偵測只代表該次採樣在該站點檢出物種 DNA，不代表個體數、族群密度、生物量、釣獲率或即時活動強度。
+2. 沒有檢出不代表魚不存在；不得把未檢出紀錄當作負樣本，因採樣努力量、季節、檢測靈敏度及環境 DNA 傳輸/降解可能不同。
+3. 依最近東部參考站的區域對應僅供地理上下文，並保留距離；超出 35 公里不強行分配六區，也不把參考站當成實際採樣站或釣點。
+4. 只對已能以學名精確對應的候選物種填入 candidate_id；俗名群組、屬級候選及未確認物種不做模糊配對。
+5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。
+6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
+
+只有在成功取得三組來源、資料解析通過且輸出筆數大於零時才產生 artifact。此階段先建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
