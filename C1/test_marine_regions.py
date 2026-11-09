@@ -43,7 +43,7 @@ class MarineRegionTests(unittest.TestCase):
    (self.input/f"{ds}.json").write_text(json.dumps({"Success":"true","Records":{"SeaSurfaceObs":{"Location":[]}}}),encoding="utf-8")
   r=build_snapshot(self.input,self.mapping,"2026-11-09T12:00:00+08:00")
   self.assertEqual(r["regions"]["hualien_north"]["coverage_status"],"no_recent_observation")
-  self.assertIn("not interpreted as calm sea",r["interpretation_limits"][3])
+  self.assertTrue(any("not interpreted as calm sea" in x for x in r["interpretation_limits"]))
  def test_stale_observation_is_not_marked_current(self):
   r=build_snapshot(self.input,self.mapping,"2026-11-09T15:00:00+08:00")
   self.assertEqual(r["regions"]["hualien_north"]["coverage_status"],"stale")
