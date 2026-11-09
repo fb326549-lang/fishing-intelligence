@@ -74,8 +74,10 @@ jobs:
           python P2/species/build_hourly_fish_outlook.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --integrated-csv "$latest_dir/integrated_hourly_fish_assessment.csv" --as-of "$as_of" --out "$latest_dir/hourly_fish_outlook.csv"
           python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json
 
-      - name: Commit append-only P2 hourly history and current P2 outlook
+      - name: Validate history and commit P2 history plus live outlook
         run: |
+          python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
+          python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json
@@ -83,20 +85,6 @@ jobs:
             echo "No new hourly records or outlook changes."
           else
             git -C p2-history-data commit -m "Archive P2 hourly environment and publish current fish outlook"
-            git -C p2-history-data push origin HEAD:p2-history
-          fi
-          python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
-          python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
-
-      - name: Commit append-only P2 hourly history
-        run: |
-          git -C p2-history-data config user.name "github-actions[bot]"
-          git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment
-          if git -C p2-history-data diff --cached --quiet; then
-            echo "No new hourly records to archive."
-          else
-            git -C p2-history-data commit -m "Archive P2 hourly marine environment records"
             git -C p2-history-data push origin HEAD:p2-history
           fi
 
