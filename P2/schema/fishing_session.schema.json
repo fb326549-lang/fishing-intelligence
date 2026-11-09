@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fishing session ground-truth record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "started_at_local",
+    "region_id",
+    "method",
+    "effort_minutes",
+    "catch_count"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "started_at_local": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended_at_local": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "region_id": {
+      "enum": [
+        "yilan_suao",
+        "hualien_north",
+        "hualien_south",
+        "fengbin_shitiping",
+        "chenggong_donghe",
+        "taitung_south"
+      ]
+    },
+    "location_label": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "habitat": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effort_minutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "catch_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "angler_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "weather_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sea_state_notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "photo_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
