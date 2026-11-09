@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
+  "dataset_page": "https://data.gov.tw/dataset/172487",
+  "generated_at_utc": "2026-11-09T12:42:46.579282+00:00",
+  "detection_record_count": 19731,
+  "exact_candidate_record_count": 523,
+  "ambiguous_taxon_record_count": 238,
+  "unmatched_taxon_record_count": 18970,
+  "nearest_region_context_record_count": 6350,
+  "candidate_month_region_summary_count": 258,
+  "candidate_region_context_count": 46,
+  "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
+  "source_datasets": [
+    {
+      "dataset_id": "oca_edna_diving_110_113",
+      "name": "110-113年潛水調查魚類eDNA",
+      "url": "https://iocean.oca.gov.tw/oca_datahub/WebService/GetData.ashx?id=27b6c7d6-62cd-465e-b429-a5e010f7f7d8"
+    },
+    {
+      "dataset_id": "oca_edna_vessel_110_112",
+      "name": "110-112年船舶調查魚類eDNA",
+      "url": "https://iocean.oca.gov.tw/oca_datahub/WebService/GetData.ashx?id=3091c6ca-8fb7-4fbb-bd47-c325d7db5072"
+    },
+    {
+      "dataset_id": "oca_edna_mpa_110_113",
+      "name": "110-113年保護區站點魚類eDNA",
+      "url": "https://iocean.oca.gov.tw/oca_datahub/WebService/GetData.ashx?id=763b4982-caa0-4cd6-8f9c-e3ee645ec736"
+    }
+  ]
+}
