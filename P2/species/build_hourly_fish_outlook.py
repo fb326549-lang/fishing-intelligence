@@ -5,7 +5,7 @@ import argparse, csv, json
 from datetime import datetime, timedelta
 from pathlib import Path
 
-HORIZONS=(6,12,24)
+HORIZONS=(6,12,24)\nREGIONS=("yilan_suao","hualien_north","hualien_south","fengbin_shitiping","chenggong_donghe","taitung_south")
 
 def parse_dt(value,label):
     if not isinstance(value,str) or not value.strip():
