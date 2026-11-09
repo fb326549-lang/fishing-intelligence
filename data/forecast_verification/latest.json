@@ -1,0 +1,25 @@
+{
+  "archive_partition_count": 6,
+  "forecast_observation_hour_pairs": 0,
+  "forecast_valid_hours_with_vintages": 492,
+  "forecast_vintages_considered": 14358,
+  "forecast_vintages_with_any_comparable_variable": 0,
+  "generated_at_utc": "2026-11-09T16:40:48.785061+00:00",
+  "limitations": [
+    "Only exact same-region and same-valid-hour pairs are compared; no nearest-time substitution or interpolation.",
+    "All archived forecast vintages are retained for lead-time analysis, but repeated vintages for the same region and valid hour count as one independent valid-hour unit for the exploratory sample threshold.",
+    "CWA regional station aggregates are not point measurements at a fishing location.",
+    "MAE and RMSE describe historical paired errors only; they do not guarantee future accuracy or local nearshore accuracy.",
+    "Direction errors use the shortest circular angular distance.",
+    "Variables with fewer than the minimum number of unique region/valid-hour pairs are marked insufficient_sample; forecast-vintage pair counts are reported separately.",
+    "Unique region/valid-hour pairs remove repeated forecast vintages but are not guaranteed statistically independent across neighboring regions or serially correlated hours."
+  ],
+  "matched_variable_pairs": 0,
+  "method": "exact_region_and_valid_hour_join_latest_observation_revision_all_archived_forecast_vintages",
+  "minimum_unique_region_valid_hours_for_exploratory_metrics": 5,
+  "observation_valid_hours_available": 240,
+  "schema_version": "1.0.0",
+  "status": "awaiting_time_aligned_observations",
+  "variables": {},
+  "variables_with_exploratory_metrics": 0
+}
