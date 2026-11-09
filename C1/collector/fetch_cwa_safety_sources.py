@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fetch CWA official weather alerts and coastal hazard observations.
 
-This collector archives raw provider responses and a per-dataset freshness
+This collector archives raw provider responses, checks the provider envelope, and records a per-dataset freshness
 manifest. It deliberately does not turn county-level warnings into an
 unverified sea-area clearance. Normalization is a separate, tested stage.
 """
