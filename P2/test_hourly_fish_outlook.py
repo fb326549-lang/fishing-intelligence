@@ -30,6 +30,25 @@ class HourlyFishOutlookTests(unittest.TestCase):
         self.assertTrue(all(r["best_fishing_window_status"]=="not_established" for r in rows))
         self.assertTrue(all(r["activity_score"]=="" and r["catch_probability"]=="" for r in rows))
 
+    def test_tide_phase_counts_are_context_only_and_missing_hours_stay_visible(self):
+        env=[forecast(h) for h in range(10,16)]
+        phases=["rising","rising","falling","high_slack","low_slack",None]
+        for row,phase in zip(env,phases):
+            row["environment"]={"tide_phase":phase,"tide_turning":phase in {"high_slack","low_slack"}}
+        joined=[integrated(h,"") for h in range(10,16)]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        self.assertEqual(row["tide_phase_rising_hours"],"2")
+        self.assertEqual(row["tide_phase_falling_hours"],"1")
+        self.assertEqual(row["tide_phase_high_slack_hours"],"1")
+        self.assertEqual(row["tide_phase_low_slack_hours"],"1")
+        self.assertEqual(row["tide_phase_known_hour_count"],"5")
+        self.assertEqual(row["tide_phase_missing_hour_count"],"1")
+        self.assertEqual(row["tide_phase_missing_forecast_hour_count"],"0")
+        self.assertEqual(row["tide_phase_coverage"],"0.8333")
+        self.assertEqual(row["tide_turning_hour_count"],"2")
+        self.assertEqual(row["activity_score"],"")
+        self.assertEqual(row["catch_probability"],"")
+
     def test_latest_forecast_vintage_before_as_of_is_selected(self):
         old=forecast(10,collected="2026-11-09T08:00:00+08:00")
         new=forecast(10,collected="2026-11-09T09:30:00+08:00")
