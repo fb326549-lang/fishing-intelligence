@@ -43,23 +43,28 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             occurrence=root/"occurrence.csv"
             candidates.write_text(
                 "candidate_id,common_name_zh,scientific_name,taxonomy_status\n"
-                "c036,南方舵魚,Kyphosus bigibbus,verified_taxon\n",encoding="utf-8")
+                "c036,南方舵魚,Kyphosus bigibbus,verified_taxon\n"
+                "c026,豆娘魚,,not_single_species\n",encoding="utf-8")
             ecology.write_text(
                 "ecology_record_id,candidate_id,scientific_name,parameter_code,parameter_value,unit_or_format,geographic_scope,evidence_id,confidence,model_use_status,limitations\n",
                 encoding="utf-8")
             evidence.write_text("evidence_id,source_name,source_url\n",encoding="utf-8")
             occurrence.write_text(
                 "regional_occurrence_id,candidate_id,taxon_scientific_name,common_name_zh,site_code,site_name,region_id,visit_number,recorded_presence,study_year,study_scope,method,source_name,source_url,confidence,model_use_status,limitations\n"
-                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\n",
+                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\n"
+                "RO008,c026,Abudefduf septemfasciatus,七帶豆娘魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,one member species only\n",
                 encoding="utf-8")
             catalog=build_catalog(candidates,ecology,evidence,occurrence)
             self.assertEqual(catalog["record_count"],0)
-            self.assertEqual(catalog["regional_occurrence_record_count"],1)
+            self.assertEqual(catalog["regional_occurrence_record_count"],2)
             row=catalog["regional_occurrence_records"][0]
             self.assertEqual(row["candidate_id"],"c036")
             self.assertEqual(row["region_id"],"chenggong_donghe")
             self.assertEqual(row["recorded_presence"],"present")
             self.assertEqual(row["model_use_status"],"context_only_east_coast_biodiversity_survey")
+            damselfish=next(x for x in catalog["regional_occurrence_records"] if x["candidate_id"]=="c026")
+            self.assertEqual(damselfish["common_name_zh"],"七帶豆娘魚")
+            self.assertEqual(damselfish["scientific_name"],"Abudefduf septemfasciatus")
 
     def test_unknown_candidate_and_missing_source_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
