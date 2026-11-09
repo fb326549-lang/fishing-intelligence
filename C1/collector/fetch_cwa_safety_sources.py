@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Fetch CWA official weather alerts and coastal hazard observations.
 
-This collector archives raw provider responses, checks the provider envelope, and records a per-dataset freshness
-manifest. It deliberately does not turn county-level warnings into an
-unverified sea-area clearance. Normalization is a separate, tested stage.
+Raw responses are preserved before validation so schema changes remain
+inspectable. No county warning is silently treated as a sea-area clearance.
 """
 from __future__ import annotations
 import argparse, json, os, time, hashlib
@@ -15,11 +14,7 @@ import requests
 REST = "https://opendata.cwa.gov.tw/api/v1/rest/datastore"
 FILE = "https://opendata.cwa.gov.tw/fileapi/v1/opendataapi"
 REST_DATASETS = ("W-C0033-001", "W-C0033-002", "W-C0033-003", "W-C0033-006")
-FILE_DATASETS = {
-    "W-C0034-001": "CAP",
-    "O-B0069-001": "JSON",
-    "O-B0070-001": "JSON",
-}
+FILE_DATASETS = {"W-C0034-001": "CAP", "O-B0069-001": "JSON", "O-B0070-001": "JSON"}
 USER_AGENT = "FishingIntelligence-C1/1.0"
 
 def utc_now():
@@ -49,16 +44,24 @@ def fetch_one(session, dataset, kind, token, outdir, timeout=45):
     url = f"{REST}/{dataset}" if kind == "REST_JSON" else f"{FILE}/{dataset}"
     params = {"format": "JSON"} if kind == "REST_JSON" else {"format": kind}
     params["Authorization"] = token
+    raw_name = f"{dataset}.raw"
     try:
         response = session.get(url, params=params, timeout=timeout, allow_redirects=True)
         if response.status_code >= 400:
             raise RuntimeError(f"HTTP {response.status_code}")
         body = response.content
+        # Save the exact bytes before parsing; useful when provider schema changes.
+        (outdir / raw_name).write_bytes(body)
         if kind == "CAP":
             validate_cap_payload(body)
             extension = "cap"
         else:
-            payload = validate_json_payload(response.json(), dataset)
+            payload = response.json()
+            try:
+                payload = validate_json_payload(payload, dataset)
+            except ValueError as exc:
+                keys = ",".join(str(k) for k in payload.keys()) if isinstance(payload, dict) else type(payload).__name__
+                raise ValueError(f"{exc}; top_level={keys}") from exc
             body = (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
             extension = "json"
         target = outdir / f"{dataset}.{extension}"
@@ -70,10 +73,11 @@ def fetch_one(session, dataset, kind, token, outdir, timeout=45):
             "content_type": response.headers.get("Content-Type", ""),
         }
     except Exception as exc:
-        # Do not include response/request URLs: file API URLs contain credentials.
+        # Never print request URLs: file API query strings contain credentials.
         return {
             "dataset_id": dataset, "status": "error", "collected_at": collected,
-            "error": f"{type(exc).__name__}: {str(exc).split('?')[0][:240]}",
+            "error": f"{type(exc).__name__}: {str(exc).split('?')[0][:360]}",
+            "raw_file": raw_name if (outdir / raw_name).exists() else None,
         }
 
 def main():
@@ -94,16 +98,16 @@ def main():
         results.append(fetch_one(session, dataset, kind, token, outdir))
         time.sleep(max(0, args.delay))
     manifest = {
-        "schema_version": "1.0.0",
-        "collector": "FishingIntelligence-C1",
-        "collected_at": utc_now(),
-        "datasets": results,
+        "schema_version": "1.0.0", "collector": "FishingIntelligence-C1",
+        "collected_at": utc_now(), "datasets": results,
         "note": "Raw-source collection only. A successful download is not equivalent to a regional safety clearance."
     }
     (outdir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for item in results:
-        print(f'{item["dataset_id"]}: {item["status"]}')
+        detail = f' — {item.get("error")}' if item["status"] != "ok" else ""
+        print(f'{item["dataset_id"]}: {item["status"]}{detail}')
     if any(item["status"] != "ok" for item in results):
         raise SystemExit("One or more official safety sources failed; fail closed.")
+
 if __name__ == "__main__":
     main()
