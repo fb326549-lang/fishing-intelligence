@@ -11,7 +11,7 @@ on:
       - "P1/species/species_candidate_register.csv"
       - ".github/workflows/oca-edna-occurrence-context.yml"
   pull_request:
-    branches: [p1-foundation]
+    branches: [main, p1-foundation]
     paths:
       - "P2/collector/fetch_oca_edna_occurrence.py"
       - "P2/test_oca_edna_occurrence.py"
