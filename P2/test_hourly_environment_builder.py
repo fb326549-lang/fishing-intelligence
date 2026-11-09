@@ -138,8 +138,8 @@ class HourlyBuilderTests(unittest.TestCase):
                 writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
             tide_csv = root / "tide.csv"
             tide_rows = [
-                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T06:00:00","tide":"乾潮"},
-                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00","tide":"滿潮"},
+                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T06:00:00","tide":"乾潮","fetched_at_utc":"2026-11-09T04:00:00+00:00"},
+                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00","tide":"滿潮","fetched_at_utc":"2026-11-09T04:00:00+00:00"},
             ]
             with tide_csv.open("w",encoding="utf-8",newline="") as handle:
                 writer=csv.DictWriter(handle,fieldnames=list(tide_rows[0]));writer.writeheader();writer.writerows(tide_rows)
@@ -149,7 +149,8 @@ class HourlyBuilderTests(unittest.TestCase):
             self.assertFalse(rec["environment"]["tide_turning"])
             self.assertIsNone(rec["environment"].get("tide_height_m"))
             self.assertIsNone(rec["environment"].get("tidal_current_velocity_ms"))
-            self.assertIn("F-A0021-001",{x["dataset"] for x in rec["source_records"]})
+            cwa_source=next(x for x in rec["source_records"] if x["dataset"]=="F-A0021-001")
+            self.assertEqual(cwa_source["retrieved_at"],"2026-11-09T04:00:00+00:00")
             self.assertIn("tide_phase_derived_from_cwa_high_low_forecast_events",rec["quality"]["flags"])
 
     def test_cwa_aggregate_without_dataset_is_not_mislabelled_as_one_dataset(self):

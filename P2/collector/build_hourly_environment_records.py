@@ -99,17 +99,23 @@ def build_tide_phase_index(csv_path: Path):
         kind = "high" if tide in {"滿潮", "高潮"} else "low" if tide in {"乾潮", "低潮"} else None
         if not region or region not in REGIONS or not location or when is None or kind is None:
             continue
-        grouped[region][location].append((when, kind))
+        grouped[region][location].append((when, kind, (row.get("fetched_at_utc") or "").strip()))
     if not grouped:
         raise ValueError("No mapped CWA high/low tide events found")
     for locations in grouped.values():
         for location, events in locations.items():
             by_time = {}
-            for when, kind in events:
-                by_time.setdefault(when, set()).add(kind)
+            for event in events:
+                when, kind = event[0], event[1]
+                fetched_at = event[2] if len(event) > 2 else ""
+                by_time.setdefault(when, {"kinds": set(), "fetched_at": []})
+                by_time[when]["kinds"].add(kind)
+                if fetched_at:
+                    by_time[when]["fetched_at"].append(fetched_at)
             locations[location] = [
-                (when, next(iter(kinds))) for when, kinds in sorted(by_time.items())
-                if len(kinds) == 1
+                (when, next(iter(value["kinds"])), max(value["fetched_at"]) if value["fetched_at"] else None)
+                for when, value in sorted(by_time.items())
+                if len(value["kinds"]) == 1
             ]
     return grouped
 
@@ -197,10 +203,16 @@ def build_forecast_rows(csv_path: Path, forecast_dir: Path, timezone_name: str, 
             else:
                 tide_flags.append("tide_phase_derived_from_cwa_high_low_forecast_events")
             if location_count:
+                retrieved_at = max(
+                    (event[2] for locations in tide_phase_index.get(region, {}).values()
+                     for event in locations if len(event) > 2 and event[2]),
+                    default=None,
+                )
                 tide_source_record = {
                     "source_id": "CWA",
                     "dataset": "F-A0021-001",
                     "url": CWA_TIDE_URL,
+                    **({"retrieved_at": parse_cwa_tide_time(retrieved_at).isoformat()} if retrieved_at and parse_cwa_tide_time(retrieved_at) else {}),
                 }
         code = env.get("weather_code")
         env["thunderstorm_risk"] = thunderstorm_risk(code)
