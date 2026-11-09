@@ -191,6 +191,24 @@ def marine_alerts(dataset,payload,collected):
   msg=f"{name}測站過去8小時監測：{warning}；最大值 {value if value is not None else '無資料'}"
   out.append(make_alert(dataset,f"{dataset}:{name}:{warning}",kind,[region],start,end,collected,msg,"https://opendata.cwa.gov.tw/dataset/observation/"+dataset,sev,"active",name))
  return out,sorted(covered)
+def deduplicate_alerts(alerts):
+ """Merge same event/time across provider feeds and union affected regions."""
+ unique={}
+ severity_rank={"unknown":0,"minor":1,"moderate":2,"severe":3,"extreme":4}
+ for x in alerts:
+  key=(x["alert_type"],x["effective_start"],x["effective_end"],x["status"])
+  if key not in unique:
+   unique[key]=dict(x)
+   continue
+  current=unique[key]
+  current["region_ids"]=sorted(set(current["region_ids"])|set(x["region_ids"]))
+  if len(x.get("message",""))>len(current.get("message","")):
+   current["message"]=x["message"]
+  if severity_rank.get(x["severity"],0)>severity_rank.get(current["severity"],0):
+   current["severity"]=x["severity"]
+  current["affected_area"]="、".join(sorted(set(filter(None,[current.get("affected_area"),x.get("affected_area")]))))
+  current["alert_id"]=f'{x["alert_type"]}:{x["effective_start"]}:{x["effective_end"]}'
+ return list(unique.values())
 def main():
  p=argparse.ArgumentParser();p.add_argument("--input",type=Path,required=True);p.add_argument("--out",type=Path,required=True);p.add_argument("--as-of");a=p.parse_args()
  manifest=json.loads((a.input/"manifest.json").read_text(encoding="utf-8"))
@@ -213,24 +231,7 @@ def main():
    alerts.extend(marine)
    # Keep the published station-coverage mask; the returned station list is audited separately.
    if set(covered)!=set(COVERAGE[ds]):raise ValueError(f"{ds}: parsed station coverage changed; review mapping before publishing")
- # Merge duplicate representations of the same alert across the CWA feeds.
- # Region lists may differ by dataset granularity, so union the affected regions.
- unique={}
- severity_rank={"unknown":0,"minor":1,"moderate":2,"severe":3,"extreme":4}
- for x in alerts:
-  key=(x["alert_type"],x["effective_start"],x["effective_end"],x["status"])
-  if key not in unique:
-   unique[key]=dict(x)
-   continue
-  current=unique[key]
-  current["region_ids"]=sorted(set(current["region_ids"])|set(x["region_ids"]))
-  if len(x.get("message",""))>len(current.get("message","")):
-   current["message"]=x["message"]
-  if severity_rank.get(x["severity"],0)>severity_rank.get(current["severity"],0):
-   current["severity"]=x["severity"]
-  current["affected_area"]="、".join(sorted(set(filter(None,[current.get("affected_area"),x.get("affected_area")]))))
-  current["alert_id"]=f'{x["alert_type"]}:{x["effective_start"]}:{x["effective_end"]}'
- alerts=list(unique.values())
+ alerts=deduplicate_alerts(alerts)
  decisions={"schema_version":"1.0.0","as_of":collected,"regions":{r:decide_region(r,alerts,status,parse_time(collected)) for r in REGIONS}}
  a.out.mkdir(parents=True,exist_ok=True)
  for name,obj in (("alerts.json",alerts),("source_status.json",status),("safety_decisions.json",decisions)):
