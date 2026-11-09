@@ -56,11 +56,26 @@ def main() -> int:
     for item in ecology:
         ecology_by_candidate.setdefault(item["candidate_id"], []).append(item)
 
+    # Protected species may be present in the ecological reference database,
+    # but must never enter the target-fishing context output.
+    protected_ids = {
+        item.get("candidate_id", "")
+        for item in ecology
+        if item.get("parameter_code") == "conservation_status"
+        and any(
+            marker in item.get("parameter_value", "").lower()
+            for marker in ("prohibited to catch", "protected wildlife", "保育類", "禁止垂釣")
+        )
+    }
+    protected_candidates = [
+        item for item in candidates if item.get("candidate_id") in protected_ids
+    ]
     eligible = [
         item for item in candidates
         if item.get("taxonomy_status") == ELIGIBLE_TAXON_STATUS
         and item.get("regional_evidence_status") == ELIGIBLE_REGIONAL_STATUS
         and item.get("scientific_name", "").strip()
+        and item.get("candidate_id") not in protected_ids
     ]
 
     output = []
@@ -141,6 +156,14 @@ def main() -> int:
         "status": "generated_context_only",
         "model_version": MODEL_VERSION,
         "eligible_species": len(eligible),
+        "excluded_protected_species": [
+            {
+                "candidate_id": item.get("candidate_id", ""),
+                "common_name_zh": item.get("common_name_zh", ""),
+                "reason": "protected_species_not_target_eligible",
+            }
+            for item in protected_candidates
+        ],
         "forecast_region_horizon_records": len(forecasts),
         "output_records": len(output),
         "activity_scores_generated": 0,

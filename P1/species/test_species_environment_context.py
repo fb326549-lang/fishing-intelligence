@@ -31,14 +31,26 @@ class SpeciesEnvironmentContextTests(unittest.TestCase):
                 "candidate_id": "c002", "common_name_zh": "待確認魚",
                 "fishery_group": "未知", "scientific_name": "",
                 "regional_evidence_status": "pending", "taxonomy_status": "pending",
+            }, {
+                "candidate_id": "c003", "common_name_zh": "保育魚",
+                "fishery_group": "保育類", "scientific_name": "Protected species",
+                "regional_evidence_status": "regional_distribution_documented",
+                "taxonomy_status": "verified_taxon",
             }])
             write_csv(species / "species_evidence_register.csv", [{
                 "evidence_id": "E001", "candidate_id": "c001", "confidence": "high",
+            }, {
+                "evidence_id": "E002", "candidate_id": "c003", "confidence": "high",
             }])
             write_csv(species / "species_ecology_parameters.csv", [{
                 "ecology_record_id": "EP001", "candidate_id": "c001",
                 "parameter_code": "habitat", "parameter_value": "reef;coastal",
                 "model_use_status": "eligible_as_species_context", "evidence_id": "E001",
+            }, {
+                "ecology_record_id": "EP002", "candidate_id": "c003",
+                "parameter_code": "conservation_status",
+                "parameter_value": "protected wildlife; prohibited to catch",
+                "model_use_status": "context_only", "evidence_id": "E002",
             }])
             forecast = root / "regional.csv"
             write_csv(forecast, [{
@@ -66,6 +78,11 @@ class SpeciesEnvironmentContextTests(unittest.TestCase):
             summary = json.loads((root / "species_environment_context_summary.json").read_text(encoding="utf-8"))
             self.assertEqual(summary["activity_scores_generated"], 0)
             self.assertEqual(summary["catch_probabilities_generated"], 0)
+            self.assertEqual(summary["excluded_protected_species"], [{
+                "candidate_id": "c003",
+                "common_name_zh": "保育魚",
+                "reason": "protected_species_not_target_eligible",
+            }])
 
 if __name__ == "__main__":
     unittest.main()
