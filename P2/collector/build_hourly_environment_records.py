@@ -149,7 +149,7 @@ def build_cwa_rows(jsonl_path: Path):
         if not valid or not collected:
             continue
         key = (region, valid)
-        if key not in selected or collected > selected[key].get("collected_at", ""):
+        if key not in selected or parse_dt(collected, "UTC") > parse_dt(selected[key]["collected_at"], "UTC"):
             selected[key] = row
     output = []
     for (region, valid), row in sorted(selected.items()):
@@ -168,7 +168,9 @@ def build_cwa_rows(jsonl_path: Path):
             env[dest] = number(row.get(src))
         # Current measurements are marine currents, not specifically tidal currents.
         available = sum(v is not None for v in env.values())
-        dataset = row.get("source_dataset") or "O-B0075-001/O-B0075-002"
+        archive_scope = row.get("archive_scope", "")
+        dataset = row.get("source_dataset") or ("O-B0075-002" if "30" in archive_scope else "O-B0075-001")
+        source_url = CWA_URLS[dataset]
         output.append({
             "schema_version": "1.0.0", "region_id": region,
             "valid_time": parse_dt(valid, "Asia/Taipei").isoformat(),
@@ -176,7 +178,7 @@ def build_cwa_rows(jsonl_path: Path):
             "data_type": "observation",
             "source_records": [{
                 "source_id": "CWA", "dataset": dataset,
-                "url": CWA_URLS["O-B0075-001"],
+                "url": source_url,
                 "retrieved_at": parse_dt(row["collected_at"], "UTC").isoformat(),
                 "source_record_id": row.get("revision_key") or row.get("snapshot_id"),
             }],
