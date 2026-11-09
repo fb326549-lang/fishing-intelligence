@@ -18,8 +18,27 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),9)
+        self.assertEqual(len(rows),16)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
+
+    def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        occurrence=[r for r in rows if r["activity_dimension"]=="occurrence_record"]
+        self.assertEqual({r["activity_evidence_id"] for r in occurrence},{"AE010","AE011","AE012","AE013","AE014","AE015"})
+        self.assertTrue(all(r["evidence_kind"]=="verified_museum_specimen" for r in occurrence))
+        self.assertTrue(all(r["model_use_status"]=="context_only_east_taiwan_occurrence" for r in occurrence))
+        self.assertTrue(all("不得作為活動分數" in r["limitations"] for r in occurrence))
+
+    def test_damselfish_feeding_observation_is_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        row=next(r for r in rows if r["activity_evidence_id"]=="AE016")
+        self.assertEqual(row["candidate_id"],"c027")
+        self.assertEqual(row["activity_dimension"],"feeding_activity")
+        self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
+        self.assertIn("護卵雄魚",row["limitations"])
+        self.assertIn("沒有測量",row["limitations"])
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
