@@ -6,6 +6,7 @@ on:
     - cron: '0 */4 * * *'
   push:
     branches:
+      - main
       - p1-foundation
     paths:
       - 'P1/collector/**'
