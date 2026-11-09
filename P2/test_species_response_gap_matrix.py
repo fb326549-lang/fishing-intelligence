@@ -41,6 +41,12 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(rabbit["literature_record_ids"],"L1")
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(black["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
+            black_activity=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="activity_period")
+            self.assertEqual(black_activity["evidence_status"],"external_literature_found_context_only")
+            black_seabream_temp=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="temperature_range")
+            self.assertEqual(black_seabream_temp["evidence_status"],"external_literature_found_context_only")
+            black_seabream_current=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="current_preference")
+            self.assertEqual(black_seabream_current["evidence_status"],"external_literature_found_context_only")
 
 if __name__ == "__main__":
     unittest.main()
