@@ -44,6 +44,8 @@ def request_json(session: requests.Session, url: str, params: dict[str, Any]) ->
 def resolve_source_location(location: dict[str, Any], source: str) -> dict[str, Any]:
     """Keep marine grid coordinates independent from land weather coordinates."""
     resolved = dict(location)
+    resolved["_requested_latitude"] = float(location["latitude"])
+    resolved["_requested_longitude"] = float(location["longitude"])
     if source == "marine":
         resolved["latitude"] = float(location.get("marine_latitude", location["latitude"]))
         resolved["longitude"] = float(location.get("marine_longitude", location["longitude"]))
@@ -67,7 +69,7 @@ def normalize_hourly(location: dict[str, Any], payload: dict[str, Any], fetched_
         for valid_time, value in zip(times, values):
             rows.append({
                 "location_id": location["id"], "location_name": location["name"],
-                "requested_latitude": location["latitude"], "requested_longitude": location["longitude"],
+                "requested_latitude": location.get("_requested_latitude", location["latitude"]), "requested_longitude": location.get("_requested_longitude", location["longitude"]),
                 "grid_latitude": payload.get("latitude"), "grid_longitude": payload.get("longitude"),
                 "variable_code": variable, "value": value, "unit": units.get(variable),
                 "valid_time": valid_time, "fetched_at": fetched_at,
