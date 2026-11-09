@@ -44,9 +44,14 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           html = Path("index.html").read_text(encoding="utf-8")
-          expected = "['fishing-intelligence-p2.4.6','fishing-intelligence-p2.6'].includes(data.source)"
-          if expected not in html:
-              raise SystemExit("PWA does not accept the live P2.6 fish outlook source")
+          expected = [
+              "['fishing-intelligence-p2.4.6','fishing-intelligence-p2.6'].includes(data.source)",
+              "regions_without_active_reference_stations",
+              "本區缺少有效參考站",
+          ]
+          missing = [item for item in expected if item not in html]
+          if missing:
+              raise SystemExit("PWA missing required P2.6/eDNA coverage handling: " + ", ".join(missing))
           PY
       - name: Run C1 safety decision tests
         run: python -m unittest discover -s C1 -p 'test_*.py' -v
