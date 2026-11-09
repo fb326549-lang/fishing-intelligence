@@ -45,7 +45,8 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 (()=>{'use strict';
 const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-A0021-001',tideKey:''},KEY='fishing_intelligence_config_v1';
 const CWA_SNAPSHOT_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json';
-const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_safety_decisions.json";\nlet point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null};
+const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_safety_decisions.json";
+let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null};
 
 const map=L.map('map').setView([23.7,121],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
@@ -379,7 +380,7 @@ function renderDecisionHome(){
   $('decisionSafety').textContent='目前無法取得官方安全決策資料。這不代表沒有警報或海況安全；請稍後重試並查核中央氣象署及現場公告。';
   $('decisionSafetyTime').textContent='官方資料更新時間：無法取得';
  }else{
-  const reasons=(safety.reasoning||[]).filter(x=>!x.startsWith('已查核的官方來源')).slice(0,2).map(x=>x.replace(/^strong_wind_land:\\s*/,'陸上強風特報：').slice(0,190));
+  const reasons=(safety.reasoning||[]).filter(x=>!x.startsWith('已查核的官方來源')).slice(0,2).map(x=>x.replace(/^strong_wind_land:\s*/,'陸上強風特報：').slice(0,190));
   const gaps=safety.missing_sources||[];
   let lead='';
   if(safety.state==='high_risk')lead='官方資料顯示本區存在高風險警示，不建議前往作釣。';
