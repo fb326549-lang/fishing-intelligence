@@ -27,6 +27,7 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 <div class="grid"><div class="metric"><div class="label">分析海域</div><div class="value" id="decisionRegion">尚未選擇</div></div><div class="metric"><div class="label">目標魚種</div><div class="value" id="decisionFish">綜合魚種</div></div></div>
 <div class="metric" style="margin-top:9px"><div class="row"><strong>🛟 出釣安全確認</strong><span class="tag" id="decisionSafetyTag">未驗證安全</span></div><div id="decisionSafety" class="small" style="margin-top:7px">正在取得中央氣象署官方警報與海象風險資料…</div><div id="decisionSafetyTime" class="small" style="margin-top:5px;color:#9fb4ae">官方資料更新時間：等待資料</div></div>
 <div class="grid" style="margin-top:9px"><div class="metric"><div class="label">海浪</div><div class="value" id="decisionWave">等待資料</div></div><div class="metric"><div class="label">風速／陣風</div><div class="value" id="decisionWind">等待資料</div></div><div class="metric"><div class="label">海表溫度</div><div class="value" id="decisionSst">等待資料</div></div><div class="metric"><div class="label">海流</div><div class="value" id="decisionCurrent">等待資料</div></div></div>
+<div class="metric" style="margin-top:9px"><div class="row"><strong>🌊 六區海象暴露分析</strong><span class="tag" id="decisionMarineRiskTag">等待分析</span></div><div id="decisionMarineRiskText" class="small" style="margin-top:7px">等待中央氣象署最新測站觀測與分析。</div><div id="decisionMarineRiskTime" class="small" style="margin-top:5px;color:#9fb4ae">分析時間：等待資料</div><div class="notice">浪高、風速分級為本專案內部環境暴露篩檢，不是官方警戒門檻或安全許可；不推斷潮汐漲退、岸線迎浪或中魚率。</div></div>
 <div class="metric" style="margin-top:9px"><div class="row"><strong>🐟 魚種環境分析</strong><span class="tag" id="decisionFishTag">資料整理中</span></div><div id="decisionFishText" class="small" style="margin-top:7px">環境資料載入後顯示；不會把舊版 heuristic 分數當作魚群活動或中魚率。</div></div>
 <div class="metric" style="margin-top:9px"><strong>⏱ 未來 6／12／24 小時</strong><div class="small" id="decisionHorizon" style="margin-top:7px">等待逐時資料。</div></div>
 <div class="notice">目前是決策首頁第一版，尚非正式安全許可或已驗證魚情預測。資料不足時會明確標示，不捏造最佳時段及中魚率。</div>
@@ -46,7 +47,8 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-A0021-001',tideKey:''},KEY='fishing_intelligence_config_v1';
 const CWA_SNAPSHOT_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json';
 const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_safety_decisions.json";
-let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null};
+const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
+let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null};
 
 const map=L.map('map').setView([23.7,121],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
@@ -363,6 +365,16 @@ async function loadSafetyDecision(){
  }
  renderDecisionHome();
 }
+async function loadMarineRisk(){
+ try{
+  const response=await fetch(CWA_MARINE_RISK_URL+'?t='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const snapshot=await response.json();
+  if(snapshot.schema_version!=='1.0.0'||snapshot.analysis_kind!=='observed_marine_exposure_screening'||!snapshot.regions)throw Error('海象分析資料格式不符');
+  latest.marineRisk=snapshot;
+ }catch(e){latest.marineRisk=null;}
+ renderDecisionHome();
+}
 function renderDecisionHome(){
  const regionId=selectedCwaRegion(),names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  $('decisionRegion').textContent=names[regionId]||'請選擇分析區域';
@@ -373,6 +385,17 @@ function renderDecisionHome(){
  $('decisionWind').textContent=fmt(w.wind_speed_10m,'km/h',0)+' / '+fmt(w.wind_gusts_10m,'km/h',0);
  $('decisionSst').textContent=fmt(m.sea_surface_temperature,'°C');
  $('decisionCurrent').textContent=fmt(m.ocean_current_velocity,'km/h');
+ const marineRisk=latest.marineRisk?.regions?.[regionId];
+ const riskLabels={low:'低',moderate:'中',high:'高',very_high:'極高',unknown:'無法判定'};
+ $('decisionMarineRiskTag').textContent=marineRisk?riskLabels[marineRisk.exposure_level]||'無法判定':'資料暫不可用';
+ if(!marineRisk){
+  $('decisionMarineRiskText').textContent='尚未取得六區海象暴露分析；不可將缺少資料解讀為海況平穩。';
+  $('decisionMarineRiskTime').textContent='分析時間：無法取得';
+ }else{
+  const factorText=(marineRisk.factors||[]).map(x=>(x.factor==='wave_height_m'?'浪高':x.factor==='wind_speed_ms'?'風速':x.factor)+' '+x.value+' '+x.unit+'（'+x.label+'）').join('；');
+  $('decisionMarineRiskText').textContent=marineRisk.state==='assessed'?'本區環境暴露篩檢：'+marineRisk.exposure_label+'。'+(factorText?'依據：'+factorText+'。':'')+'測站 '+marineRisk.station_count+'/'+marineRisk.mapped_station_count+'；'+marineRisk.reason:'本區無法判定：'+marineRisk.reason;
+  $('decisionMarineRiskTime').textContent='最新觀測：'+cwaTime(marineRisk.latest_observation_time)+'｜觀測年齡：'+(marineRisk.observation_age_minutes===null?'未知':marineRisk.observation_age_minutes+' 分鐘')+'｜分析：'+cwaTime(latest.marineRisk.generated_at);
+ }
  const safety=latest.safety?.regions?.[regionId];
  const safetyLabels={high_risk:'高風險',warning:'官方警示',no_active_alerts_reported:'未回報有效警特報',insufficient_data:'資訊不足'};
  $('decisionSafetyTag').textContent=safety?safetyLabels[safety.state]||'無法判定':'官方資料暫不可用';
@@ -471,7 +494,7 @@ $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecision
 renderFishOptions();
 initFavorites();
 loadSafetyDecision();
-async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
+async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,cloud_cover,visibility,wind_direction_10m',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m,pressure_msl',forecast_days:'2',timezone:'Asia/Taipei'});
 const [mr,wr]=await Promise.all([fetch(mu),fetch(wu)]);if(!mr.ok)throw Error('Marine API HTTP '+mr.status);if(!wr.ok)throw Error('Weather API HTTP '+wr.status);
