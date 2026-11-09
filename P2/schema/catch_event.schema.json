@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fishing catch event ground-truth record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "catch_id",
+    "session_id",
+    "caught_at_local",
+    "common_name_reported",
+    "species_identification_confidence",
+    "count"
+  ],
+  "properties": {
+    "catch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "caught_at_local": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "candidate_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "common_name_reported": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scientific_name_confirmed": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "species_identification_confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unconfirmed"
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "length_cm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "weight_g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "released": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "bait_or_lure": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "photo_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
