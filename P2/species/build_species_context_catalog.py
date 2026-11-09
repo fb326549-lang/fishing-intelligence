@@ -75,9 +75,8 @@ def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path
             "limitations": row.get("limitations", ""),
         })
     records.sort(key=lambda r: (r["candidate_id"], r["category"], r["parameter_code"], r["ecology_record_id"]))
-    occurrence_path = occurrence_path or Path(__file__).with_name("species_regional_occurrence_register.csv")
     occurrence_records = []
-    if occurrence_path.exists():
+    if occurrence_path is not None and occurrence_path.exists():
         required_occurrence = {
             "regional_occurrence_id", "candidate_id", "taxon_scientific_name", "site_name",
             "region_id", "visit_number", "recorded_presence", "study_year",
