@@ -41,6 +41,9 @@ COVERAGE={
  "O-B0069-001":["yilan_suao","hualien_north","chenggong_donghe","taitung_south"],
  "O-B0070-001":["yilan_suao","hualien_north","chenggong_donghe","taitung_south"],
 }
+def source_coverage(dataset):
+ covered=set(COVERAGE.get(dataset,REGIONS))
+ return {region:region in covered for region in REGIONS}
 def one(value):
  return value if isinstance(value,list) else ([] if value is None else [value])
 def local(tag):
@@ -204,11 +207,12 @@ def main():
  if item["status"]=="ok":alerts.extend(cap_alerts(a.input/item["file"],item["collected_at"]))
  for ds in ("O-B0069-001","O-B0070-001"):
   item=next(x for x in manifest["datasets"] if x["dataset_id"]==ds)
-  for r in REGIONS:status[ds]["region_coverage"][r]=False
+  status[ds]["region_coverage"]=source_coverage(ds)
   if item["status"]=="ok":
    marine,covered=marine_alerts(ds,json.loads((a.input/item["file"]).read_text(encoding="utf-8")),item["collected_at"])
    alerts.extend(marine)
-   for r in covered:status[ds]["region_coverage"][r]=True
+   # Keep the published station-coverage mask; the returned station list is audited separately.
+   if set(covered)!=set(COVERAGE[ds]):raise ValueError(f"{ds}: parsed station coverage changed; review mapping before publishing")
  # Merge duplicate representations of the same alert from county, detail and CAP feeds.
  # Prefer the most descriptive message while retaining one canonical safety event.
  unique={}
