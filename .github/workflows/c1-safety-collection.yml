@@ -10,7 +10,12 @@ on:
       - "C1/test_collector.py"
       - "C1/test_normalize_cwa_safety.py"
       - "C1/test_safety_decision.py"
-      - "C1/test_marine_regions.py"\n      - "P1/collector/fetch_cwa_stations.py"\n      - "P1/collector/normalize_cwa_marine.py"\n      - "P1/collector/build_east_region_conditions.py"\n      - "P1/collector/build_latest_regional_marine_snapshot.py"\n      - "P1/stations/east_region_station_mapping.csv"
+      - "C1/test_marine_regions.py"
+      - "P1/collector/fetch_cwa_stations.py"
+      - "P1/collector/normalize_cwa_marine.py"
+      - "P1/collector/build_east_region_conditions.py"
+      - "P1/collector/build_latest_regional_marine_snapshot.py"
+      - "P1/stations/east_region_station_mapping.csv"
       - "C1/safety_decision.py"
       - ".github/workflows/c1-safety-collection.yml"
 permissions:
@@ -59,12 +64,13 @@ jobs:
           mkdir -p tide-history-data/data
           cp output/c1_safety_decisions/safety_decisions.json tide-history-data/data/latest_safety_decisions.json
           cp output/c1_safety_decisions/source_status.json tide-history-data/data/latest_safety_source_status.json
-          cp output/c1_marine_decisions/latest_marine_conditions.json tide-history-data/data/latest_marine_conditions.json\n          cp output/c1_marine_decisions/latest_regional_marine_conditions.json tide-history-data/data/latest_regional_marine_conditions.json
+          cp output/c1_marine_decisions/latest_marine_conditions.json tide-history-data/data/latest_marine_conditions.json
+          cp output/c1_marine_decisions/latest_regional_marine_conditions.json tide-history-data/data/latest_regional_marine_conditions.json
           git -C tide-history-data config user.name "github-actions[bot]"
           git -C tide-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C tide-history-data add data/latest_safety_decisions.json data/latest_safety_source_status.json data/latest_marine_conditions.json
+          git -C tide-history-data add data/latest_safety_decisions.json data/latest_safety_source_status.json data/latest_marine_conditions.json data/latest_regional_marine_conditions.json
           if git -C tide-history-data diff --cached --quiet; then
-            echo "No change in normalized safety decision snapshots."
+            echo "No change in normalized safety and marine observation snapshots."
           else
             git -C tide-history-data commit -m "Publish latest six-region safety and marine observations"
             git -C tide-history-data push origin HEAD:tide-history
@@ -78,6 +84,10 @@ jobs:
             output/c1_safety_sources/
             output/c1_safety_decisions/
             output/c1_marine_sources/
-            output/c1_marine_decisions/\n            output/c1_cwa_stations/\n            output/c1_marine_normalized/\n            output/c1_east_region_48h/\n            output/c1_east_region_30d/
+            output/c1_marine_decisions/
+            output/c1_cwa_stations/
+            output/c1_marine_normalized/
+            output/c1_east_region_48h/
+            output/c1_east_region_30d/
           if-no-files-found: warn
           retention-days: 7
