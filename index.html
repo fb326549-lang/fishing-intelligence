@@ -470,6 +470,7 @@ $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFish
 $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
 renderFishOptions();
 initFavorites();
+loadSafetyDecision();
 async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,cloud_cover,visibility,wind_direction_10m',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m,pressure_msl',forecast_days:'2',timezone:'Asia/Taipei'});
