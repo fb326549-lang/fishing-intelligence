@@ -20,7 +20,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
         self.assertEqual(southern_specimen["model_use_status"], "occurrence_only_no_environment_response")
         self.assertEqual(cinerascens_crosswalk["model_use_status"], "occurrence_record_conflict_requires_reconciliation")
         self.assertIn("成功／三仙台", cinerascens_crosswalk["geographic_scope"])
-        self.assertIn("日期、漁法與地點", cinerascens_crosswalk["limitations"])
+        self.assertIn("日期、漁法與精確地點", cinerascens_crosswalk["limitations"])
         self.assertIn("台東三仙台", southern_specimen["geographic_scope"])
 
 
