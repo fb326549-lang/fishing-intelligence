@@ -18,14 +18,14 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),12)
+        self.assertEqual(len(rows),15)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
         occurrence=[r for r in rows if r["activity_dimension"]=="occurrence_record"]
-        self.assertEqual({r["activity_evidence_id"] for r in occurrence},{"AE010","AE011","AE012"})
+        self.assertEqual({r["activity_evidence_id"] for r in occurrence},{"AE010","AE011","AE012","AE013","AE014","AE015"})
         self.assertTrue(all(r["evidence_kind"]=="verified_museum_specimen" for r in occurrence))
         self.assertTrue(all(r["model_use_status"]=="context_only_east_taiwan_occurrence" for r in occurrence))
         self.assertTrue(all("不得作為活動分數" in r["limitations"] for r in occurrence))
