@@ -63,7 +63,8 @@ const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-in
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
 const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
-const FORECAST_VERIFICATION_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/latest.json";\nconst FORECAST_COVERAGE_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/environment_coverage.json";
+const FORECAST_VERIFICATION_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/latest.json";
+const FORECAST_COVERAGE_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/environment_coverage.json";
 let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null,forecastVerification:null,forecastCoverage:null};
 
 const map=L.map('map').setView([23.72,121.62],8);
@@ -463,7 +464,14 @@ function renderForecastVerification(){
   if(v.status!=='exploratory_metrics'||v.mae==null)return '<div>'+escapeP2Text(label[0])+'：樣本不足（'+String(v.unique_region_valid_hours??0)+' 個有效時刻；至少 '+String(data.minimum_unique_region_valid_hours_for_exploratory_metrics??5)+' 個）</div>';
   return '<div>'+escapeP2Text(label[0])+'：MAE '+Number(v.mae).toFixed(2)+' '+label[1]+'｜RMSE '+Number(v.rmse).toFixed(2)+' '+label[1]+'｜有效時刻 '+String(v.unique_region_valid_hours??0)+'</div>';
  });
- $('forecastVerificationMetrics').innerHTML=rows.length?rows.join(''):'目前尚無可用的誤差統計。';\n const regionNames={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};\n const detailRows=Object.entries(data.variables||{}).map(([key,v])=>{\n  const regional=Object.entries(v.regional||{}).map(([id,r])=>'<div>'+escapeP2Text(regionNames[id]||id)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜RMSE '+Number(r.rmse).toFixed(2)+'｜有效時刻 '+String(r.unique_valid_hours??0):'樣本不足（'+String(r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');\n  const lead=Object.entries(v.lead_bands||{}).map(([band,r])=>'<div>'+escapeP2Text(band)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜有效時刻 '+String(r.unique_region_valid_hours??r.unique_valid_hours??0):'樣本不足（'+String(r.unique_region_valid_hours??r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');\n  return regional||lead?'<details class="evidence-details"><summary>'+escapeP2Text(names[key]?.[0]||key)+'：分區及提前時間明細</summary>'+(regional?'<div class="small">各區域</div>'+regional:'')+(lead?'<div class="small" style="margin-top:6px">預報提前時間</div>'+lead:'')+'</details>':'';\n }).filter(Boolean);\n if(detailRows.length)$('forecastVerificationMetrics').innerHTML+=detailRows.join('');
+ $('forecastVerificationMetrics').innerHTML=rows.length?rows.join(''):'目前尚無可用的誤差統計。';
+ const regionNames={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ const detailRows=Object.entries(data.variables||{}).map(([key,v])=>{
+  const regional=Object.entries(v.regional||{}).map(([id,r])=>'<div>'+escapeP2Text(regionNames[id]||id)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜RMSE '+Number(r.rmse).toFixed(2)+'｜有效時刻 '+String(r.unique_valid_hours??0):'樣本不足（'+String(r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');
+  const lead=Object.entries(v.lead_bands||{}).map(([band,r])=>'<div>'+escapeP2Text(band)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜有效時刻 '+String(r.unique_region_valid_hours??r.unique_valid_hours??0):'樣本不足（'+String(r.unique_region_valid_hours??r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');
+  return regional||lead?'<details class="evidence-details"><summary>'+escapeP2Text(names[key]?.[0]||key)+'：分區及提前時間明細</summary>'+(regional?'<div class="small">各區域</div>'+regional:'')+(lead?'<div class="small" style="margin-top:6px">預報提前時間</div>'+lead:'')+'</details>':'';
+ }).filter(Boolean);
+ if(detailRows.length)$('forecastVerificationMetrics').innerHTML+=detailRows.join('');
  if(data.status==='awaiting_time_aligned_observations'){
   $('forecastVerificationNote').textContent='目前尚無同區域、同有效小時的預報／實測配對。系統不以最近時間替代、不插值，也不推估預報準確度；持續累積資料後才會開始計算。';
  }else if(data.status==='exploratory_metrics_available'){
@@ -474,7 +482,18 @@ function renderForecastVerification(){
  const generated=new Date(data.generated_at_utc||'');
  $('forecastVerificationFreshness').textContent='驗證更新時間：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜觀測有效時刻 '+String(data.observation_valid_hours_available??0)+'｜預報有效時刻 '+String(data.forecast_valid_hours_with_vintages??0);
 }
-function renderForecastCoverage(){\n const data=latest.forecastCoverage;if(!data)return;\n const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};\n const status={forecast_and_observation_present:'預報與實測均有資料',forecast_only_observation_unavailable_by_design:'僅預報；本區無 CWA 海象測站',forecast_only_observation_missing:'有預報；實測資料缺漏',observation_only_forecast_missing:'有實測；預報資料缺漏',no_data:'預報與實測均無資料'};\n $('forecastCoverageStatus').textContent='涵蓋 '+String(data.expected_region_count??0)+' 區｜預報完整區域 '+String(data.all_regions_with_expected_forecasts?'全部':'未全部')+'｜應有實測區域 '+String(data.regions_with_forecast_and_observation??0)+' 區有資料';\n $('forecastCoverageRegions').innerHTML=(data.regions||[]).map(r=>'<div><strong>'+escapeP2Text(names[r.region_id]||r.region_id)+'</strong>：'+escapeP2Text(status[r.status]||r.status)+'｜預報 '+String(r.forecast?.unique_valid_hours??0)+' 有效時刻／'+String(r.forecast?.record_count??0)+' 筆｜實測 '+String(r.observation?.unique_valid_hours??0)+' 有效時刻／'+String(r.observation?.record_count??0)+' 筆</div>').join('');\n}\nasync function loadForecastCoverage(){\n try{const response=await fetch(FORECAST_COVERAGE_URL+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(data.schema_version!=='1.0.0'||!Array.isArray(data.regions))throw Error('覆蓋資料格式不符');latest.forecastCoverage=data;renderForecastCoverage();}\n catch(e){latest.forecastCoverage=null;$('forecastCoverageStatus').textContent='區域覆蓋報告尚未發布；不代表資料完整或海況正常。';$('forecastCoverageRegions').textContent='等待下一次正式資料管線發布區域覆蓋報告。';}\n}\nasync function loadForecastVerification(){
+function renderForecastCoverage(){
+ const data=latest.forecastCoverage;if(!data)return;
+ const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ const status={forecast_and_observation_present:'預報與實測均有資料',forecast_only_observation_unavailable_by_design:'僅預報；本區無 CWA 海象測站',forecast_only_observation_missing:'有預報；實測資料缺漏',observation_only_forecast_missing:'有實測；預報資料缺漏',no_data:'預報與實測均無資料'};
+ $('forecastCoverageStatus').textContent='涵蓋 '+String(data.expected_region_count??0)+' 區｜預報完整區域 '+String(data.all_regions_with_expected_forecasts?'全部':'未全部')+'｜應有實測區域 '+String(data.regions_with_forecast_and_observation??0)+' 區有資料';
+ $('forecastCoverageRegions').innerHTML=(data.regions||[]).map(r=>'<div><strong>'+escapeP2Text(names[r.region_id]||r.region_id)+'</strong>：'+escapeP2Text(status[r.status]||r.status)+'｜預報 '+String(r.forecast?.unique_valid_hours??0)+' 有效時刻／'+String(r.forecast?.record_count??0)+' 筆｜實測 '+String(r.observation?.unique_valid_hours??0)+' 有效時刻／'+String(r.observation?.record_count??0)+' 筆</div>').join('');
+}
+async function loadForecastCoverage(){
+ try{const response=await fetch(FORECAST_COVERAGE_URL+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(data.schema_version!=='1.0.0'||!Array.isArray(data.regions))throw Error('覆蓋資料格式不符');latest.forecastCoverage=data;renderForecastCoverage();}
+ catch(e){latest.forecastCoverage=null;$('forecastCoverageStatus').textContent='區域覆蓋報告尚未發布；不代表資料完整或海況正常。';$('forecastCoverageRegions').textContent='等待下一次正式資料管線發布區域覆蓋報告。';}
+}
+async function loadForecastVerification(){
  try{
   const response=await fetch(FORECAST_VERIFICATION_URL+'?t='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
