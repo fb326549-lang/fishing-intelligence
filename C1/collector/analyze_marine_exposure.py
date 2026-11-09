@@ -114,10 +114,14 @@ def assess_region(region_id, region, generated_at, now, stale_after_minutes=180)
         state = "insufficient_data"
         level = "unknown"
         reason = "目前沒有可用的浪高或風速觀測，不能推定海況平穩。"
+    elif len(factors) < len(BANDS):
+        state = "partial_data"
+        level = "unknown"
+        reason = "浪高與風速僅取得其中一項；顯示已取得的因子，但整體暴露級別不予判定。"
     else:
         level = max((item["level"] for item in factors), key=lambda x: LEVEL_RANK[x])
         state = "assessed"
-        reason = "依目前可用的浪高與風速觀測，提供環境暴露篩檢；不是安全判定。"
+        reason = "浪高與風速兩項觀測均可用，提供環境暴露篩檢；不是安全判定。"
 
     if observed.get("coverage_status") == "no_cwa_station_coverage":
         state, level = "insufficient_data", "unknown"
