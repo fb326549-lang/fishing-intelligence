@@ -29,7 +29,8 @@
     "interpretation",
     "activity_evidence_context_json",
     "occurrence_evidence_context_json",
-    "seasonal_evidence_context_json"
+    "seasonal_evidence_context_json",
+    "rule_evidence_trace_json"
   ],
   "properties": {
     "candidate_id": {
@@ -132,6 +133,10 @@
     "seasonal_evidence_context_json": {
       "type": "string",
       "description": "JSON-encoded seasonal context with study period, geography, source provenance, transferability and limitations."
+    },
+    "rule_evidence_trace_json": {
+      "type": "string",
+      "description": "JSON array of per-hour rule evaluations with evidence IDs, sources, observed values and match outcomes."
     }
   }
 }

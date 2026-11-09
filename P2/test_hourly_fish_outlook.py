@@ -20,7 +20,7 @@ def integrated(hour,score="",activity="context_only_evidence_available",cid="c00
         "valid_time":f"2026-11-09T{hour:02d}:00:00+08:00",
         "environment_match_score":score,"environment_match_status":"scored" if score!="" else "insufficient_evidence",
         "activity_evidence_status":activity,"activity_evidence_ids":"AE003","seasonal_evidence_ids":"SE003",
-        "activity_evidence_context_json":"[]","occurrence_evidence_context_json":"[]"}
+        "activity_evidence_context_json":"[]","occurrence_evidence_context_json":"[]","rule_evidence_trace_json":"[]"}
 
 class HourlyFishOutlookTests(unittest.TestCase):
     def test_generates_three_horizons_and_never_best_fishing_window(self):
@@ -119,6 +119,24 @@ class HourlyFishOutlookTests(unittest.TestCase):
         }])
         with self.assertRaisesRegex(ValueError,"conflicting activity_evidence_context_json"):
             build_window_summaries(env,[candidate()],joined,AS_OF)
+
+
+    def test_rule_provenance_is_aggregated_per_forecast_hour(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"85") for h in range(10,16)]
+        for row in joined:
+            row["rule_evidence_trace_json"]=json.dumps([{
+                "rule_id":"R1","evidence_id":"E1","source_url":"https://example.org/rule",
+                "valid_time":row["valid_time"],"observed_value":24,"match":True,
+                "evaluation_status":"evaluated"
+            }])
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        trace=json.loads(result["rule_evidence_trace_json"])
+        self.assertEqual(len(trace),6)
+        self.assertEqual({x["rule_id"] for x in trace},{"R1"})
+        self.assertEqual({x["evidence_id"] for x in trace},{"E1"})
+        self.assertEqual(len({x["valid_time"] for x in trace}),6)
 
     def test_latest_forecast_vintage_before_as_of_is_selected(self):
         old=forecast(10,collected="2026-11-09T08:00:00+08:00")

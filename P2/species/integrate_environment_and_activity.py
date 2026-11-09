@@ -82,6 +82,7 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
                 "environment_match_status":match.get("status","missing_environment_match_result") if match else "missing_environment_match_result",
                 "environment_match_score":match.get("environment_match_score","") if match else "",
                 "environment_rule_coverage":match.get("rule_coverage","") if match else "",
+                "rule_evidence_trace_json":match.get("rule_evidence_trace_json","[]") if match else "[]",
                 "activity_evidence_status":activity_status,
                 "activity_evidence_count":str(len(arows)),
                 "occurrence_evidence_count":str(len(orows)),
@@ -173,7 +174,7 @@ def main():
     rows=build_integrated_rows(env,read_csv(a.candidates_csv),read_csv(a.environment_match_csv),
         read_csv(a.activity_csv),read_csv(a.seasonal_csv))
     fields=["candidate_id","common_name_zh","scientific_name","region_id","valid_time","data_type","taxon_gate",
-        "environment_match_status","environment_match_score","environment_rule_coverage","activity_evidence_status",
+        "environment_match_status","environment_match_score","environment_rule_coverage","rule_evidence_trace_json","activity_evidence_status",
         "activity_evidence_count","occurrence_evidence_count","seasonal_evidence_count","activity_evidence_ids","occurrence_evidence_ids","seasonal_evidence_ids","activity_evidence_context_json","occurrence_evidence_context_json","seasonal_evidence_context_json",
         "activity_reason","activity_score","catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)

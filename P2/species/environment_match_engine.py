@@ -108,6 +108,7 @@ def evaluate(environment_records, candidate_rows, rules):
                     "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                     "status": "taxon_or_distribution_gate", "environment_match_score": "",
                     "rule_coverage": "0", "rules_matched": "0", "rules_evaluated": "0", "rules_applicable": "0",
+                    "rule_evidence_trace_json": "[]",
                     "reason": "candidate identity or regional occurrence is not cleared",
                     "interpretation": "not_fish_activity_or_catch_probability",
                 })
@@ -118,22 +119,51 @@ def evaluate(environment_records, candidate_rows, rules):
                     "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                     "status": "insufficient_evidence", "environment_match_score": "",
                     "rule_coverage": "0", "rules_matched": "0", "rules_evaluated": "0", "rules_applicable": "0",
+                    "rule_evidence_trace_json": "[]",
                     "reason": "no approved East Taiwan direct-field response rules",
                     "interpretation": "not_fish_activity_or_catch_probability",
                 })
                 continue
             evaluated = []
             missing = []
+            trace = []
             for rule in applicable:
                 value = env_values.get(rule["environment_field"])
                 if value is None:
                     missing.append(rule["rule_id"])
+                    trace.append({
+                        "rule_id": rule["rule_id"], "environment_field": rule["environment_field"],
+                        "valid_time": env.get("valid_time", ""), "observed_value": None,
+                        "evaluation_status": "missing", "match": None,
+                        "operator": rule["operator"], "minimum": rule.get("minimum", ""),
+                        "maximum": rule.get("maximum", ""), "match_score": rule["match_score"],
+                        "weight": rule["weight"], "evidence_id": rule["evidence_id"],
+                        "source_url": rule["source_url"], "confidence": rule["confidence"],
+                    })
                     continue
                 result = matches(rule, value)
                 if result is None:
                     missing.append(rule["rule_id"])
+                    trace.append({
+                        "rule_id": rule["rule_id"], "environment_field": rule["environment_field"],
+                        "valid_time": env.get("valid_time", ""), "observed_value": None,
+                        "evaluation_status": "non_numeric", "match": None,
+                        "operator": rule["operator"], "minimum": rule.get("minimum", ""),
+                        "maximum": rule.get("maximum", ""), "match_score": rule["match_score"],
+                        "weight": rule["weight"], "evidence_id": rule["evidence_id"],
+                        "source_url": rule["source_url"], "confidence": rule["confidence"],
+                    })
                 else:
                     evaluated.append((rule, result))
+                    trace.append({
+                        "rule_id": rule["rule_id"], "environment_field": rule["environment_field"],
+                        "valid_time": env.get("valid_time", ""), "observed_value": value,
+                        "evaluation_status": "evaluated", "match": result,
+                        "operator": rule["operator"], "minimum": rule.get("minimum", ""),
+                        "maximum": rule.get("maximum", ""), "match_score": rule["match_score"],
+                        "weight": rule["weight"], "evidence_id": rule["evidence_id"],
+                        "source_url": rule["source_url"], "confidence": rule["confidence"],
+                    })
             total_weight = sum(r["_weight"] for r in applicable)
             observed_weight = sum(r["_weight"] for r, _ in evaluated)
             coverage = observed_weight / total_weight if total_weight else 0
@@ -148,7 +178,9 @@ def evaluate(environment_records, candidate_rows, rules):
                 "candidate_id": cid, "region_id": region, "valid_time": env.get("valid_time", ""), "data_type": env.get("data_type", ""),
                 "status": status, "environment_match_score": "" if score == "" else f"{score:.2f}",
                 "rule_coverage": f"{coverage:.4f}", "rules_matched": str(sum(1 for _, matched in evaluated if matched)),
-                "rules_evaluated": str(len(evaluated)), "rules_applicable": str(len(applicable)), "reason": reason,
+                "rules_evaluated": str(len(evaluated)), "rules_applicable": str(len(applicable)),
+                "rule_evidence_trace_json": json.dumps(trace, ensure_ascii=False, separators=(",", ":")),
+                "reason": reason,
                 "interpretation": "environment_match_only_not_fish_activity_or_catch_probability",
             })
     return results
@@ -163,7 +195,7 @@ def main():
     environments = [json.loads(line) for line in args.environment_jsonl.read_text(encoding="utf-8").splitlines() if line.strip()]
     results = evaluate(environments, read_csv(args.candidates_csv), load_rules(args.rules_csv))
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    fields = ["candidate_id", "region_id", "valid_time", "data_type", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "reason", "interpretation"]
+    fields = ["candidate_id", "region_id", "valid_time", "data_type", "status", "environment_match_score", "rule_coverage", "rules_matched", "rules_evaluated", "rules_applicable", "rule_evidence_trace_json", "reason", "interpretation"]
     with args.out.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         writer.writeheader()

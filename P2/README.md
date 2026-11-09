@@ -736,3 +736,8 @@ The P2 outlook cards now expose expandable, source-traceable evidence sections f
 ## P2.7.1 季節漁業證據與逐時活動證據分層
 
 The priority species response-gap matrix now carries a JSON provenance bundle for each matched literature domain (study design, geography, study period, reported observation/value, source, confidence, use status and limitations). East Taiwan commercial seasonal-distribution records (seasonal_activity) are visible under the seasonal/activity research domain as context-only literature, without becoming approved nearshore activity rules or hourly catch predictions. The matrix preserves the not_model_eligible_until_direct_response_evidence_reviewed policy. This prevents offshore commercial longline seasonality from being misrepresented as shore-angling activity.
+
+
+## P2.7.2 環境比對分數的逐條證據追溯
+
+The environmental match engine now emits `rule_evidence_trace_json` for every candidate/region/hour. Each evaluated rule records its rule ID, environmental field, observed value, operator/range, match outcome, score/weight, evidence ID, source URL and confidence. Missing/non-numeric inputs are explicitly represented rather than silently disappearing. The trace is carried through the integrated assessment and aggregated into the published 6/12/24-hour outlook by rule and forecast hour; conflicting duplicate metadata is rejected. This is provenance for the environmental-match calculation only, not a fish-activity score or catch probability.

@@ -132,6 +132,26 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                 activity_context=collect_evidence_context("activity_evidence_context_json")
                 occurrence_context=collect_evidence_context("occurrence_evidence_context_json")
                 seasonal_context=collect_evidence_context("seasonal_evidence_context_json")
+                rule_trace_by_hour={}
+                for integrated_row in joined:
+                    raw_trace=integrated_row.get("rule_evidence_trace_json","")
+                    if not raw_trace:
+                        continue
+                    try:
+                        trace_items=json.loads(raw_trace)
+                    except (TypeError,ValueError) as exc:
+                        raise ValueError(f"invalid rule_evidence_trace_json for {cid}/{region}: {exc}") from exc
+                    if not isinstance(trace_items,list):
+                        raise ValueError("rule_evidence_trace_json must contain a JSON array")
+                    for item in trace_items:
+                        if not isinstance(item,dict) or not item.get("rule_id"):
+                            raise ValueError("rule trace entries must be objects with a rule_id")
+                        key=(item["rule_id"],item.get("valid_time",""))
+                        previous=rule_trace_by_hour.get(key)
+                        if previous is not None and previous!=item:
+                            raise ValueError(f"conflicting rule trace metadata for {key}")
+                        rule_trace_by_hour[key]=item
+                rule_trace=[rule_trace_by_hour[key] for key in sorted(rule_trace_by_hour)]
                 output.append({
                     "candidate_id":cid,"common_name_zh":candidate.get("common_name_zh",""),
                     "scientific_name":candidate.get("scientific_name",""),"region_id":region,
@@ -159,6 +179,7 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                     "occurrence_evidence_ids":";".join(occurrence_ids),
                     "seasonal_evidence_ids":";".join(seasonal_ids),
                     "seasonal_evidence_context_json":json.dumps(seasonal_context,ensure_ascii=False,separators=(",",":")),
+                    "rule_evidence_trace_json":json.dumps(rule_trace,ensure_ascii=False,separators=(",",":")),
                     "activity_score":"","catch_probability":"","best_fishing_window_status":"not_established",
                     "interpretation":"forecast_environment_summary_not_fish_activity_or_catch_probability",
                 })
@@ -182,7 +203,7 @@ def main():
         "environment_match_status","environment_match_mean","environment_match_min","environment_match_max",
         "activity_evidence_status","activity_evidence_ids","activity_evidence_context_json",
         "occurrence_evidence_count","occurrence_evidence_ids","occurrence_evidence_context_json",
-        "seasonal_evidence_ids","seasonal_evidence_context_json","activity_score",
+        "seasonal_evidence_ids","seasonal_evidence_context_json","rule_evidence_trace_json","activity_score",
         "catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:

@@ -91,6 +91,16 @@ class IntegratedActivityTests(unittest.TestCase):
         self.assertEqual(fish["environment_match_score"],"")
         self.assertEqual(fish["interpretation"],"environment_match_is_not_fish_activity_or_catch_probability")
 
+
+    def test_approved_environment_rule_provenance_is_carried_forward(self):
+        matches=[dict(self.matches[0],status="scored",environment_match_score="85.00",
+            rule_coverage="1.0000",
+            rule_evidence_trace_json='[{"rule_id":"R1","evidence_id":"E1","source_url":"https://example.org/rule","valid_time":"2026-11-09T12:00:00+08:00","match":true}]')]
+        rows=build_integrated_rows(self.env,self.candidates,matches,self.activity,self.seasonal)
+        fish=next(r for r in rows if r["candidate_id"]=="c003")
+        self.assertIn('"rule_id":"R1"',fish["rule_evidence_trace_json"])
+        self.assertIn('"evidence_id":"E1"',fish["rule_evidence_trace_json"])
+
     def test_missing_match_row_is_explicit(self):
         rows=build_integrated_rows(self.env,self.candidates,[],self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c003")
