@@ -8,6 +8,9 @@ on:
     paths:
       - "C1/collector/**"
       - "C1/test_collector.py"
+      - "C1/test_normalize_cwa_safety.py"
+      - "C1/test_safety_decision.py"
+      - "C1/safety_decision.py"
       - ".github/workflows/c1-safety-collection.yml"
 permissions:
   contents: read
