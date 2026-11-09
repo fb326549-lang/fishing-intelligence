@@ -142,13 +142,29 @@ def build_verification(archive_root, minimum_pairs=5):
             "mean_bias": round(sum(signed) / len(signed), 4) if signed else None,
             "lead_bands": bands,
         }
+    matched_variable_pairs = sum(item["sample_count"] for item in summaries.values())
+    variables_with_metrics = sum(item["status"] == "exploratory_metrics" for item in summaries.values())
+    if not matched_hours:
+        verification_status = "awaiting_time_aligned_observations"
+    elif not matched_variable_pairs:
+        verification_status = "matched_hours_without_comparable_variables"
+    elif variables_with_metrics:
+        verification_status = "exploratory_metrics_available"
+    else:
+        verification_status = "exploratory_pairs_below_minimum_sample"
     return {
         "schema_version": "1.0.0",
+        "status": verification_status,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "method": "exact_region_and_valid_hour_join_latest_observation_revision_all_archived_forecast_vintages",
         "archive_partition_count": partition_count,
+        "observation_valid_hours_available": len(observations),
+        "forecast_valid_hours_with_vintages": len(forecasts),
+        "forecast_vintages_considered": sum(len(items) for items in forecasts.values()),
         "forecast_observation_hour_pairs": len(matched_hours),
         "forecast_vintages_with_any_comparable_variable": len(matched_forecast_keys),
+        "matched_variable_pairs": matched_variable_pairs,
+        "variables_with_exploratory_metrics": variables_with_metrics,
         "minimum_pairs_for_exploratory_metrics": minimum_pairs,
         "variables": summaries,
         "limitations": [
