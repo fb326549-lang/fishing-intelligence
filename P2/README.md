@@ -228,3 +228,31 @@ python P2/species/environment_match_engine.py \
 - `taxon_or_distribution_gate`：物種鑑定或區域出現資格未通過。
 
 分數名稱為 `environment_match_score`，代表環境條件與已審查反應規則的匹配程度，**不是魚類活動強度、咬餌機率或中魚機率**。目前正式規則模板保持空白；現有 122 筆遷移參數沒有任何一筆被自動升格為反應規則，因此在補齊直接證據前，系統正確回報證據不足，不會虛構魚情分數。
+
+
+## P2.2.4 白毛俗名與舵魚物種級證據拆分
+
+白毛是地方俗名，不等於單一物種。優先研究矩陣擴充為 10 個候選、70 個反應領域列：
+- c002：白毛俗名群組（Kyphosus spp.），仍維持 species_identification_required，不可直接產生物種分數。
+- c036：南方舵魚（Kyphosus bigibbus），獨立物種候選。
+- c037：天竺舵魚（Kyphosus cinerascens），獨立物種候選。
+
+既有 L001、L003 研究對象均為 K. bigibbus，已由白毛俗名群組 c002 改掛至南方舵魚 c036。日本消波塊群聚及遙測資料仍標記 context_only_external_region，不得套用為台灣東部門檻。
+
+新增 L015–L019：
+- L015：瓜子鱲物種資料頁的日行性與岩礁激浪區活動描述，僅為分類資料背景。
+- L016：南方舵魚物種資料頁的日行性、中表層與外礁環境描述，僅為分類資料背景。
+- L017：天竺舵魚物種資料頁的日行性、中表層、岩礁/海藻床/潟湖描述，僅為分類資料背景。
+- L018：天竺舵魚台東三仙台標本 FRIP21798（2007-01-02，底刺網），只證明曾出現。
+- L019：瓜子鱲花蓮東堤標本 FRIP22025（竿釣），只證明曾出現。
+
+L015–L017 的用途為 context_only_taxonomic_database；L018–L019 的用途為 occurrence_only_no_environment_response。任何一筆都不會自動轉成環境反應規則或活動分數。
+
+資料來源：
+- 瓜子鱲：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381912-fishdb
+- 南方舵魚：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381913-fishdb
+- 天竺舵魚：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381914-fishdb
+- 台東三仙台天竺舵魚標本 FRIP21798：https://fishdb.sinica.edu.tw/chi/specimendetail.php?id=FRIP21798
+- 花蓮東堤瓜子鱲標本 FRIP22025：https://www.tfrin.gov.tw/theme_data.php?id=1395&sub_theme=kuroshio&theme=collection
+
+CI 會重建 70 列矩陣並逐位元比對；測試確認南方舵魚文獻不再掛在白毛俗名群組，且兩種舵魚各自保有物種級候選紀錄。
