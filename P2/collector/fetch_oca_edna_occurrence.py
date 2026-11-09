@@ -365,7 +365,8 @@ def main():
     if not detections:
         raise SystemExit("No normalized eDNA detections found; refusing to publish an empty dataset.")
     summary = build_monthly_summary(detections)
-    manifest = write_outputs(args.out_dir, detections, summary, fetched_at)
+    region_context = build_candidate_region_context(detections)
+    manifest = write_outputs(args.out_dir, detections, summary, region_context, fetched_at)
     print(
         f"eDNA occurrence context built: {len(detections)} positive records; "
         f"{manifest['exact_candidate_record_count']} exact-candidate records; "
