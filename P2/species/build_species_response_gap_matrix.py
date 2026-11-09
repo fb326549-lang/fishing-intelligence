@@ -13,6 +13,7 @@ PRIORITY = {
     "c002": "white_hair_is_kyphosus_genus_group_species_identification_required",
     "c003": "verified_taxon",
     "c004": "verified_taxon",
+    "c023": "verified_taxon",
     "c027": "verified_taxon",
     "c028": "verified_taxon",
     "c029": "verified_taxon",
