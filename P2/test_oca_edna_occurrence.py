@@ -101,7 +101,7 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
             summary = build_monthly_summary(detections)
             write_outputs(Path(tmp), detections, summary, "2026-11-09T00:00:00+00:00")
             manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
-            self.assertIn("not abundance", manifest["interpretation"])
+            self.assertIn("do not measure fish abundance", manifest["interpretation"])
             self.assertTrue((Path(tmp) / "edna_occurrence_context.jsonl").exists())
             self.assertTrue((Path(tmp) / "edna_species_monthly_summary.csv").exists())
 
