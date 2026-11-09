@@ -35,3 +35,37 @@ Status meanings:
 - TBIA API documentation: https://tbiadata.tw/zh-hant/api/doc
 
 This register records metadata research, not successful live API ingestion. Dataset schemas and terms must be rechecked before production use.
+
+## CWA live integration verification (reviewed 2026-11-09)
+
+The following official CWA products are now implemented in the P1 collector workflow:
+
+| Dataset | Product / fields | Official cadence and fee | P1 handling |
+|---|---|---|---|
+| O-B0075-001 | 48-hour buoy and tide-station marine observations: station ID, observation time, tide height, wave height/direction/period, sea temperature, air temperature/pressure, wind, gusts, current layer/direction/speed | 4 updates/hour; free; CWA OpenData platform usage rules | Integrated through fetch, normalization and reviewed station-to-region mapping. Values retain source time, units and missing status. |
+| O-B0075-002 | 30-day buoy and tide-station marine observations | Available in the CWA REST API / Swagger; fee and cadence must be rechecked on its dataset page before routine use | Not currently used by the daily P1 ingestion; avoid adding unnecessary duplicate volume. |
+| F-A0021-001 | One-month tide forecast: location ID/name/coordinates, high/low event time, tide range and three separate height datums | Updated daily; free; CWA OpenData platform usage rules | Integrated as forecast events, not continuous observed tide. TWVD, local MSL and chart datum remain separate. |
+| O-B0076-001 | Buoy/tide-station metadata and available observation elements | Hourly metadata update; free | Used to discover stations and their supported elements; metadata is not a measurement. |
+
+### Access, quota and credential handling
+
+- CWA API access requires a free CWA OpenData member account and its member authorization token. The token is supplied to the REST endpoint through the documented Authorization parameter or supported authentication method; it must not be embedded in browser code or committed to Git.
+- CWA's FAQ lists a general-member allowance of 20,000 API requests and 2 GB per 24 hours, and recommends at least 10 seconds to 1 minute between repeated non-earthquake data requests, depending on the dataset. The P1 scheduled workflow makes a small number of daily dataset requests and does not poll continuously.
+- The repository workflow reads `CWA_AUTHORIZATION` from GitHub Actions Secrets. Previous P1 CWA workflow runs completed successfully, confirming the secret was available to those runs; secret values are never logged.
+- These products are free to access, but use remains subject to the CWA OpenData platform usage rules and dataset-specific conditions. Do not describe the data as unrestricted public-domain content.
+
+### Data and verification status
+
+- The `tide-history` branch currently contains 288 observed-tide records from six explicitly paired mainland stations and 20,384 forecast-vintage records from six collection snapshots (latest archive summary: 2026-11-08 23:15 UTC).
+- The current historical verification report has zero matched forecast-extremum events. Therefore no MAE or timing-accuracy statistic is reported yet. This is an insufficient-history result, not evidence that the CWA forecast is inaccurate.
+- Continue daily append-only collection. Do not overwrite forecast vintages, mix vertical datums, or interpret hourly observations as exact high/low event times.
+
+### Official CWA references
+
+- O-B0075-001 dataset metadata: https://opendata.cwa.gov.tw/dataset/all/O-B0075-001
+- F-A0021-001 dataset metadata: https://opendata.cwa.gov.tw/dataset/forecast/F-A0021-001
+- O-B0075-001 / O-B0075-002 / F-A0021-001 REST endpoints: https://opendata.cwa.gov.tw/dist/opendata-swagger.html
+- API access guide: https://opendata.cwa.gov.tw/devManual/description
+- API quota and credential FAQ: https://opendata.cwa.gov.tw/faq
+- CWA usage rules: https://opendata.cwa.gov.tw/about/rules
+
