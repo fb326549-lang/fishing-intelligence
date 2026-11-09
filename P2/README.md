@@ -344,3 +344,47 @@ python -m unittest discover -s P2 -p 'test_*.py' -v
 ```
 
 限制：所有 SE001–SE004 均維持 `context_only_*`。本階段不建立月份權重、不宣稱東部魚種最佳月份、不將繁殖期/漁業分布/群聚觀察轉成咬況或釣獲機率。後續若要形成東部季節性活動分數，必須有可定位到東部區域、物種鑑定、時間戳、漁法/觀察方法與足夠樣本量的連續資料，並將 effort 與未釣獲樣本納入，避免只用成功釣獲紀錄造成偏差。
+
+
+## P2.4.4 潮汐與海流反應：證據層及中性水文上下文
+
+本階段先把「資料可用」與「魚種反應已知」分開，避免把潮汐經驗直接寫成魚活性規則。
+
+### 中性逐時水文上下文
+新增：
+- `collector/build_tide_current_context.py`：從已驗證逐時環境 JSONL，逐筆保留潮位、潮汐階段、潮汐轉折、潮流速度/方向及一般海流速度/方向。
+- `schema/tide_current_context.schema.json`：上下文輸出契約。
+- `test_tide_current_context.py`：驗證潮位、潮流與一般海流不混用，缺值不補值、不推斷。
+
+執行：
+```bash
+python P2/validate_p2_data.py --environment-jsonl output/p2/hourly_environment.jsonl
+python P2/collector/build_tide_current_context.py \\
+  --input output/p2/hourly_environment.jsonl \\
+  --out output/p2/tide_current_context.jsonl
+python -m unittest P2.test_tide_current_context -v
+```
+
+轉換器只直接傳遞既有欄位：
+- `tide_height_m` 是潮位高度，不是流速。
+- `tide_phase` 只有來源明確提供 rising/falling/high_slack/low_slack 才保留；缺值不從潮位曲線自行猜測。
+- `tide_turning` 只保留來源明確提供的布林值，不以單一小時資料推定轉折。
+- `tidal_current_velocity_ms` 與 `ocean_current_velocity_ms` 分欄保存，不互相複製或換算。
+- 任何缺值均明確標記 missing/unknown。
+
+### 新增研究證據（全部 context-only）
+文獻登錄新增：
+- L022：Mori (1956)，日本岩岸瓜子鱲幼魚在低潮潮池被隔離時的社會/領域行為。這是幼魚潮池行為，不代表成魚偏好退潮或潮流越強越容易中魚。
+- L023：Cowx 等（1998），台灣西部黑鯛幼生於春潮期間採樣，沿岸與河口樣點的平均流速不同，幼生多見於冬末至早春。這不是東部成魚磯釣研究；因只在春潮期間採樣，不能據此證明大潮優於小潮。
+
+活動證據登錄新增：
+- AE008：瓜子鱲幼魚低潮潮池行為，低信心、日本外部區域。
+- AE009：黑鯛幼生與西部沿岸/河口流速差異，台灣西部、幼生階段。
+
+更新 activity evidence schema、validator 與測試，允許上述兩種研究維度，但仍強制 `context_only_*`。目前沒有找到足以建立台灣東部目標魚種「漲/退潮偏好」、「大/小潮偏好」或「最佳潮流速度」的直接成魚釣獲研究，因此不建立任何潮汐/海流計分權重或門檻。
+
+研究來源：
+- Mori (1956), `https://doi.org/10.18960/seitai.5.4_145`
+- Cowx et al. (1998), `https://agris.fao.org/search/en/records/65e00de37c7033e84bf001c6`
+
+驗收限制：此階段完成的是水文欄位上下文與外部/西部研究證據整理，不代表魚種潮汐反應模型已可預測。未來要升格為東部活動反應，必須有物種鑑定、精確釣點/觀察位置、有效時間、潮位與實測潮流、方法/努力量及中魚與未中魚紀錄，並先做跨日期/釣點驗證。
