@@ -43,7 +43,7 @@ def decide_region(region_id,alerts,source_status,now,max_age_minutes=90):
         t=parse_time(s.get("collected_at"))
         if t is None or t>now or (now-t).total_seconds()>max_age_minutes*60: stale.append(dataset)
     unmapped=[a for a in alerts if a.get("unmapped_area")]
-    if any(a["alert_type"] in HIGH_RISK_TYPES for a in valid): state="high_risk"
+    if any(a["alert_type"] in HIGH_RISK_TYPES or (a["alert_type"]=="large_tide" and a["severity"] in {"severe","extreme"}) for a in valid): state="high_risk"
     elif valid: state="warning"
     elif missing or stale or issues or unmapped: state="insufficient_data"
     else: state="no_active_alerts_reported"
