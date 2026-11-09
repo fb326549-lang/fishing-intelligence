@@ -108,6 +108,7 @@ def build_verification(archive_root, minimum_pairs=5):
                 per_variable[metric].append({
                     "region_id": key[0],
                     "valid_time": forecast_row["valid_time"],
+                    "valid_time_utc": key[1].isoformat(),
                     "forecast_collected_at": forecast_row["collected_at"],
                     "observation_collected_at": observation_entry[0].isoformat(),
                     "lead_hours": round(lead_hours, 3),
@@ -129,14 +130,14 @@ def build_verification(archive_root, minimum_pairs=5):
         for _, _, label in LEAD_BANDS:
             selected = [p for p in pairs if p["lead_band"] == label]
             if selected:
-                unique_hours = {(p["region_id"], p["valid_time"]) for p in selected}
+                unique_hours = {(p["region_id"], p["valid_time_utc"]) for p in selected}
                 bands[label] = {
                     "forecast_vintage_pair_count": len(selected),
                     "unique_region_valid_hours": len(unique_hours),
                     "status": "exploratory_metrics" if len(unique_hours) >= minimum_pairs else "insufficient_sample",
                     "mae": round(sum(p["absolute_error"] for p in selected) / len(selected), 4),
                 }
-        unique_valid_hours = {(p["region_id"], p["valid_time"]) for p in pairs}
+        unique_valid_hours = {(p["region_id"], p["valid_time_utc"]) for p in pairs}
         enough = len(unique_valid_hours) >= minimum_pairs
         summaries[metric] = {
             "sample_count": len(errors),
@@ -180,6 +181,7 @@ def build_verification(archive_root, minimum_pairs=5):
             "MAE and RMSE describe historical paired errors only; they do not guarantee future accuracy or local nearshore accuracy.",
             "Direction errors use the shortest circular angular distance.",
             "Variables with fewer than the minimum number of unique region/valid-hour pairs are marked insufficient_sample; forecast-vintage pair counts are reported separately.",
+            "Unique region/valid-hour pairs remove repeated forecast vintages but are not guaranteed statistically independent across neighboring regions or serially correlated hours.",
         ],
     }
 
