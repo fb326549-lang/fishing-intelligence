@@ -10,6 +10,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from archive_regional_marine_observations import archive
+sys.path.insert(0, str(HERE.parent.parent / "P2" / "collector"))
+from build_hourly_environment_records import build_cwa_rows
 
 
 class RegionalObservationArchiveTests(unittest.TestCase):
@@ -70,6 +72,19 @@ class RegionalObservationArchiveTests(unittest.TestCase):
             self.assertEqual(len(rows), 2)
             self.assertEqual({row["wave_height_m"] for row in rows}, {"1.2", "1.4"})
             self.assertEqual(len({row["revision_key"] for row in rows}), 2)
+
+    def test_archived_rows_feed_p2_observation_normalizer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            csv_path = Path(tmp) / "observations.csv"
+            history = Path(tmp) / "history"
+            self.write_csv(csv_path, "1.2")
+            archive(str(csv_path), str(history), "run-1", "2026-11-10T00:00:00Z")
+            records = build_cwa_rows(history / "regional_marine_observations_48h.jsonl")
+            self.assertEqual(len(records), 1)
+            self.assertEqual(records[0]["data_type"], "observation")
+            self.assertEqual(records[0]["region_id"], "chenggong_donghe")
+            self.assertEqual(records[0]["environment"]["wave_height_m"], 1.2)
+            self.assertEqual(records[0]["source_records"][0]["dataset"], "O-B0075-001")
 
     def test_missing_region_or_valid_time_is_not_archived(self):
         with tempfile.TemporaryDirectory() as tmp:
