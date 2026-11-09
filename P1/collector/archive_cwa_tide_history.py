@@ -52,13 +52,18 @@ def archive_regional_series(csv_path, history_dir, filename, source_dataset, sco
         valid_time = str(source.get("valid_time", "")).strip()
         if not region_id or not valid_time:
             continue
-        canonical = json.dumps(source, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        canonical = json.dumps({
+            "archive_schema_version": 1,
+            "source_dataset": source_dataset,
+            "record": source,
+        }, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         revision_key = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         key = (region_id, valid_time, revision_key)
         if key in keys:
             continue
         row = dict(source)
         row.update({
+            "archive_schema_version": 1,
             "archive_scope": scope,
             "source_dataset": source_dataset,
             "snapshot_id": snapshot_id,
@@ -68,8 +73,11 @@ def archive_regional_series(csv_path, history_dir, filename, source_dataset, sco
         additions.append(row)
         keys.add(key)
     append_jsonl(history_path, additions)
+    revision_keys = load_keys(history_path, ("region_id", "valid_time", "revision_key"))
+    unique_time_keys = load_keys(history_path, ("region_id", "valid_time"))
     return {"file": filename, "records_seen": len(source_rows),
-            "new_revisions": len(additions), "history_records": len(keys)}
+            "new_revisions": len(additions), "history_records": len(revision_keys),
+            "unique_region_time_records": len(unique_time_keys)}
 
 def main():
     p = argparse.ArgumentParser()
@@ -158,7 +166,9 @@ def main():
         if a.regional_48h else {"file": "regional_marine_observations_48h.jsonl",
                                 "records_seen": 0, "new_revisions": 0,
                                 "history_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_48h.jsonl",
-                                                                  ("region_id", "valid_time", "revision_key")))}
+                                                                  ("region_id", "valid_time", "revision_key"))),
+                                "unique_region_time_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_48h.jsonl",
+                                                                             ("region_id", "valid_time")))}
     )
     regional_30d = (
         archive_regional_series(a.regional_30d, a.history_dir,
@@ -167,7 +177,9 @@ def main():
         if a.regional_30d else {"file": "regional_marine_observations_30d.jsonl",
                                 "records_seen": 0, "new_revisions": 0,
                                 "history_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_30d.jsonl",
-                                                                  ("region_id", "valid_time", "revision_key")))}
+                                                                  ("region_id", "valid_time", "revision_key"))),
+                                "unique_region_time_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_30d.jsonl",
+                                                                             ("region_id", "valid_time")))}
     )
     run = {
         "snapshot_id": a.snapshot_id, "collected_at": a.collected_at,
@@ -178,9 +190,11 @@ def main():
         "regional_48h_records_seen": regional_48h["records_seen"],
         "new_regional_48h_revisions": regional_48h["new_revisions"],
         "regional_48h_history_records": regional_48h["history_records"],
+        "regional_48h_unique_region_time_records": regional_48h["unique_region_time_records"],
         "regional_30d_records_seen": regional_30d["records_seen"],
         "new_regional_30d_revisions": regional_30d["new_revisions"],
         "regional_30d_history_records": regional_30d["history_records"],
+        "regional_30d_unique_region_time_records": regional_30d["unique_region_time_records"],
         "matched_station_count": len(station_ids),
         "matched_forecast_location_count": len(location_ids),
         "archived_forecast_location_count": len(forecast_location_ids),
@@ -195,7 +209,9 @@ def main():
         "observation_history_records": len(obs_keys),
         "forecast_vintage_records": len(forecast_keys),
         "regional_48h_history_records": regional_48h["history_records"],
+        "regional_48h_unique_region_time_records": regional_48h["unique_region_time_records"],
         "regional_30d_history_records": regional_30d["history_records"],
+        "regional_30d_unique_region_time_records": regional_30d["unique_region_time_records"],
         "collection_run_count": sum(1 for line in runs_path.open(encoding="utf-8") if line.strip()),
         "matched_station_ids": sorted(station_ids),
         "matched_forecast_location_ids": sorted(location_ids),

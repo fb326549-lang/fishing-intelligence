@@ -369,9 +369,14 @@ class CwaTideHistoryArchiveTests(unittest.TestCase):
                 records = [json.loads(line) for line in (history / filename).read_text(encoding="utf-8").splitlines()]
                 self.assertEqual(len(records), 2)
                 self.assertEqual({row["wave_height_m"] for row in records}, {"1.2", "1.3"})
+                expected_dataset = "O-B0075-001" if filename.endswith("48h.jsonl") else "O-B0075-002"
+                self.assertEqual({row["source_dataset"] for row in records}, {expected_dataset})
+                self.assertEqual({row["archive_schema_version"] for row in records}, {1})
             summary = json.loads((history / "history_summary.json").read_text(encoding="utf-8"))
             self.assertEqual(summary["regional_48h_history_records"], 2)
             self.assertEqual(summary["regional_30d_history_records"], 2)
+            self.assertEqual(summary["regional_48h_unique_region_time_records"], 1)
+            self.assertEqual(summary["regional_30d_unique_region_time_records"], 1)
 
     def test_archive_rejects_invalid_history_json(self):
         with tempfile.TemporaryDirectory() as tmp:
