@@ -290,3 +290,27 @@ python -m unittest discover -s P2 -p 'test_*.py' -v
 ```
 
 本工作僅完成活動證據資料層與品質閘門，尚未建立日出/日落、晨昏、季節、潮汐或海流對逐時活動的已驗證權重。下一步 P2.4.2 才會建立日夜/晨昏特徵；在缺乏直接東部活動資料前，時間特徵僅作上下文，不可當成魚活性分數。
+
+
+## P2.4.2 日夜/晨昏中性時間特徵
+
+新增 `collector/build_solar_time_context.py`，從逐時環境紀錄中的來源日出/日落時間，衍生不帶魚種假設的時間上下文：
+- `dawn`：日出前後設定窗口內。
+- `daylight`：日出窗口結束後至日落窗口開始前。
+- `dusk`：日落前後設定窗口內。
+- `night`：上述時段以外。
+- 日出或日落缺值、時間格式無效時回傳 `unknown`，不猜測日出日落。
+- 同時保留距日出/距日落分鐘數、區域、有效時間、資料類型及來源紀錄。
+
+預設晨昏窗口為日出/日落前後各 60 分鐘，可透過 CLI 設定 0–180 分鐘。此窗口只是時間分箱設定，不是魚種活動門檻。輸出明確標記 `neutral_time_context_not_fish_activity_or_catch_probability`，不可直接換算成活性分數、咬況或最佳作釣時間。
+
+執行：
+```bash
+python P2/collector/build_solar_time_context.py \\
+  --input output/p2/hourly_environment.jsonl \\
+  --out output/p2/solar_time_context.jsonl \\
+  --twilight-window-minutes 60
+python -m unittest P2.test_solar_time_context -v
+```
+
+P2.4.2 僅產生日夜/晨昏的中性時間特徵；魚種對晨昏的反應仍須有對應物種、地區、季節、生命階段及研究方法的直接證據後，才可進入後續活動模型。
