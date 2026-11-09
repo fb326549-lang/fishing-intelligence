@@ -1,7 +1,7 @@
 name: P2 data contract tests
 on:
   push:
-    branches: [p1-foundation]
+    branches: [main, p1-foundation]
     paths:
       - "P2/**"
       - ".github/workflows/test-p2-data-contracts.yml"
