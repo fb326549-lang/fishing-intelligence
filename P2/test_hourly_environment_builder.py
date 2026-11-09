@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / 'collector'))
 
-from build_hourly_environment_records import build_forecast_rows, build_cwa_rows
+from build_hourly_environment_records import build_forecast_rows, build_cwa_rows, build_tide_phase_index, tide_phase_for_location, regional_tide_phase
 
 class HourlyBuilderTests(unittest.TestCase):
     def test_forecast_rows_join_marine_weather_and_daily_sun(self):
@@ -78,6 +78,80 @@ class HourlyBuilderTests(unittest.TestCase):
             rec = build_forecast_rows(csv_path, raw, "Asia/Taipei")[0]
             self.assertIsNone(rec["environment"]["wave_height_m"])
             self.assertIn("missing_wave_height_m", rec["quality"]["flags"])
+
+    def test_cwa_high_low_events_derive_rising_and_falling_phase(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("Asia/Taipei")
+        events = [
+            (datetime.fromisoformat("2026-11-09T00:00:00").replace(tzinfo=tz), "low"),
+            (datetime.fromisoformat("2026-11-09T06:00:00").replace(tzinfo=tz), "high"),
+            (datetime.fromisoformat("2026-11-09T12:00:00").replace(tzinfo=tz), "low"),
+        ]
+        self.assertEqual(tide_phase_for_location(events, datetime.fromisoformat("2026-11-09T03:00:00").replace(tzinfo=tz)), "rising")
+        self.assertEqual(tide_phase_for_location(events, datetime.fromisoformat("2026-11-09T09:00:00").replace(tzinfo=tz)), "falling")
+
+    def test_cwa_event_near_target_is_slack_and_unbracketed_is_unknown(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("Asia/Taipei")
+        events = [
+            (datetime.fromisoformat("2026-11-09T00:00:00").replace(tzinfo=tz), "low"),
+            (datetime.fromisoformat("2026-11-09T06:00:00").replace(tzinfo=tz), "high"),
+        ]
+        self.assertEqual(tide_phase_for_location(events, datetime.fromisoformat("2026-11-09T05:45:00").replace(tzinfo=tz)), "high_slack")
+        self.assertIsNone(tide_phase_for_location(events, datetime.fromisoformat("2026-11-08T20:00:00").replace(tzinfo=tz)))
+
+    def test_regional_tide_phase_requires_all_mapped_locations_to_agree(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("Asia/Taipei")
+        target = datetime.fromisoformat("2026-11-09T03:00:00").replace(tzinfo=tz)
+        low_high = [
+            (datetime.fromisoformat("2026-11-09T00:00:00").replace(tzinfo=tz), "low"),
+            (datetime.fromisoformat("2026-11-09T06:00:00").replace(tzinfo=tz), "high"),
+        ]
+        high_low = [
+            (datetime.fromisoformat("2026-11-09T00:00:00").replace(tzinfo=tz), "high"),
+            (datetime.fromisoformat("2026-11-09T06:00:00").replace(tzinfo=tz), "low"),
+        ]
+        phase, turning, count = regional_tide_phase({"yilan_suao":{"A":low_high,"B":low_high}}, "yilan_suao", target)
+        self.assertEqual((phase, turning, count), ("rising", False, 2))
+        phase, turning, count = regional_tide_phase({"yilan_suao":{"A":low_high,"B":high_low}}, "yilan_suao", target)
+        self.assertEqual((phase, turning, count), (None, None, 2))
+
+    def test_forecast_builder_adds_cwa_tide_phase_without_fabricating_height_or_current(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw_dir = root / "raw"
+            raw_dir.mkdir()
+            (raw_dir / "taitung_south_weather_raw.json").write_text(json.dumps({
+                "daily": {"time":["2026-11-09"],"sunrise":["2026-11-09T06:02"],"sunset":["2026-11-09T17:12"]}
+            }), encoding="utf-8")
+            forecast_csv = root / "forecast.csv"
+            rows = [{
+                "location_id":"taitung_south","valid_time":"2026-11-09T09:00",
+                "fetched_at":"2026-11-09T04:00:00+00:00","variable_code":"wave_height",
+                "value":"1.1","source":"open-meteo-marine"
+            }]
+            with forecast_csv.open("w",encoding="utf-8",newline="") as handle:
+                writer=csv.DictWriter(handle,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+            tide_csv = root / "tide.csv"
+            tide_rows = [
+                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T06:00:00","tide":"乾潮","fetched_at_utc":"2026-11-09T04:00:00+00:00"},
+                {"location_id":"10014010","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00","tide":"滿潮","fetched_at_utc":"2026-11-09T04:00:00+00:00"},
+            ]
+            with tide_csv.open("w",encoding="utf-8",newline="") as handle:
+                writer=csv.DictWriter(handle,fieldnames=list(tide_rows[0]));writer.writeheader();writer.writerows(tide_rows)
+            index=build_tide_phase_index(tide_csv)
+            rec=build_forecast_rows(forecast_csv,raw_dir,"Asia/Taipei",index)[0]
+            self.assertEqual(rec["environment"]["tide_phase"],"rising")
+            self.assertFalse(rec["environment"]["tide_turning"])
+            self.assertIsNone(rec["environment"].get("tide_height_m"))
+            self.assertIsNone(rec["environment"].get("tidal_current_velocity_ms"))
+            cwa_source=next(x for x in rec["source_records"] if x["dataset"]=="F-A0021-001")
+            self.assertEqual(cwa_source["retrieved_at"],"2026-11-09T04:00:00+00:00")
+            self.assertIn("tide_phase_derived_from_cwa_high_low_forecast_events",rec["quality"]["flags"])
 
     def test_cwa_aggregate_without_dataset_is_not_mislabelled_as_one_dataset(self):
         with tempfile.TemporaryDirectory() as tmp:
