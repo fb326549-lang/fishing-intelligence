@@ -36,11 +36,12 @@ jobs:
             exit 1
           fi
           python C1/collector/fetch_cwa_safety_sources.py --out output/c1_safety_sources
+          python C1/collector/normalize_cwa_safety_sources.py --input output/c1_safety_sources --out output/c1_safety_decisions
       - name: Upload raw official source snapshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: c1-official-safety-sources
-          path: output/c1_safety_sources/
+          path: |\n            output/c1_safety_sources/\n            output/c1_safety_decisions/
           if-no-files-found: warn
           retention-days: 7
