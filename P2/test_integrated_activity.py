@@ -52,7 +52,7 @@ class IntegratedActivityTests(unittest.TestCase):
         self.assertEqual(fish["catch_probability"],"")
         self.assertEqual(fish["best_fishing_window_status"],"not_established")
 
-    def test_east_taiwan_occurrence_context_is_added_to_verified_kyphosus_species):
+    def test_east_taiwan_occurrence_context_is_added_to_verified_kyphosus_species(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         for cid in ("c036","c037"):
             fish=next(r for r in rows if r["candidate_id"]==cid)
