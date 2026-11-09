@@ -23,6 +23,6 @@ class SafetyTests(unittest.TestCase):
   a=alert();a["region_ids"]=[];a["unmapped_area"]="unmapped";self.assertEqual(decide_region("taitung_south",[a],statuses(),NOW)["state"],"insufficient_data")
  def test_timezone_required(self):
   a=alert();a["issued_at"]="2026-11-09T10:00:00";self.assertTrue(validate_alert(a))
- def test_never_returns_clearance(self):
+ def test_missing_region_station_coverage_is_unknown(self):\n  st=statuses();st["O-B0070-001"]["region_coverage"]={"yilan_suao":True,"hualien_north":True,"hualien_south":False,"fengbin_shitiping":False,"chenggong_donghe":True,"taitung_south":True}\n  self.assertEqual(decide_region("fengbin_shitiping",[],st,NOW)["state"],"insufficient_data")\n def test_large_tide_extreme_is_high_risk(self):\n  a=alert("large_tide");a["severity"]="severe"\n  self.assertEqual(decide_region("taitung_south",[a],statuses(),NOW)["state"],"high_risk")\n def test_never_returns_clearance(self):
   for alerts in ([],[alert()],[alert("typhoon")]): self.assertFalse(decide_region("taitung_south",alerts,statuses(),NOW)["safety_clearance"])
 if __name__=="__main__": unittest.main()
