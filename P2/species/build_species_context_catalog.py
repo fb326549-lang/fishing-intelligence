@@ -137,7 +137,7 @@ def main():
     payload = build_catalog(args.candidates, args.ecology, args.evidence, args.regional_occurrence_csv)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
-    print(f"Built {payload['record_count']} traceable species ecology context records; no fishing scores inferred.")
+    print(f"Built {payload['record_count']} traceable ecology records and {payload['regional_occurrence_record_count']} regional occurrence records; no fishing scores inferred.")
 
 if __name__ == "__main__":
     main()
