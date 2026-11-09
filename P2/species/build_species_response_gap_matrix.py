@@ -10,7 +10,7 @@ from pathlib import Path
 
 PRIORITY = {
     "c001": "black_hair_alias_requires_morphological_species_check",
-    "c002": "white_hair_is_khyphosus_genus_group_species_identification_required",
+    "c002": "white_hair_is_kyphosus_genus_group_species_identification_required",
     "c003": "verified_taxon",
     "c004": "verified_taxon",
     "c027": "verified_taxon",
