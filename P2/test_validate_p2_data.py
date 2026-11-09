@@ -19,6 +19,15 @@ class P2ValidationTests(unittest.TestCase):
     def test_inconsistent_completeness_rejected(self):
         x=sample(); x["completeness"]["ratio"]=0.9
         self.assertTrue(any("completeness" in e for e in validate_environment(x)))
+    def test_unknown_environment_field_rejected(self):
+        x=sample(); x["environment"]["invented_score"]=99
+        self.assertTrue(any("unknown environment fields" in e for e in validate_environment(x)))
+    def test_timezone_required(self):
+        x=sample(); x["valid_time"]="2026-11-09T12:00:00"
+        self.assertTrue(any("valid_time" in e for e in validate_environment(x)))
+    def test_precipitation_probability_bounds(self):
+        x=sample(); x["environment"]["precipitation_probability_pct"]=120
+        self.assertTrue(any("precipitation_probability_pct" in e for e in validate_environment(x)))
     def test_species_template_header(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/"p.csv"; p.write_text("response_record_id,candidate_id,parameter_code,parameter_value,unit,life_stage,geographic_scope,habitat_scope,evidence_id,source_url,confidence,model_use_status,notes\n",encoding="utf-8")
