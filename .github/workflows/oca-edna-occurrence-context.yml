@@ -6,6 +6,7 @@ on:
       - "P2/collector/fetch_oca_edna_occurrence.py"
       - "P2/test_oca_edna_occurrence.py"
       - "P2/schema/edna_occurrence_context.schema.json"
+      - "P2/schema/edna_candidate_region_context.schema.json"
       - "P1/stations/east_region_station_mapping.csv"
       - "P1/species/species_candidate_register.csv"
       - ".github/workflows/oca-edna-occurrence-context.yml"
@@ -22,18 +23,26 @@ on:
     - cron: "17 3 1 * *"
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: p2-hourly-history-archive
+  cancel-in-progress: false
 jobs:
   collect-edna-context:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Check out P2 append-only history branch
+        uses: actions/checkout@v4
+        with:
+          ref: p2-history
+          path: p2-history-data
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Run eDNA collector contract tests
-        run: python -m unittest P2.test_oca_edna_occurrence -v
+        run: python -m unittest P2.test_oca_edna_occurrence P2.test_export_hourly_fish_outlook_json -v
       - name: Fetch and normalize OCA eDNA datasets
         run: |
           python P2/collector/fetch_oca_edna_occurrence.py \
@@ -55,8 +64,37 @@ jobs:
           assert all(row["detection_type"] == "positive_edna_detection_record" for row in rows)
           assert all(row["candidate_match_status"] in {"exact_scientific_name", "ambiguous_multi_species_taxon", "no_exact_candidate_match"} for row in rows)
           assert all("fish_count" not in row and "activity_score" not in row and "catch_probability" not in row for row in rows)
-          print(f"Validated {len(rows)} positive eDNA records; no abundance or activity inference.")
+          context = json.loads((root / "edna_candidate_region_context.json").read_text(encoding="utf-8"))
+          assert context["schema_version"] == 1 and isinstance(context["records"], list)
+          assert len(context["records"]) == manifest["candidate_region_context_count"]
+          assert all(row["model_use_status"] == "context_only_edna_occurrence" for row in context["records"])
+          print("Validated", len(rows), "positive eDNA records and", len(context["records"]), "compact region summaries; no abundance or activity inference.")
           PY
+      - name: Publish compact historical eDNA context to P2 history
+        if: github.event_name != 'pull_request'
+        run: |
+          cp output/oca_edna_context/edna_candidate_region_context.json p2-history-data/data/edna_candidate_region_context.json
+          cp output/oca_edna_context/manifest.json p2-history-data/data/edna_occurrence_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          history = Path("p2-history-data/data")
+          context = json.loads((history / "edna_candidate_region_context.json").read_text(encoding="utf-8"))
+          latest_path = history / "latest_hourly_fish_outlook.json"
+          if latest_path.exists():
+              latest = json.loads(latest_path.read_text(encoding="utf-8"))
+              latest["edna_occurrence_context"] = context
+              latest_path.write_text(json.dumps(latest, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+          PY
+          git -C p2-history-data config user.name "github-actions[bot]"
+          git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C p2-history-data add data/edna_candidate_region_context.json data/edna_occurrence_manifest.json data/latest_hourly_fish_outlook.json
+          if git -C p2-history-data diff --cached --quiet; then
+            echo "No changes to compact eDNA occurrence context."
+          else
+            git -C p2-history-data commit -m "Publish reviewed OCA eDNA occurrence context"
+            git -C p2-history-data push origin HEAD:p2-history
+          fi
       - name: Upload normalized occurrence context
         if: always()
         uses: actions/upload-artifact@v4
