@@ -72,6 +72,20 @@ class ExportHourlyFishOutlookTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"missing candidate, parameter or provenance"):
             build_payload(self.rows,species_context=context)
 
+    def test_species_evidence_context_fields_are_preserved_in_published_rows(self):
+        row=dict(self.rows[0])
+        row.update({
+            "activity_evidence_context_json": '[{"id":"AE003","model_use_status":"context_only_captive_feeding"}]',
+            "occurrence_evidence_context_json": '[{"id":"AE011","model_use_status":"context_only_east_taiwan_occurrence"}]',
+        })
+        rows=[row]+[dict(r) for r in self.rows[1:]]
+        payload=build_payload(rows)
+        published=payload["rows"][0]
+        self.assertIn('"AE003"',published["activity_evidence_context_json"])
+        self.assertIn('"AE011"',published["occurrence_evidence_context_json"])
+        self.assertIsNone(payload["model_limits"]["activity_score"])
+        self.assertIsNone(payload["model_limits"]["catch_probability"])
+
     def test_requires_all_three_horizons(self):
         with self.assertRaisesRegex(ValueError,"6/12/24-hour"):
             build_payload(self.rows[:2])

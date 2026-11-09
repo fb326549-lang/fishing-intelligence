@@ -26,7 +26,9 @@
     "activity_score",
     "catch_probability",
     "best_fishing_window_status",
-    "interpretation"
+    "interpretation",
+    "activity_evidence_context_json",
+    "occurrence_evidence_context_json"
   ],
   "properties": {
     "candidate_id": {
@@ -117,6 +119,14 @@
     },
     "interpretation": {
       "const": "forecast_environment_summary_not_fish_activity_or_catch_probability"
+    },
+    "activity_evidence_context_json": {
+      "type": "string",
+      "description": "JSON-encoded, source-traceable evidence context array; context-only records do not create activity scores."
+    },
+    "occurrence_evidence_context_json": {
+      "type": "string",
+      "description": "JSON-encoded, source-traceable evidence context array; context-only records do not create activity scores."
     }
   }
 }

@@ -718,3 +718,12 @@ P2 整合器現在保留每個候選魚種的季節研究 ID、報告季節、�
 This lets downstream PWA/API consumers explain why a record is context-only (for example, northern Taiwan, western Taiwan fishery, captive feeding, juvenile-only behaviour, external-region telemetry, or a single East Taiwan occurrence). Occurrence records remain a separate evidence class and are never counted as activity observations. This change does not create activity scores, environmental-response scores, catch probabilities, or best-fishing windows. The existing blank score fields and taxonomy gates remain unchanged.
 
 Validation is covered by `P2/test_integrated_activity.py`: source URL/literature traceability, transferability and limitations are preserved, and occurrence-only evidence remains separate from activity evidence.
+
+### Evidence context propagation to the published 6/12/24-hour PWA outlook
+
+The evidence provenance fields produced by the hourly integration are carried through `build_hourly_fish_outlook.py` into each candidate/region/horizon summary, then published unchanged by `export_hourly_fish_outlook_json.py` in `latest_hourly_fish_outlook.json`:
+- `activity_evidence_context_json`: traceable activity-study metadata and limitations.
+- `occurrence_evidence_context_json`: separate occurrence-only provenance; never merged into activity counts.
+- `seasonal_evidence_context_json`: seasonal-study provenance and transferability limits.
+
+The window builder deduplicates repeated evidence IDs across forecast hours. If the same evidence ID carries conflicting metadata within one summary window, it fails rather than silently selecting one version. Empty context remains an empty JSON array. No activity score, catch probability, or best-fishing-window claim is created by exposing the metadata. Regression tests cover propagation, deduplication, conflicting metadata rejection, and publication.

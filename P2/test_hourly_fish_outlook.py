@@ -19,7 +19,8 @@ def integrated(hour,score="",activity="context_only_evidence_available",cid="c00
     return {"candidate_id":cid,"region_id":"taitung_south","data_type":"forecast",
         "valid_time":f"2026-11-09T{hour:02d}:00:00+08:00",
         "environment_match_score":score,"environment_match_status":"scored" if score!="" else "insufficient_evidence",
-        "activity_evidence_status":activity,"activity_evidence_ids":"AE003","seasonal_evidence_ids":"SE003"}
+        "activity_evidence_status":activity,"activity_evidence_ids":"AE003","seasonal_evidence_ids":"SE003",
+        "activity_evidence_context_json":"[]","occurrence_evidence_context_json":"[]"}
 
 class HourlyFishOutlookTests(unittest.TestCase):
     def test_generates_three_horizons_and_never_best_fishing_window(self):
@@ -81,6 +82,43 @@ class HourlyFishOutlookTests(unittest.TestCase):
         self.assertEqual(result["seasonal_evidence_ids"],"SE005;SE006")
         self.assertEqual(result["activity_score"],"")
         self.assertEqual(result["catch_probability"],"")
+
+    def test_activity_and_occurrence_source_contexts_are_deduplicated_and_preserved(self):
+        env=[forecast(h) for h in range(10,16)]
+        activity_context=[{
+            "id":"AE003","dimension":"diel_feeding","geographic_scope":"Japan",
+            "source_url":"https://example.org/study","model_use_status":"context_only_captive_feeding",
+            "limitations":"Captive study, not wild bite activity."
+        }]
+        occurrence_context=[{
+            "id":"AE011","geographic_scope":"Taitung, Taiwan","source_url":"https://example.org/specimen",
+            "model_use_status":"context_only_east_taiwan_occurrence","limitations":"One specimen only."
+        }]
+        joined=[integrated(h,"") for h in range(10,16)]
+        for row in joined:
+            row["activity_evidence_context_json"]=json.dumps(activity_context)
+            row["occurrence_evidence_context_json"]=json.dumps(occurrence_context)
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        self.assertEqual(json.loads(result["activity_evidence_context_json"]),activity_context)
+        self.assertEqual(json.loads(result["occurrence_evidence_context_json"]),occurrence_context)
+        self.assertEqual(result["activity_score"],"")
+        self.assertEqual(result["catch_probability"],"")
+
+    def test_conflicting_evidence_metadata_is_rejected(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"") for h in range(10,16)]
+        for row in joined:
+            row["activity_evidence_context_json"]=json.dumps([{
+                "id":"AE003","model_use_status":"context_only_captive_feeding",
+                "source_url":"https://example.org/study"
+            }])
+        joined[-1]["activity_evidence_context_json"]=json.dumps([{
+            "id":"AE003","model_use_status":"eligible_for_activity_scoring",
+            "source_url":"https://example.org/study"
+        }])
+        with self.assertRaisesRegex(ValueError,"conflicting activity_evidence_context_json"):
+            build_window_summaries(env,[candidate()],joined,AS_OF)
 
     def test_latest_forecast_vintage_before_as_of_is_selected(self):
         old=forecast(10,collected="2026-11-09T08:00:00+08:00")
