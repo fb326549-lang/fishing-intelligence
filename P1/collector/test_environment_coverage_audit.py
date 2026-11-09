@@ -5,32 +5,24 @@ from audit_environment_coverage import audit_catalog
 
 class EnvironmentCoverageAuditTests(unittest.TestCase):
     def test_reports_missing_region_observations_without_filling_them(self):
-        catalog = {
-            "partitions": [
-                {
-                    "records_by_region_type": {
-                        "north|forecast": 24,
-                        "south|forecast": 24,
-                        "north|observation": 8,
-                    },
-                    "unique_valid_hours_by_region_type": {
-                        "north|forecast": 24,
-                        "south|forecast": 24,
-                        "north|observation": 8,
-                    },
-                    "collection_vintages_by_region_type": {
-                        "north|forecast": 1,
-                        "south|forecast": 1,
-                        "north|observation": 1,
-                    },
-                }
-            ]
-        }
+        catalog = {"partitions": [{
+            "records_by_region_type": {"north|forecast": 24, "south|forecast": 24, "north|observation": 8},
+            "unique_valid_hours_by_region_type": {"north|forecast": 24, "south|forecast": 24, "north|observation": 8},
+            "collection_vintages_by_region_type": {"north|forecast": 1, "south|forecast": 1, "north|observation": 1},
+        }]}
         result = audit_catalog(catalog, ("north", "south"))
         self.assertEqual(result["regions_with_forecast_and_observation"], 1)
-        self.assertEqual(result["regions_missing_observations"], ["south"])
+        self.assertEqual(result["regions_missing_expected_observations"], ["south"])
         self.assertEqual(result["regions"][1]["observation"]["record_count"], 0)
         self.assertEqual(result["regions"][1]["status"], "forecast_only_observation_missing")
+
+    def test_hualien_south_is_explicitly_not_expected_to_have_cwa_observations(self):
+        result = audit_catalog({"partitions": []})
+        item = next(row for row in result["regions"] if row["region_id"] == "hualien_south")
+        self.assertFalse(item["observation_expected"])
+        self.assertEqual(item["observation_policy"], "no_cwa_station_coverage")
+        self.assertIn("hualien_south", result["regions_without_observations_by_design"])
+        self.assertNotIn("hualien_south", result["regions_missing_expected_observations"])
 
     def test_sums_counts_across_partitions(self):
         partition = {
@@ -44,11 +36,7 @@ class EnvironmentCoverageAuditTests(unittest.TestCase):
         self.assertEqual(result["regions"][0]["observation"]["collection_vintages"], 4)
 
     def test_rejects_negative_or_non_integer_counts(self):
-        bad = {
-            "partitions": [{
-                "records_by_region_type": {"north|forecast": -1},
-            }]
-        }
+        bad = {"partitions": [{"records_by_region_type": {"north|forecast": -1}}]}
         with self.assertRaises(ValueError):
             audit_catalog(bad, ("north",))
 
