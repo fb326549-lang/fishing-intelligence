@@ -19,6 +19,7 @@ PRIORITY = {
     "c030": "regional_occurrence_conflict_requires_review",
     "c036": "verified_taxon",
     "c037": "verified_taxon",
+    "c039": "verified_taxon",
 }
 DOMAINS = [
     ("temperature_range", "temperature_response"),
