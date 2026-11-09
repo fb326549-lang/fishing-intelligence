@@ -39,7 +39,7 @@ def append_jsonl(path, rows):
             f.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
 
 
-def archive_regional_series(csv_path, history_dir, filename, scope, snapshot_id, collected_at):
+def archive_regional_series(csv_path, history_dir, filename, source_dataset, scope, snapshot_id, collected_at):
     """Append unique region/time/value revisions from a CWA regional series."""
     source_rows = read_csv(Path(csv_path))
     if not source_rows:
@@ -60,7 +60,7 @@ def archive_regional_series(csv_path, history_dir, filename, scope, snapshot_id,
         row = dict(source)
         row.update({
             "archive_scope": scope,
-            "source_dataset": source.get("dataset_id", ""),
+            "source_dataset": source_dataset,
             "snapshot_id": snapshot_id,
             "collected_at": collected_at,
             "revision_key": revision_key,
@@ -154,7 +154,7 @@ def main():
     regional_48h = (
         archive_regional_series(a.regional_48h, a.history_dir,
                                 "regional_marine_observations_48h.jsonl",
-                                "rolling_48_hour", a.snapshot_id, a.collected_at)
+                                "O-B0075-001", "rolling_48_hour", a.snapshot_id, a.collected_at)
         if a.regional_48h else {"file": "regional_marine_observations_48h.jsonl",
                                 "records_seen": 0, "new_revisions": 0,
                                 "history_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_48h.jsonl",
@@ -163,7 +163,7 @@ def main():
     regional_30d = (
         archive_regional_series(a.regional_30d, a.history_dir,
                                 "regional_marine_observations_30d.jsonl",
-                                "rolling_30_day", a.snapshot_id, a.collected_at)
+                                "O-B0075-002", "rolling_30_day", a.snapshot_id, a.collected_at)
         if a.regional_30d else {"file": "regional_marine_observations_30d.jsonl",
                                 "records_seen": 0, "new_revisions": 0,
                                 "history_records": len(load_keys(Path(a.history_dir) / "regional_marine_observations_30d.jsonl",
