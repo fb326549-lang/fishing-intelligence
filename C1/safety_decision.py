@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 REGIONS=("yilan_suao","hualien_north","hualien_south","fengbin_shitiping","chenggong_donghe","taitung_south")
 REQUIRED_SOURCES=("W-C0033-001","W-C0033-002","W-C0033-003","W-C0033-006","W-C0034-001","O-B0069-001","O-B0070-001")
-HIGH_RISK_TYPES={"typhoon"}
+HIGH_RISK_TYPES={"typhoon","high_wave","storm_surge"}
 def parse_time(value):
     if not isinstance(value,str): return None
     try:
