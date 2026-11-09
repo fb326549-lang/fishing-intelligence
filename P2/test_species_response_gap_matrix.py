@@ -36,6 +36,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c002,白毛,Kyphosus spp.\n"
                 "c003,臭肚,Siganus fuscescens\n"
                 "c004,黑鯛,Acanthopagrus schlegelii\n"
+                "c023,鬼頭刀,Coryphaena hippurus\n"
                 "c027,條紋豆娘魚,Abudefduf vaigiensis\n"
                 "c028,孟加拉豆娘魚,Abudefduf bengalensis\n"
                 "c029,瑪拉巴石斑魚,Epinephelus malabaricus\n"
@@ -48,16 +49,20 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             literature=root/"literature.csv"
             literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),77)
+            self.assertEqual(len(rows),84)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
             skipjack=next(r for r in rows if r["candidate_id"]=="c039" and r["response_domain"]=="temperature_range")
+            dolphinfish=next(r for r in rows if r["candidate_id"]=="c023" and r["response_domain"]=="temperature_range")
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(grouper["evidence_status"],"regional_evidence_gate")
             self.assertEqual(black["evidence_status"],"evidence_gap")
             self.assertEqual(skipjack["eligibility_gate"],"verified_taxon")
             self.assertEqual(skipjack["evidence_status"],"evidence_gap")
+            self.assertEqual(dolphinfish["eligibility_gate"],"verified_taxon")
+            self.assertEqual(dolphinfish["evidence_status"],"evidence_gap")
+            self.assertIn("E001;E002",dolphinfish["evidence_ids"])
             self.assertIn("habitat",black["existing_parameter_codes"])
             rabbit=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="temperature_range")
             self.assertEqual(rabbit["evidence_status"],"external_literature_found_context_only")
