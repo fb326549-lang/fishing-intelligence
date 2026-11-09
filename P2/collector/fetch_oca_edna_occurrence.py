@@ -260,7 +260,56 @@ def build_monthly_summary(detections):
         })
     return output
 
-def write_outputs(out_dir: Path, detections, summary, fetched_at):
+def build_candidate_region_context(detections):
+    """Compact historical positive-detection context; never an activity or abundance score."""
+    grouped = defaultdict(list)
+    for row in detections:
+        region = row.get("region_id", "")
+        if region not in REGIONS:
+            continue
+        if row.get("candidate_id"):
+            grouped[(row["candidate_id"], region, "exact")].append(row)
+        for cid in filter(None, (row.get("possible_candidate_ids") or "").split(";")):
+            grouped[(cid, region, "ambiguous")].append(row)
+    merged = {}
+    for (cid, region, kind), rows in sorted(grouped.items()):
+        key = (cid, region)
+        if key not in merged:
+            merged[key] = {
+                "candidate_id": cid, "region_id": region,
+                "exact_positive_detection_record_count": 0,
+                "ambiguous_positive_detection_record_count": 0,
+                "exact_sample_month_count": 0, "exact_distinct_station_count": 0,
+                "first_sampled_month": "", "last_sampled_month": "",
+                "min_sample_depth_m": None, "max_sample_depth_m": None,
+                "dataset_ids": set(), "ambiguous_taxon_labels": set(),
+                "model_use_status": "context_only_edna_occurrence",
+            }
+        target = merged[key]
+        target["dataset_ids"].update(r["dataset_id"] for r in rows)
+        if kind == "exact":
+            target["exact_positive_detection_record_count"] += len(rows)
+            months = sorted({r["year_month"] for r in rows if r.get("year_month")})
+            stations = {r["station_name"] for r in rows if r.get("station_name")}
+            depths = [r["depth_m"] for r in rows if r.get("depth_m") is not None]
+            target["exact_sample_month_count"] = len(months)
+            target["exact_distinct_station_count"] = len(stations)
+            target["first_sampled_month"] = months[0] if months else ""
+            target["last_sampled_month"] = months[-1] if months else ""
+            target["min_sample_depth_m"] = min(depths) if depths else None
+            target["max_sample_depth_m"] = max(depths) if depths else None
+        else:
+            target["ambiguous_positive_detection_record_count"] += len(rows)
+            target["ambiguous_taxon_labels"].update(r["scientific_name"] for r in rows)
+    result = []
+    for row in merged.values():
+        row["dataset_ids"] = sorted(row["dataset_ids"])
+        row["ambiguous_taxon_labels"] = sorted(row["ambiguous_taxon_labels"])
+        result.append(row)
+    return sorted(result, key=lambda x: (x["region_id"], x["candidate_id"]))
+
+
+def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at):
     out_dir.mkdir(parents=True, exist_ok=True)
     with (out_dir / "edna_occurrence_context.jsonl").open("w", encoding="utf-8", newline="") as handle:
         for row in detections:
@@ -281,10 +330,22 @@ def write_outputs(out_dir: Path, detections, summary, fetched_at):
         "unmatched_taxon_record_count": sum(r["candidate_match_status"] == "no_exact_candidate_match" for r in detections),
         "nearest_region_context_record_count": sum(r["region_mapping_status"] == "nearest_station_context_only" for r in detections),
         "candidate_month_region_summary_count": len(summary),
+        "candidate_region_context_count": len(region_context),
         "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
         "source_datasets": [{"dataset_id": x[0], "name": x[1], "url": x[2]} for x in SOURCES],
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    context_payload = {
+        "schema_version": 1,
+        "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
+        "dataset_page": DATASET_PAGE,
+        "generated_at_utc": fetched_at,
+        "interpretation": "Historical positive eDNA occurrence context only; not abundance, current presence, catch rate, activity, or absence.",
+        "records": region_context,
+    }
+    (out_dir / "edna_candidate_region_context.json").write_text(
+        json.dumps(context_payload, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8"
+    )
     return manifest
 
 def main():
@@ -304,12 +365,14 @@ def main():
     if not detections:
         raise SystemExit("No normalized eDNA detections found; refusing to publish an empty dataset.")
     summary = build_monthly_summary(detections)
-    manifest = write_outputs(args.out_dir, detections, summary, fetched_at)
+    region_context = build_candidate_region_context(detections)
+    manifest = write_outputs(args.out_dir, detections, summary, region_context, fetched_at)
     print(
         f"eDNA occurrence context built: {len(detections)} positive records; "
         f"{manifest['exact_candidate_record_count']} exact-candidate records; "
         f"{manifest['ambiguous_taxon_record_count']} ambiguous multi-species records; "
-        f"{len(summary)} candidate/month/region summaries."
+        f"{len(summary)} candidate/month/region summaries; "
+        f"{len(region_context)} compact candidate-region context rows."
     )
     print("All records remain context_only_edna_occurrence; no activity/catch scores are produced.")
     return 0

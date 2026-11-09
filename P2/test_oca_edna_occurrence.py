@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "collector"))
 from fetch_oca_edna_occurrence import (
-    build_monthly_summary, collect, load_region_stations, normalize_fields,
+    build_candidate_region_context, build_monthly_summary, collect, load_region_stations, normalize_fields,
     match_candidate, parse_payload, parse_year_month, write_outputs,
 )
 
@@ -91,6 +91,23 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
         self.assertNotIn("abundance", summary)
         self.assertNotIn("catch_rate", summary)
 
+    def test_region_context_separates_exact_and_ambiguous_positive_detections(self):
+        rows = [
+            {"candidate_id":"c027","possible_candidate_ids":"","region_id":"chenggong_donghe",
+             "year_month":"2023-03","station_name":"A","depth_m":5,"dataset_id":"d1",
+             "scientific_name":"Abudefduf vaigiensis"},
+            {"candidate_id":"","possible_candidate_ids":"c027","region_id":"chenggong_donghe",
+             "year_month":"2023-03","station_name":"B","depth_m":8,"dataset_id":"d2",
+             "scientific_name":"Abudefduf sexfasciatus/vaigiensis"},
+        ]
+        context=build_candidate_region_context(rows)
+        row=context[0]
+        self.assertEqual(row["exact_positive_detection_record_count"],1)
+        self.assertEqual(row["ambiguous_positive_detection_record_count"],1)
+        self.assertEqual(row["exact_distinct_station_count"],1)
+        self.assertEqual(row["ambiguous_taxon_labels"],["Abudefduf sexfasciatus/vaigiensis"])
+        self.assertEqual(row["model_use_status"],"context_only_edna_occurrence")
+
     def test_output_manifest_declares_occurrence_only_interpretation(self):
         with tempfile.TemporaryDirectory() as tmp:
             detections = [{
@@ -109,7 +126,8 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
                 "station_name": "A", "depth_m": None,
             })
             summary = build_monthly_summary(detections)
-            manifest = write_outputs(Path(tmp), detections, summary, "2026-11-09T00:00:00+00:00")
+            context = build_candidate_region_context(detections)
+            manifest = write_outputs(Path(tmp), detections, summary, context, "2026-11-09T00:00:00+00:00")
             disk_manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest, disk_manifest)
             self.assertEqual(manifest["exact_candidate_record_count"], 1)
@@ -117,6 +135,7 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
             self.assertIn("do not measure fish abundance", manifest["interpretation"])
             self.assertTrue((Path(tmp) / "edna_occurrence_context.jsonl").exists())
             self.assertTrue((Path(tmp) / "edna_species_monthly_summary.csv").exists())
+            self.assertTrue((Path(tmp) / "edna_candidate_region_context.json").exists())
 
 if __name__ == "__main__":
     unittest.main()

@@ -615,3 +615,13 @@ python -m unittest P2.test_oca_edna_occurrence -v
 6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
 
 資料流程會先通過三組來源蒐集、欄位正規化、逐筆 JSON Schema 驗證及 occurrence-only 語意檢查。此階段只建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
+
+
+### P2.6 → PWA 歷史出現背景介接
+
+eDNA 蒐集器另輸出精簡的 `edna_candidate_region_context.json`，按候選物種 × 六區分開計算：
+- 精確學名陽性檢出資料列數、採樣月份數、站點數、採樣年月範圍及樣本深度範圍。
+- 可能涉及該候選的多物種合併標籤筆數與原始合併學名，獨立標示為 ambiguous，不加到精確檢出數。
+- 每筆均固定 `context_only_edna_occurrence`，不輸出活動分數或中魚機率。
+
+每月 OCA workflow 將精簡 JSON 與資料 manifest 發布至 `p2-history/data/`；Open-Meteo/P2 四小時流程讀取該檔，將它嵌入 `latest_hourly_fish_outlook.json` 的 `edna_occurrence_context` 區塊。PWA 可依目前區域及候選魚種顯示歷史採樣背景。若尚未發布或沒有該候選/區域資料，前端必須明確說明「未找到精確檢出紀錄不代表魚不存在」，不能顯示為物種不存在。
