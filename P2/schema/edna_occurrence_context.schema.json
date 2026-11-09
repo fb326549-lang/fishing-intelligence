@@ -10,7 +10,7 @@
     "fetched_at_utc", "station_name", "latitude", "longitude", "depth_m",
     "sampled_at", "year_month", "scientific_name", "common_name_zh",
     "family_scientific", "family_zh", "project_type", "candidate_id",
-    "region_id", "nearest_reference_station_id", "nearest_reference_distance_km",
+    "candidate_match_status", "possible_candidate_ids", "region_id", "nearest_reference_station_id", "nearest_reference_distance_km",
     "region_mapping_status", "detection_type", "model_use_status", "limitations"
   ],
   "properties": {
@@ -32,6 +32,8 @@
     "family_zh": {"type": "string"},
     "project_type": {"type": "string"},
     "candidate_id": {"type": "string"},
+    "candidate_match_status": {"type": "string", "enum": ["exact_scientific_name", "ambiguous_multi_species_taxon", "no_exact_candidate_match"]},
+    "possible_candidate_ids": {"type": "string"},
     "region_id": {"type": "string", "enum": ["", "yilan_suao", "hualien_north", "hualien_south", "fengbin_shitiping", "chenggong_donghe", "taitung_south"]},
     "nearest_reference_station_id": {"type": "string"},
     "nearest_reference_distance_km": {"type": ["number", "null"], "minimum": 0},
