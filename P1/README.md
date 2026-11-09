@@ -157,3 +157,6 @@ Verification joins only the same region and exact valid hour. It uses the latest
 
 If no time-aligned observation exists yet, the report status is `awaiting_time_aligned_observations`; this is a waiting state, not a zero-error or zero-skill result. CWA regional station aggregates are not point measurements at a fishing spot, and these verification metrics do not validate fish activity or catch probability.
 
+## Hourly marine archive coverage audit
+
+The four-hour Open-Meteo/P2 workflow runs `P1/collector/audit_environment_coverage.py` against the append-only P2 hourly history catalog and writes `data/forecast_verification/environment_coverage.json`. The report separately counts forecast records, observed records, unique valid hours, and collection vintages for all six planning regions. It does not interpolate missing hours or substitute another region. Hualien South is explicitly marked as having no CWA marine station coverage; its missing observation feed is a known coverage limitation, not a zero-valued observation. The report is also copied into the run artifact for review.
