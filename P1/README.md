@@ -1,6 +1,6 @@
 # Fishing Intelligence P1 Foundation
 
-This branch is an isolated development area. The production `main` branch and GitHub Pages site are not changed.
+P1 collector and validation code is developed on `p1-foundation` and merged to `main` through reviewed pull requests. The public GitHub Pages site is kept separate from the collector outputs; data collection artifacts are not automatically exposed as website content.
 
 ## P1 goals
 - Build a verifiable East Taiwan environmental-data foundation.
@@ -82,18 +82,17 @@ Official dataset: https://opendata.cwa.gov.tw/dataset/forecast/O-B0076-001
 
 The CWA Swagger lists O-B0075-001 and O-B0075-002 under observations. The dataset metadata page for O-B0076-001 includes an example of the O-MMC-0001 real-time marine-condition XML. Keep these product IDs separate in the source registry and ingestion code.
 
-## Next local verification step
-Run the station metadata collector on your own Windows computer using the API key already held by you:
-```powershell
-$env:CWA_AUTHORIZATION="貼上你的授權碼"
-python collector/fetch_cwa_stations.py --out data/cwa_stations
-```
-Do not send the authorization code in chat or add it to any file. After the run, share only:
-- the printed station count;
-- the first 10 lines of `stations.csv` (remove any personal/private fields if present);
-- any HTTP error text, after confirming it contains no token.
+## Automated CWA ingestion status (reviewed 2026-11-09)
+The GitHub Actions workflow uses the repository secret `CWA_AUTHORIZATION`; the credential is not stored in source files and does not need to be sent in chat.
 
-Then we can map actual stations to the six regions and query O-B0075-001 for one station. Keep the raw API JSON local until its fields and redistribution terms have been reviewed.
+The daily workflow now:
+1. Refreshes O-B0076-001 station metadata.
+2. Fetches O-B0075-001 (48-hour) and O-B0075-002 (30-day) marine observations.
+3. Normalizes both datasets while keeping missing values blank.
+4. Builds separate six-region outputs: `output/east_region/` for the rolling 48-hour feed and `output/east_region_30d/` for the rolling 30-day historical context.
+5. Fetches and maps F-A0021-001 tide events, compares only forecasts issued before their target events, and appends observed tide / forecast vintages to the dedicated `tide-history` branch.
+
+The 30-day output is currently uploaded as a workflow artifact with 3-day retention. It is not yet a permanent long-term archive. CWA currently has no mapped station in 花蓮南段; this remains a known coverage gap. Do not fill it with interpolated observations.
 
 
 ## Evidence-gated species/environment context engine
@@ -126,4 +125,4 @@ python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir path/to/t
 
 The verifier uses only reviewed mainland station/location pairs and TWVD2001 heights. Forecast lead time is calculated from the original CWA fetch timestamp. Forecasts fetched at or after the target event are excluded. It reports descriptive MAE and timing errors only after valid matches exist; no fish activity score or catch probability is inferred from a small or empty sample.
 
-The CWA workflow is configured for 07:00 Taiwan-time daily collection. GitHub scheduled workflows run only from the repository default branch, so the schedule will become active only after the workflow is reviewed and merged to that branch. The P1 development branch does not modify `main`.
+The CWA workflow is configured for 07:00 Taiwan-time daily collection. It is now present on the repository default branch, so the schedule is enabled. The workflow checks out `p1-foundation` for its collector code; keep that branch synchronized with the reviewed `main` version.
