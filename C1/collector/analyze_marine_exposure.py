@@ -78,6 +78,12 @@ def assess_region(region_id, region, generated_at, now, stale_after_minutes=180)
     period = finite_number(values.get("wave_period_s"))
     tide = finite_number(values.get("tide_height_m"))
     current = finite_number(values.get("current_speed_ms"))
+    # Negative wave height, wind speed, period or current speed are invalid;
+    # tide height may legitimately be negative relative to its chart datum.
+    if wave is not None and wave < 0: wave = None
+    if wind is not None and wind < 0: wind = None
+    if period is not None and period < 0: period = None
+    if current is not None and current < 0: current = None
     factors = []
     for key, value, unit in (
         ("wave_height_m", wave, "m"),
