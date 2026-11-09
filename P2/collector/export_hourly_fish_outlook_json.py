@@ -31,7 +31,7 @@ def build_payload(rows, edna_context=None, generated_at=None):
                 raise ValueError(f"invalid eDNA context count: {field}")
     return {
         "schema_version":1,
-        "source":"fishing-intelligence-p2.4.6",
+        "source":"fishing-intelligence-p2.6",
         "generated_at":generated_at or datetime.now(timezone.utc).isoformat(),
         "as_of":next(iter(as_ofs)),
         "regions":regions,
