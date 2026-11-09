@@ -364,7 +364,7 @@ async function loadP2FishOutlook(){
   const response=await fetch(P2_FISH_OUTLOOK_URL+'?t='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const data=await response.json();
-  if(data.schema_version!==1||data.source!=='fishing-intelligence-p2.4.6'||!Array.isArray(data.rows)||!data.rows.length)throw Error('P2 展望資料格式不符');
+  if(data.schema_version!==1||!['fishing-intelligence-p2.4.6','fishing-intelligence-p2.6'].includes(data.source)||!Array.isArray(data.rows)||!data.rows.length)throw Error('P2 展望資料格式不符');
   if(!Array.isArray(data.horizons_hours)||!data.horizons_hours.includes(6)||!data.horizons_hours.includes(12)||!data.horizons_hours.includes(24))throw Error('P2 預報時段不完整');
   latest.p2FishOutlook=data;
   const sel=$('p2FishCandidate'),previous=sel.value;
