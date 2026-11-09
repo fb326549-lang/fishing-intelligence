@@ -117,7 +117,7 @@ def build_forecast_rows(csv_path: Path, forecast_dir: Path, timezone_name: str):
         env["sunrise"] = parse_dt(sun["sunrise"], timezone_name).isoformat() if sun.get("sunrise") else None
         env["sunset"] = parse_dt(sun["sunset"], timezone_name).isoformat() if sun.get("sunset") else None
         expected = len(MARINE_MAP) + len(WEATHER_MAP) + 3
-        available = sum(v is not None for v in env.values())
+        available = sum(v is not None and not (k == "thunderstorm_risk" and v == "unknown") for k, v in env.items())
         output.append({
             "schema_version": "1.0.0", "region_id": region,
             "valid_time": item["valid_time"],
