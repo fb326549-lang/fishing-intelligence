@@ -22,13 +22,15 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c027,條紋豆娘魚,Abudefduf vaigiensis\n"
                 "c028,孟加拉豆娘魚,Abudefduf bengalensis\n"
                 "c029,瑪拉巴石斑魚,Epinephelus malabaricus\n"
-                "c030,點帶石斑魚,Epinephelus coioides\n",encoding="utf-8")
+                "c030,點帶石斑魚,Epinephelus coioides\n"
+                "c036,南方舵魚,Kyphosus bigibbus\n"
+                "c037,天竺舵魚,Kyphosus cinerascens\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
             evidence.write_text("candidate_id,evidence_id,source_url\nc001,E1,https://example.org/e1\n",encoding="utf-8")
             literature=root/"literature.csv"
             literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),56)
+            self.assertEqual(len(rows),70)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
@@ -47,6 +49,13 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(black_seabream_temp["evidence_status"],"external_literature_found_context_only")
             black_seabream_current=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="current_preference")
             self.assertEqual(black_seabream_current["evidence_status"],"external_literature_found_context_only")
+            southern = next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="temperature_range")
+            white_alias = next(r for r in rows if r["candidate_id"]=="c002" and r["response_domain"]=="temperature_range")
+            self.assertEqual(southern["evidence_status"],"external_literature_found_context_only")
+            self.assertIn("L001", southern["literature_record_ids"])
+            self.assertEqual(white_alias["evidence_status"],"species_identification_required")
+            self.assertEqual(white_alias["literature_record_ids"],"")
+            self.assertEqual(len([r for r in rows if r["candidate_id"] in {"c036","c037"}]),14)
 
 if __name__ == "__main__":
     unittest.main()
