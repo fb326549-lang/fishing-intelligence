@@ -595,3 +595,13 @@ python -m unittest P2.test_oca_edna_occurrence -v
 第一次官方資料抓取已成功取得 19,731 筆陽性 eDNA 資料列、258 筆候選物種/月/區域摘要。這是資料列數而非魚隻數；約 13,381 筆因距六區參考站超過 35 公里而保留為未分區背景資料，避免硬塞進六區。資料中也存在多物種合併學名，必須保持 ambiguous，不能當成 c003 臭肚或 c027 條紋豆娘魚的確證。
 
 只有在成功取得三組來源、資料解析通過且輸出筆數大於零時才產生 artifact。此階段先建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
+
+
+### P2.6 → PWA 歷史出現背景介接
+
+eDNA 蒐集器另輸出精簡的 `edna_candidate_region_context.json`，按候選物種 × 六區分開計算：
+- 精確學名陽性檢出資料列數、採樣月份數、站點數、採樣年月範圍及樣本深度範圍。
+- 可能涉及該候選的多物種合併標籤筆數與原始合併學名，獨立標示為 ambiguous，不加到精確檢出數。
+- 每筆均固定 `context_only_edna_occurrence`，不輸出活動分數或中魚機率。
+
+每月 OCA workflow 將精簡 JSON 與資料 manifest 發布至 `p2-history/data/`；Open-Meteo/P2 四小時流程讀取該檔，將它嵌入 `latest_hourly_fish_outlook.json` 的 `edna_occurrence_context` 區塊。PWA 可依目前區域及候選魚種顯示歷史採樣背景。若尚未發布或沒有該候選/區域資料，前端必須明確說明「未找到精確檢出紀錄不代表魚不存在」，不能顯示為物種不存在。
