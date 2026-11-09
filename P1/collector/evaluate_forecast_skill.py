@@ -189,10 +189,11 @@ def main():
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({
-        "status": "generated",
+        "status": result["status"],
         "forecast_observation_hour_pairs": result["forecast_observation_hour_pairs"],
         "forecast_vintages_with_any_comparable_variable": result["forecast_vintages_with_any_comparable_variable"],
-        "variables_with_metrics": sum(v["status"] == "exploratory_metrics" for v in result["variables"].values()),
+        "matched_variable_pairs": result["matched_variable_pairs"],
+        "variables_with_metrics": result["variables_with_exploratory_metrics"],
         "out": str(args.out),
     }, ensure_ascii=False, sort_keys=True))
 
