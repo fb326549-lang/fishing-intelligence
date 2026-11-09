@@ -25,4 +25,18 @@
 - insufficient_data：來源缺漏、逾時、解析失敗或影響範圍無法映射。
 任何狀態的 safety_clearance 永遠為 false。現場浪況、岸際公告、港區/保護區管制與個人裝備仍須獨立確認。
 
-本階段交付資料契約、六區安全引擎與單元測試；尚未宣稱官方警報已完成即時抓取。
+## C1.2 海象觀測資料
+- CWA OpenData O-B0075-001：48 小時浮標站與潮位站海況監測資料。
+- CWA OpenData O-B0075-002：30 天浮標站與潮位站海況監測資料。
+- 使用 P1/stations/east_region_station_mapping.csv 的明確 station_id → region_id 對照，只納入 station_status=1 的測站。
+- 輸出 tide-history/data/latest_marine_conditions.json，按六區保留測站、最新觀測時間、48 小時筆數及 30 天筆數。
+- 單站資料不外推到其他區域；缺測不等於平靜或安全。
+- 最新觀測超過 180 分鐘標記 stale；資料欄位原樣保留，不猜測波浪欄位名稱或單位。
+- 此資料是「觀測」不是「預報」，目前不計算魚活性、中魚率或安全許可。
+
+官方參考：
+- https://opendata.cwa.gov.tw/dataset/all/O-B0075-001
+- https://opendata.cwa.gov.tw/dataset/all/O-B0075-002
+- https://www.cwa.gov.tw/Data/data_catalog/4-1-1.pdf
+
+C1.1 已建立官方安全來源自動蒐集及六區警特報判斷；C1.2 新增海象觀測自動蒐集與六區彙整。兩者由 GitHub Actions 每 15 分鐘執行，並發布至 tide-history 分支。海象觀測需待本次 CI 與真實資料輸出驗證後，才算正式完成。
