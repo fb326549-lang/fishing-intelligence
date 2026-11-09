@@ -243,7 +243,7 @@ python P2/species/environment_match_engine.py \
 - L015：瓜子鱲物種資料頁的日行性與岩礁激浪區活動描述，僅為分類資料背景。
 - L016：南方舵魚物種資料頁的日行性、中表層與外礁環境描述，僅為分類資料背景。
 - L017：天竺舵魚物種資料頁的日行性、中表層、岩礁/海藻床/潟湖描述，僅為分類資料背景。
-- L018：天竺舵魚台東三仙台標本 FRIP21798（2007-01-02，底刺網），只證明曾出現。
+- L018：天竺舵魚台東東部標本 FRIP21798。交叉典藏對同一關聯紀錄的日期、漁法與地點標示不一致（2007-01-02 底刺網、三仙台 vs 2006-01-02 手釣、成功），已標記 occurrence_record_conflict_requires_reconciliation；僅保留台東東部出現資訊，不把兩個頁面當成兩筆樣本。
 - L019：瓜子鱲花蓮東堤標本 FRIP22025（竿釣），只證明曾出現。
 
 L015–L017 的用途為 context_only_taxonomic_database；L019–L020 的用途為 occurrence_only_no_environment_response；L018 因典藏欄位衝突暫列 occurrence_record_conflict_requires_reconciliation。任何一筆都不會自動轉成環境反應規則或活動分數。
