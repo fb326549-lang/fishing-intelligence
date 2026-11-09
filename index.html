@@ -60,6 +60,7 @@ const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.
 const CWA_SNAPSHOT_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json';
 const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_safety_decisions.json";
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
+const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
 let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null};
 
@@ -113,37 +114,52 @@ $('test').onclick=async()=>{if(!saveSettings())return;const c=config(),u=new URL
 async function loadTide(){
 const c=config();
 $('tideLevel').textContent='查詢中…';$('tidePhase').textContent='—';$('tideDetail').textContent='正在取得中央氣象署潮汐預報…';
-if(!c.tideKey){$('tideLevel').textContent='尚未設定授權碼';$('tidePhase').textContent='—';$('tideDetail').textContent='請開啟「API 設定」，貼上中央氣象署 OpenData 授權碼並儲存。';return}
+let valid=[],tideSource='CWA 快取';
 try{
-const u=new URL(c.tideUrl||defaults.tideUrl);
-u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
-const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);
-const j=await r.json();
-const norm=k=>String(k).replace(/[^a-z0-9]/gi,'').toLowerCase();
-const prop=(o,...keys)=>{if(!o||typeof o!=='object')return undefined;const wanted=keys.map(norm);const k=Object.keys(o).find(x=>wanted.includes(norm(x)));return k===undefined?undefined:o[k]};
-const arr=v=>v==null?[]:Array.isArray(v)?v:[v];
-if(String(prop(j,'success')||'').toLowerCase()==='false'||String(prop(j,'status')||'').toUpperCase()==='ERROR')throw Error(prop(j,'message')||'中央氣象署回應錯誤');
-const candidates=[];
-const scanEvents=(node,out,depth=0)=>{
- if(!node||typeof node!=='object'||depth>16)return;
- if(Array.isArray(node)){node.forEach(x=>scanEvents(x,out,depth+1));return}
- const dt=prop(node,'DateTime','dateTime','datetime'),tide=prop(node,'Tide');
- if(dt&&tide){const heights=prop(node,'TideHeights','tideHeights')||{};out.push({date:dt,tide:String(tide),height:prop(heights,'AboveLocalMSL','AboveChartDatum')??prop(node,'AboveLocalMSL','AboveChartDatum')});}
- Object.values(node).forEach(x=>scanEvents(x,out,depth+1));
-};
-const walk=(node,depth=0)=>{
- if(!node||typeof node!=='object'||depth>16)return;
- if(Array.isArray(node)){node.forEach(x=>walk(x,depth+1));return}
- const lat=prop(node,'Latitude'),lon=prop(node,'Longitude');
- if(lat!==undefined&&lon!==undefined){
-  const events=[];scanEvents(node,events);
-  if(events.length)candidates.push({node,lat:Number(lat),lon:Number(lon),events});
+ const snapshotResponse=await fetch(CWA_TIDE_SNAPSHOT_URL);
+ if(snapshotResponse.ok){
+  const snapshot=await snapshotResponse.json();
+  const generatedAt=new Date(snapshot.generated_at_utc||'');
+  const ageHours=(Date.now()-generatedAt.getTime())/3600000;
+  if(snapshot.schema_version===1&&Array.isArray(snapshot.locations)&&Number.isFinite(ageHours)&&ageHours>=-0.25&&ageHours<=12){
+   valid=snapshot.locations.map(location=>({
+    node:{LocationName:location.location_name||location.location_id},
+    lat:Number(location.latitude),lon:Number(location.longitude),
+    events:(Array.isArray(location.events)?location.events:[]).map(event=>({
+     date:event.valid_time,tide:event.tide,height:event.height_above_local_msl_cm
+    }))
+   })).filter(location=>Number.isFinite(location.lat)&&Number.isFinite(location.lon)&&location.events.length);
+   if(valid.length)tideSource='CWA 官方潮汐預報快取（'+generatedAt.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})+'）';
+  }
  }
- Object.values(node).forEach(x=>walk(x,depth+1));
-};
-walk(j);
-const valid=candidates.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.events.length);
-if(!valid.length)throw Error('官方 API 已連線，但回傳內容沒有可辨識的測站座標與潮汐事件。頂層欄位：'+Object.keys(j||{}).join(', '));
+}catch(e){/* use direct CWA API fallback when configured */}
+if(!valid.length&&c.tideKey){
+ tideSource='CWA OpenData 直接查詢';
+ const u=new URL(c.tideUrl||defaults.tideUrl);
+ u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
+ const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);
+ const j=await r.json();
+ const norm=k=>String(k).replace(/[^a-z0-9]/gi,'').toLowerCase();
+ const prop=(o,...keys)=>{if(!o||typeof o!=='object')return undefined;const wanted=keys.map(norm);const k=Object.keys(o).find(x=>wanted.includes(norm(x)));return k===undefined?undefined:o[k]};
+ const candidates=[];
+ const scanEvents=(node,out,depth=0)=>{
+  if(!node||typeof node!=='object'||depth>16)return;
+  if(Array.isArray(node)){node.forEach(x=>scanEvents(x,out,depth+1));return}
+  const dt=prop(node,'DateTime','dateTime','datetime'),tide=prop(node,'Tide');
+  if(dt&&tide){const heights=prop(node,'TideHeights','tideHeights')||{};out.push({date:dt,tide:String(tide),height:prop(heights,'AboveLocalMSL')});}
+  Object.values(node).forEach(x=>scanEvents(x,out,depth+1));
+ };
+ const walk=(node,depth=0)=>{
+  if(!node||typeof node!=='object'||depth>16)return;
+  if(Array.isArray(node)){node.forEach(x=>walk(x,depth+1));return}
+  const lat=prop(node,'Latitude'),lon=prop(node,'Longitude');
+  if(lat!==undefined&&lon!==undefined){const events=[];scanEvents(node,events);if(events.length)candidates.push({node,lat:Number(lat),lon:Number(lon),events});}
+  Object.values(node).forEach(x=>walk(x,depth+1));
+ };
+ walk(j);
+ valid=candidates.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.events.length);
+}
+if(!valid.length)throw Error('後端潮汐快取暫不可用；如需直接連線備援，請在 API 設定中填入 CWA 授權碼。');
 const rad=x=>x*Math.PI/180;
 const distance=x=>{const a=rad(x.lat-point.lat),b=rad(x.lon-point.lon),h=Math.sin(a/2)**2+Math.cos(rad(point.lat))*Math.cos(rad(x.lat))*Math.sin(b/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))};
 valid.sort((a,b)=>distance(a)-distance(b));
@@ -180,7 +196,7 @@ if(todayRange){
  $('tideRangeGrade').textContent='資料不足';
  $('tideRangeGrade').title='此測站今日缺少完整滿潮、乾潮潮高，請稍後重新查詢。';
 }
-$('tideLevel').textContent=label+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm':'');
+$('tideLevel').textContent=label+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm（當地平均海面基準）':'');
 let tideState=null;
 if(prev){
  const rising=prev.tide.includes('乾潮')&&next.tide.includes('滿潮');
@@ -196,7 +212,7 @@ if(prev){
  }else{$('tidePhase').textContent='潮汐轉折資料待確認';$('tideProgressText').textContent='無法判定潮向';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—'}
 }else{$('tidePhase').textContent='等待前一筆潮汐資料';$('tideProgressText').textContent='資料不足';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—'}
 latest.tide=tideState;
-$('tideDetail').textContent='配對地點：'+(prop(station.node,'LocationName')||'最近預報地點')+'；距離約 '+distance(station).toFixed(1)+' 公里。分數為兩個官方潮汐轉折時刻之間的時間進度，並非實測潮高比例。';
+$('tideDetail').textContent='配對地點：'+(station.node.LocationName||'最近預報地點')+'；距離約 '+distance(station).toFixed(1)+' 公里。來源：'+tideSource+'。潮汐轉折進度不是實測潮高比例或海流流速。';
 calculateFishing();
 }catch(e){latest.tide=null;$('tideLevel').textContent='取得失敗';$('tidePhase').textContent='—';$('tideProgressText').textContent='無法計算';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—';$('tideDetail').textContent='潮汐資料錯誤：'+e.message+'。請確認授權碼、API 網址及網路連線。';calculateFishing()}
 }
