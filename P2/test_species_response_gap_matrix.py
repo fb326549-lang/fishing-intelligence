@@ -26,7 +26,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
             evidence.write_text("candidate_id,evidence_id,source_url\nc001,E1,https://example.org/e1\n",encoding="utf-8")
             literature=root/"literature.csv"
-            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\n",encoding="utf-8")
+            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),56)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -41,6 +41,12 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(rabbit["literature_record_ids"],"L1")
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(black["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
+            black_activity=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="activity_period")
+            self.assertEqual(black_activity["evidence_status"],"external_literature_found_context_only")
+            black_seabream_temp=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="temperature_range")
+            self.assertEqual(black_seabream_temp["evidence_status"],"external_literature_found_context_only")
+            black_seabream_current=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="current_preference")
+            self.assertEqual(black_seabream_current["evidence_status"],"external_literature_found_context_only")
 
 if __name__ == "__main__":
     unittest.main()
