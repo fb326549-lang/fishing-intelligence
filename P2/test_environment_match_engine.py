@@ -9,6 +9,15 @@ from environment_match_engine import evaluate, load_rules
 
 FIELDS = ["rule_id","candidate_id","environment_field","operator","minimum","maximum","match_score","weight","region_scope","life_stage","evidence_id","source_url","confidence","evidence_basis","model_use_status","reviewed_by","reviewed_at"]
 
+def load_fixture_rules(rows):
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "rules.csv"
+        with path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=FIELDS)
+            w.writeheader()
+            w.writerows(rows)
+        return load_rules(path)
+
 def rule(**overrides):
     row = {
         "rule_id":"R1","candidate_id":"c003","environment_field":"sea_surface_temperature_c",
@@ -56,14 +65,14 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
             self.assertEqual(rabbit["interpretation"], "environment_match_only_not_fish_activity_or_catch_probability")
 
     def test_taxonomy_gate_prevents_scoring(self):
-        rows = evaluate(self.environment, self.candidates, [rule()])
+        rows = evaluate(self.environment, self.candidates, load_fixture_rules([rule()]))
         white = next(r for r in rows if r["candidate_id"] == "c002")
         self.assertEqual(white["status"], "taxon_or_distribution_gate")
         self.assertEqual(white["environment_match_score"], "")
 
     def test_missing_environment_field_reports_partial_coverage(self):
         env = [{"region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","environment":{}}]
-        rows = evaluate(env, self.candidates[:1], [rule()])
+        rows = evaluate(env, self.candidates[:1], load_fixture_rules([rule()]))
         self.assertEqual(rows[0]["status"], "insufficient_environment_data")
         self.assertEqual(rows[0]["rule_coverage"], "0")
 
