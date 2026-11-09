@@ -73,7 +73,7 @@ class IntegratedActivityTests(unittest.TestCase):
         self.assertEqual(fish["catch_probability"],"")
         self.assertEqual(fish["best_fishing_window_status"],"not_established")
 
-    def test_taxonomy_gate_remains_blocked_even_with_no_match_score):
+    def test_taxonomy_gate_remains_blocked_even_with_no_match_score(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c002")
         self.assertEqual(fish["activity_evidence_status"],"taxon_or_distribution_gate")
