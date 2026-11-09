@@ -13,14 +13,14 @@ class IntegratedActivityTests(unittest.TestCase):
             {"candidate_id":"c027","common_name_zh":"條紋豆娘魚","scientific_name":"Abudefduf vaigiensis","eligibility_gate":"verified_taxon"},
             {"candidate_id":"c036","common_name_zh":"南方舵魚","scientific_name":"Kyphosus bigibbus","eligibility_gate":"verified_taxon"},
             {"candidate_id":"c037","common_name_zh":"天竺舵魚","scientific_name":"Kyphosus cinerascens","eligibility_gate":"verified_taxon"},
-            {"candidate_id":"c001","common_name_zh":"瓜子鱲","scientific_name":"Girella punctata","eligibility_gate":"black_hair_vernacular_group_species_identification_required"},
+            {"candidate_id":"c001","common_name_zh":"瓜子鱲","scientific_name":"Girella punctata","eligibility_gate":"verified_taxon"},
         ]
         self.matches=[
             {"candidate_id":"c003","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
             {"candidate_id":"c002","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","status":"taxon_or_distribution_gate","environment_match_score":"","rule_coverage":"0"},
             {"candidate_id":"c036","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
             {"candidate_id":"c037","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
-            {"candidate_id":"c001","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"taxon_or_distribution_gate","environment_match_score":"","rule_coverage":"0"},
+            {"candidate_id":"c001","region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","data_type":"forecast","status":"insufficient_evidence","environment_match_score":"","rule_coverage":"0"},
         ]
         self.activity=[
             {"candidate_id":"c003","activity_evidence_id":"AE003","model_use_status":"context_only_captive_feeding","transferability":"low_for_wild_east_taiwan_angler_prediction"},
@@ -59,12 +59,14 @@ class IntegratedActivityTests(unittest.TestCase):
             self.assertEqual(fish["catch_probability"],"")
             self.assertEqual(fish["best_fishing_window_status"],"not_established")
 
-    def test_black_hair_vernacular_gate_remains_blocked_despite_catch_record(self):
+    def test_black_hair_candidate_catch_record_does_not_create_activity_score(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
         fish=next(r for r in rows if r["candidate_id"]=="c001")
-        self.assertEqual(fish["activity_evidence_status"],"taxon_or_distribution_gate")
+        self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
+        self.assertEqual(fish["activity_evidence_count"],"1")
         self.assertEqual(fish["activity_score"],"")
         self.assertEqual(fish["catch_probability"],"")
+        self.assertEqual(fish["best_fishing_window_status"],"not_established")
 
     def test_taxonomy_gate_remains_blocked_even_with_no_match_score(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
