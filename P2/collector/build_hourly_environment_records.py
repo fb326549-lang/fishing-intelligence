@@ -7,7 +7,7 @@ regional substitution, tide-phase inference, or tide-height/current conversion.
 from __future__ import annotations
 import argparse, csv, json
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -191,6 +191,7 @@ def build_forecast_rows(csv_path: Path, forecast_dir: Path, timezone_name: str, 
             )
             env["tide_phase"] = phase
             env["tide_turning"] = turning
+            tide_flags.append("tide_phase_based_on_predicted_high_low_events_not_measured_current")
             if phase is None:
                 tide_flags.append("cwa_tide_phase_unavailable_or_region_locations_disagree")
             else:
