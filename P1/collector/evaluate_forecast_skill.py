@@ -127,15 +127,21 @@ def build_verification(archive_root, minimum_pairs=5):
         signed = [p["signed_error"] for p in pairs]
         bands = {}
         for _, _, label in LEAD_BANDS:
-            selected = [p["absolute_error"] for p in pairs if p["lead_band"] == label]
+            selected = [p for p in pairs if p["lead_band"] == label]
             if selected:
+                unique_hours = {(p["region_id"], p["valid_time"]) for p in selected}
                 bands[label] = {
-                    "sample_count": len(selected),
-                    "mae": round(sum(selected) / len(selected), 4),
+                    "forecast_vintage_pair_count": len(selected),
+                    "unique_region_valid_hours": len(unique_hours),
+                    "status": "exploratory_metrics" if len(unique_hours) >= minimum_pairs else "insufficient_sample",
+                    "mae": round(sum(p["absolute_error"] for p in selected) / len(selected), 4),
                 }
-        enough = len(errors) >= minimum_pairs
+        unique_valid_hours = {(p["region_id"], p["valid_time"]) for p in pairs}
+        enough = len(unique_valid_hours) >= minimum_pairs
         summaries[metric] = {
             "sample_count": len(errors),
+            "forecast_vintage_pair_count": len(errors),
+            "unique_region_valid_hours": len(unique_valid_hours),
             "status": "exploratory_metrics" if enough else "insufficient_sample",
             "mae": round(sum(errors) / len(errors), 4) if errors else None,
             "rmse": round(math.sqrt(sum(x*x for x in errors) / len(errors)), 4) if errors else None,
@@ -165,15 +171,15 @@ def build_verification(archive_root, minimum_pairs=5):
         "forecast_vintages_with_any_comparable_variable": len(matched_forecast_keys),
         "matched_variable_pairs": matched_variable_pairs,
         "variables_with_exploratory_metrics": variables_with_metrics,
-        "minimum_pairs_for_exploratory_metrics": minimum_pairs,
+        "minimum_unique_region_valid_hours_for_exploratory_metrics": minimum_pairs,
         "variables": summaries,
         "limitations": [
             "Only exact same-region and same-valid-hour pairs are compared; no nearest-time substitution or interpolation.",
-            "All archived forecast vintages are retained, so repeated valid hours represent different forecast lead times, not independent observations.",
+            "All archived forecast vintages are retained for lead-time analysis, but repeated vintages for the same region and valid hour count as one independent valid-hour unit for the exploratory sample threshold.",
             "CWA regional station aggregates are not point measurements at a fishing location.",
             "MAE and RMSE describe historical paired errors only; they do not guarantee future accuracy or local nearshore accuracy.",
             "Direction errors use the shortest circular angular distance.",
-            "Variables with fewer than the minimum sample count are marked insufficient_sample.",
+            "Variables with fewer than the minimum number of unique region/valid-hour pairs are marked insufficient_sample; forecast-vintage pair counts are reported separately.",
         ],
     }
 
@@ -181,7 +187,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--archive-root", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--minimum-pairs", type=int, default=5)
+    parser.add_argument("--minimum-pairs", "--minimum-unique-hours", dest="minimum_pairs", type=int, default=5,
+                        help="Minimum unique region/valid-hour pairs required for exploratory metrics (default: 5).")
     args = parser.parse_args()
     if args.minimum_pairs < 1:
         parser.error("--minimum-pairs must be at least 1")

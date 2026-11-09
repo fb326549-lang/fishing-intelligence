@@ -44,10 +44,31 @@ class ForecastSkillTests(unittest.TestCase):
             self.assertEqual(result["forecast_vintages_with_any_comparable_variable"],2)
             wave=result["variables"]["wave_height_m"]
             self.assertEqual(wave["sample_count"],2)
-            self.assertEqual(wave["status"],"exploratory_metrics")
+            self.assertEqual(wave["unique_region_valid_hours"],1)
+            self.assertEqual(wave["status"],"insufficient_sample")
             self.assertAlmostEqual(wave["mae"],0.75)
             direction=result["variables"]["wind_direction_deg"]
+            self.assertEqual(direction["unique_region_valid_hours"],1)
+            self.assertEqual(direction["status"],"insufficient_sample")
             self.assertAlmostEqual(direction["mae"],3.0)
+
+    def test_distinct_region_valid_hours_satisfy_minimum_even_with_multiple_vintages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            rows=[
+                self.row("observation","2026-11-09T12:00:00+08:00","2026-11-09T13:10:00+08:00",env={"wave_height_m":2.0}),
+                self.row("forecast","2026-11-09T12:00:00+08:00","2026-11-09T06:00:00+08:00",env={"wave_height_m":3.0}),
+                self.row("forecast","2026-11-09T12:00:00+08:00","2026-11-09T10:00:00+08:00",env={"wave_height_m":2.5}),
+                self.row("observation","2026-11-09T13:00:00+08:00","2026-11-09T14:10:00+08:00",env={"wave_height_m":1.0}),
+                self.row("forecast","2026-11-09T13:00:00+08:00","2026-11-09T08:00:00+08:00",env={"wave_height_m":2.0}),
+            ]
+            self.write_rows(root,rows)
+            result=build_verification(root,minimum_pairs=2)
+            wave=result["variables"]["wave_height_m"]
+            self.assertEqual(wave["sample_count"],3)
+            self.assertEqual(wave["unique_region_valid_hours"],2)
+            self.assertEqual(wave["status"],"exploratory_metrics")
+            self.assertEqual(result["minimum_unique_region_valid_hours_for_exploratory_metrics"],2)
 
     def test_no_time_aligned_observations_is_reported_as_waiting_not_zero_skill(self):
         with tempfile.TemporaryDirectory() as tmp:
