@@ -92,7 +92,9 @@ The daily workflow now:
 4. Builds separate six-region outputs: `output/east_region/` for the rolling 48-hour feed and `output/east_region_30d/` for the rolling 30-day historical context.
 5. Fetches and maps F-A0021-001 tide events, compares only forecasts issued before their target events, and appends observed tide / forecast vintages to the dedicated `tide-history` branch.
 
-The 30-day output is currently uploaded as a workflow artifact with 3-day retention. It is not yet a permanent long-term archive. CWA currently has no mapped station in 花蓮南段; this remains a known coverage gap. Do not fill it with interpolated observations.
+The regional 48-hour and 30-day time series are persisted append-only on the `tide-history` branch as `regional_marine_observations_48h.jsonl` and `regional_marine_observations_30d.jsonl`. Identical region/time/value records are deduplicated and changed values are retained as revisions. Raw CWA JSON and station-level normalized CSV are still uploaded as workflow artifacts with 3-day retention.
+
+The 30-day endpoint is a rolling window. Repeated daily snapshots are not independent samples; downstream training must deduplicate by region, valid time, and revision. CWA currently has no mapped station in 花蓮南段; this remains a known coverage gap. Do not fill it with interpolated observations.
 
 
 ## Evidence-gated species/environment context engine
@@ -123,6 +125,6 @@ Run locally from the repository root:
 python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir path/to/tide-history/data --out-dir output/tide-analysis
 ```
 
-The verifier uses only reviewed mainland station/location pairs and TWVD2001 heights. Forecast lead time is calculated from the original CWA fetch timestamp. Forecasts fetched at or after the target event are excluded. It reports descriptive MAE and timing errors only after valid matches exist; no fish activity score or catch probability is inferred from a small or empty sample.
+The history branch also stores regional 48-hour and 30-day marine observation series with append-only revision tracking. The verifier uses only reviewed mainland station/location pairs and TWVD2001 heights. Forecast lead time is calculated from the original CWA fetch timestamp. Forecasts fetched at or after the target event are excluded. It reports descriptive MAE and timing errors only after valid matches exist; no fish activity score or catch probability is inferred from a small or empty sample.
 
 The CWA workflow is configured for 07:00 Taiwan-time daily collection. It is now present on the repository default branch, so the schedule is enabled. The workflow checks out `p1-foundation` for its collector code; keep that branch synchronized with the reviewed `main` version.

@@ -15,6 +15,7 @@ on:
       - 'P1/collector/build_cwa_regional_tide_forecast.py'
       - 'P1/collector/compare_cwa_tide_observed_forecast.py'
       - 'P1/collector/archive_cwa_tide_history.py'
+      - 'P1/collector/build_east_region_conditions.py'
       - 'P1/collector/analyze_cwa_tide_forecast_history.py'
       - 'P1/stations/cwa_tide_observation_forecast_pairing.csv'
       - 'P1/stations/cwa_tide_region_mapping.csv'
@@ -68,7 +69,7 @@ jobs:
           python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
           python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
           python P1/collector/compare_cwa_tide_observed_forecast.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --out output/cwa_tides/tide_observed_forecast_comparison.csv
-          python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --history-dir tide-history/data --snapshot-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --collected-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --regional-48h output/east_region/east_region_conditions.csv --regional-30d output/east_region_30d/east_region_conditions.csv --history-dir tide-history/data --snapshot-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" --collected-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir tide-history/data --out-dir tide-history/data/analysis
 
       - name: Commit tide history and forecast verification outputs
@@ -89,7 +90,7 @@ jobs:
               echo "History branch moved during upload; refreshing and rebuilding append-only snapshot (attempt ${attempt})."
               git -C tide-history fetch origin tide-history
               git -C tide-history reset --hard origin/tide-history
-              python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --history-dir tide-history/data --snapshot-id "${SNAPSHOT_ID}" --collected-at "${COLLECTED_AT}"
+              python P1/collector/archive_cwa_tide_history.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --regional-48h output/east_region/east_region_conditions.csv --regional-30d output/east_region_30d/east_region_conditions.csv --history-dir tide-history/data --snapshot-id "${SNAPSHOT_ID}" --collected-at "${COLLECTED_AT}"
               python P1/collector/analyze_cwa_tide_forecast_history.py --history-dir tide-history/data --out-dir tide-history/data/analysis
               git -C tide-history add data/
               git -C tide-history commit -m "Archive CWA tide snapshot ${GITHUB_RUN_ID}"
