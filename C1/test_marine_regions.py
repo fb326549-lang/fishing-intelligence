@@ -44,7 +44,11 @@ class MarineRegionTests(unittest.TestCase):
   r=build_snapshot(self.input,self.mapping,"2026-11-09T12:00:00+08:00")
   self.assertEqual(r["regions"]["hualien_north"]["coverage_status"],"no_recent_observation")
   self.assertIn("not interpreted as calm sea",r["interpretation_limits"][3])
- def test_stale_observation_is_not_marked_current(self):\n  r=build_snapshot(self.input,self.mapping,"2026-11-09T15:00:00+08:00")\n  self.assertEqual(r["regions"]["hualien_north"]["coverage_status"],"stale")\n  self.assertEqual(r["regions"]["hualien_north"]["stations"][0]["status"],"stale")\n def test_rejects_failed_provider_payload(self):
+ def test_stale_observation_is_not_marked_current(self):
+  r=build_snapshot(self.input,self.mapping,"2026-11-09T15:00:00+08:00")
+  self.assertEqual(r["regions"]["hualien_north"]["coverage_status"],"stale")
+  self.assertEqual(r["regions"]["hualien_north"]["stations"][0]["status"],"stale")
+ def test_rejects_failed_provider_payload(self):
   (self.input/"O-B0075-001.json").write_text(json.dumps({"Success":"false","Records":{}}),encoding="utf-8")
   with self.assertRaises(ValueError):build_snapshot(self.input,self.mapping,"2026-11-09T12:00:00+08:00")
  def test_rejects_timezone_naive_as_of(self):
