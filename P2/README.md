@@ -246,13 +246,15 @@ python P2/species/environment_match_engine.py \
 - L018：天竺舵魚台東三仙台標本 FRIP21798（2007-01-02，底刺網），只證明曾出現。
 - L019：瓜子鱲花蓮東堤標本 FRIP22025（竿釣），只證明曾出現。
 
-L015–L017 的用途為 context_only_taxonomic_database；L018–L019 的用途為 occurrence_only_no_environment_response。任何一筆都不會自動轉成環境反應規則或活動分數。
+L015–L017 的用途為 context_only_taxonomic_database；L019–L020 的用途為 occurrence_only_no_environment_response；L018 因典藏欄位衝突暫列 occurrence_record_conflict_requires_reconciliation。任何一筆都不會自動轉成環境反應規則或活動分數。
 
 資料來源：
 - 瓜子鱲：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381912-fishdb
 - 南方舵魚：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381913-fishdb
 - 天竺舵魚：臺灣魚類資料庫 https://fishdb.sinica.edu.tw/taxon/381914-fishdb
 - 台東三仙台天竺舵魚標本 FRIP21798：https://fishdb.sinica.edu.tw/chi/specimendetail.php?id=FRIP21798
+- FRIP21798 交叉典藏 ASIZP0802636：https://fishdb.sinica.edu.tw/muse/digi_object/61f77d718847328c7d2424f6381a8891
+- 台東三仙台南方舵魚標本 ASIZP0805860：https://fishdb.sinica.edu.tw/muse/digi_object/6149599f37ab67e61a6983029a1734b4
 - 花蓮東堤瓜子鱲標本 FRIP22025：https://www.tfrin.gov.tw/theme_data.php?id=1395&sub_theme=kuroshio&theme=collection
 
 CI 會重建 70 列矩陣並逐位元比對；測試確認南方舵魚文獻不再掛在白毛俗名群組，且兩種舵魚各自保有物種級候選紀錄。
