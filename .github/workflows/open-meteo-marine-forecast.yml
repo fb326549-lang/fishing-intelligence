@@ -102,7 +102,6 @@ jobs:
           python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}" "${ecology_args[@]}"
 
       - name: Archive hourly forecasts and build retrospective forecast verification
-        if: github.event_name != 'pull_request'
         run: |
           latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
           test -n "$latest_dir"
