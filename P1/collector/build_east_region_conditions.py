@@ -74,6 +74,10 @@ def main():
     p.add_argument("--mapping", default="P1/stations/east_region_station_mapping.csv")
     p.add_argument("--stations", default="output/cwa_stations/stations.csv")
     p.add_argument("--out", default="output/east_region")
+    p.add_argument(
+        "--historical", action="store_true",
+        help="Aggregate rolling historical observations without applying today's live station status."
+    )
     a = p.parse_args()
     observations, mapping = read_csv(a.input), read_csv(a.mapping)
     inventory_rows = read_csv(a.stations) if Path(a.stations).exists() else []
@@ -93,6 +97,10 @@ def main():
     inactive_or_unknown = set()
 
     def station_allows(sid, source_field):
+        if a.historical:
+            # Current station/element metadata must not erase valid records
+            # from a previous period when a station was still transmitting.
+            return True
         meta = inventory.get(sid)
         if not meta:
             return True  # Do not silently discard if inventory metadata is absent.
@@ -122,7 +130,7 @@ def main():
         if not timestamp:
             continue
         meta = inventory.get(sid)
-        if meta and parse_status(meta.get("station_status")) != 1:
+        if not a.historical and meta and parse_status(meta.get("station_status")) != 1:
             inactive_or_unknown.add(sid)
             continue
         active_region_stations[region].add(sid)
@@ -142,7 +150,7 @@ def main():
         row = {
             "region_id": region, "region_name": REGIONS[region],
             "valid_time": timestamp, "source": "CWA",
-            "data_kind": "observed",
+            "data_kind": "observed_historical_window" if a.historical else "observed",
             "stations_reporting_any_data": len(station_observed_rows[(region, timestamp)]),
         }
         for name in VARIABLES:
@@ -171,22 +179,30 @@ def main():
             # Denominator includes only mapped stations whose live metadata says
             # they are transmitting and that advertise this specific element.
             eligible = set()
-            for sid in mapped_ids:
-                meta = inventory.get(sid)
-                if not meta or parse_status(meta.get("station_status")) != 1:
-                    continue
-                props = parse_properties(meta.get("observed_properties"))
-                prop = source
-                if source.startswith("PrimaryAnemometer_"):
-                    prop = source.replace("PrimaryAnemometer_", "")
-                if source.startswith("SeaCurrent_"):
-                    prop = source.replace("SeaCurrent_", "")
-                if parse_status(props.get(prop)) == 1:
-                    eligible.add(sid)
+            if a.historical:
+                # For historical windows the live inventory is not a valid
+                # denominator; use all explicitly mapped stations.
+                eligible = set(mapped_ids)
+                denominator_basis = "all_mapped_stations_in_region"
+            else:
+                for sid in mapped_ids:
+                    meta = inventory.get(sid)
+                    if not meta or parse_status(meta.get("station_status")) != 1:
+                        continue
+                    props = parse_properties(meta.get("observed_properties"))
+                    prop = source
+                    if source.startswith("PrimaryAnemometer_"):
+                        prop = source.replace("PrimaryAnemometer_", "")
+                    if source.startswith("SeaCurrent_"):
+                        prop = source.replace("SeaCurrent_", "")
+                    if parse_status(props.get(prop)) == 1:
+                        eligible.add(sid)
+                denominator_basis = "currently_active_stations_advertising_element"
             reporting = bucket_station_values[(region, latest_time)].get(var, set()) if latest_time else set()
             coverage[var] = {
                 "label": label, "unit": unit,
-                "eligible_active_stations": len(eligible),
+                "eligible_stations": len(eligible),
+                "coverage_denominator_basis": denominator_basis,
                 "stations_with_data_latest_time": len(reporting),
                 "coverage_ratio": round(len(reporting) / len(eligible), 3) if eligible else None,
                 "status": "available" if reporting else ("not_reported" if eligible else "no_eligible_station"),
@@ -194,16 +210,19 @@ def main():
         summaries.append({
             "region_id": region, "region_name": name,
             "mapped_station_count": len(mapped_ids),
-            "active_stations_with_observations": len(active_ids),
+            "stations_with_observations": len(active_ids),
             "latest_observation_time": latest_time,
             "latest_values": {v: latest.get(v) for v in VARIABLES} if latest else {},
             "variable_coverage": coverage,
-            "status": "observed" if active_ids else "no_mapped_station_observations",
+            "status": ("observed_historical_window" if a.historical else "observed") if active_ids else "no_mapped_station_observations",
         })
 
     report = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "source_dataset": "CWA O-B0075-001", "data_kind": "observed",
+        "source_datasets": sorted({r.get("dataset_id", "unknown") for r in observations}),
+        "data_kind": "observed_historical_window" if a.historical else "observed",
+        "temporal_scope": "rolling_30_day" if a.historical else "rolling_48_hour",
+        "station_status_filter": "not_applied_to_historical_records" if a.historical else "current_live_station_and_element_metadata",
         "region_definition": "P1 planning mapping; not official CWA marine zones",
         "input_observation_rows": len(observations),
         "mapped_station_ids": sorted({r.get("station_id") for r in observations} & set(station_region)),
@@ -214,7 +233,7 @@ def main():
         "limitations": [
             "Only mapped CWA in-situ observations are included.",
             "Missing values remain null; no zero-fill or interpolation.",
-            "Coverage denominator uses live station and element status where available.",
+            ("Historical mode intentionally ignores today's live station status; use this output as a 30-day historical context, not a live-availability report." if a.historical else "Coverage denominator uses live station and element status where available."),
             "Latest available observation is not a forecast.",
             "Direction values use circular means; direction is undefined when vector components cancel.",
             "Sea-current values currently represent the provider's first reported layer; layer number is retained in normalized source CSV.",
@@ -227,7 +246,7 @@ def main():
     print("Input rows:", len(observations), "mapped stations:", len(report["mapped_station_ids"]),
           "unmapped IDs:", len(unmapped), "inactive mapped:", len(inactive_or_unknown))
     for region in summaries:
-        print(region["region_name"], "active stations", region["active_stations_with_observations"],
+        print(region["region_name"], "stations with observations", region["stations_with_observations"],
               "latest", region["latest_observation_time"] or "no data")
 
 if __name__ == "__main__":

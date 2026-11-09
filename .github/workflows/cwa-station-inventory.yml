@@ -9,6 +9,9 @@ on:
       - p1-foundation
     paths:
       - 'P1/collector/fetch_cwa_tide_forecast.py'
+      - 'P1/collector/fetch_cwa_marine.py'
+      - 'P1/collector/normalize_cwa_marine.py'
+      - 'P1/collector/build_east_region_conditions.py'
       - 'P1/collector/build_cwa_regional_tide_forecast.py'
       - 'P1/collector/compare_cwa_tide_observed_forecast.py'
       - 'P1/collector/archive_cwa_tide_history.py'
@@ -61,6 +64,7 @@ jobs:
           python P1/collector/fetch_cwa_marine.py --out output/cwa_marine
           python P1/collector/normalize_cwa_marine.py --input output/cwa_marine --stations output/cwa_stations/stations.csv --out output/normalized
           python P1/collector/build_east_region_conditions.py --input output/normalized/O-B0075-001.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/cwa_stations/stations.csv --out output/east_region
+          python P1/collector/build_east_region_conditions.py --input output/normalized/O-B0075-002.csv --mapping P1/stations/east_region_station_mapping.csv --stations output/cwa_stations/stations.csv --out output/east_region_30d --historical
           python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
           python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
           python P1/collector/compare_cwa_tide_observed_forecast.py --observations output/normalized/O-B0075-001.csv --forecasts output/cwa_tides/regional_tide_forecast.csv --pairing P1/stations/cwa_tide_observation_forecast_pairing.csv --out output/cwa_tides/tide_observed_forecast_comparison.csv
@@ -105,6 +109,7 @@ jobs:
             output/cwa_marine/
             output/normalized/
             output/east_region/
+            output/east_region_30d/
             output/cwa_tides/
           if-no-files-found: warn
           retention-days: 3
