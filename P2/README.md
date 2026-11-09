@@ -506,3 +506,30 @@ python -m unittest P2.test_fishing_logs -v
 ```
 
 目前資料契約只驗證紀錄完整性與 session/catch 關聯，不會推論魚種活動分數、環境偏好或中魚率。下一步才建立環境快照配對器，並以「每次出勤」為樣本單位，避免把同一次出勤的多尾魚當成多次獨立成功樣本。
+
+
+## P2.4.7 CWA 高低潮事件推導逐時潮汐階段
+
+Open-Meteo 工作流程新增 CWA F-A0021-001 高低潮預報事件蒐集，使用明確審查的 `P1/stations/cwa_tide_region_mapping.csv` 將預報地點對應到六區，再由 `build_hourly_environment_records.py --cwa-tide-forecast-csv` 為逐時 forecast record 建立 `tide_phase` 與 `tide_turning`。
+
+推導規則：
+- 只使用同一 CWA 地點前後相鄰的官方滿潮/乾潮預報事件；乾潮→滿潮為 rising，滿潮→乾潮為 falling。
+- 距離最近高/低潮事件 30 分鐘內，標記 high_slack / low_slack 及 `tide_turning=true`，表示預報轉折時間窗，不代表實測潮流已停流。
+- 同一區域所有已映射預報地點必須得到相同階段；若地點間相位不同、缺少前後事件或事件資料不完整，整區階段保持 null，不以平均或最近點代替。
+- 只在 forecast records 加入預報潮勢；不回填歷史 observation，避免以事後取得的預報版本造成時間洩漏。
+- 不插值潮位高度、不推算潮流速度；`tide_height_m`、`tidal_current_velocity_ms` 仍保持各自獨立欄位與缺值。
+- `source_records` 保留 CWA F-A0021-001 來源；品質旗標明示潮勢是由預報高低潮事件推導，並非實測潮流或流速。
+
+執行：
+```bash
+python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
+python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
+python P2/collector/build_hourly_environment_records.py \
+  --forecast-csv output/open_meteo/RUN_ID/environmental_forecast.csv \
+  --forecast-dir output/open_meteo/RUN_ID \
+  --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl \
+  --cwa-tide-forecast-csv output/cwa_tides/regional_tide_forecast.csv \
+  --out output/p2/hourly_environment.jsonl
+```
+
+測試涵蓋漲/退潮方向、高潮/低潮轉折時間窗、事件未涵蓋時段、不同地點相位不一致、來源可追溯，以及潮位/潮流不被虛構。潮汐階段只是水文上下文，不是任何魚種的偏好或中魚率。
