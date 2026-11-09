@@ -139,6 +139,34 @@ def build_verification(archive_root, minimum_pairs=5):
                 }
         unique_valid_hours = {(p["region_id"], p["valid_time_utc"]) for p in pairs}
         enough = len(unique_valid_hours) >= minimum_pairs
+        regional = {}
+        for region_id in sorted({p["region_id"] for p in pairs}):
+            region_pairs = [p for p in pairs if p["region_id"] == region_id]
+            region_errors = [p["absolute_error"] for p in region_pairs]
+            region_signed = [p["signed_error"] for p in region_pairs]
+            region_hours = {p["valid_time_utc"] for p in region_pairs}
+            region_bands = {}
+            for _, _, label in LEAD_BANDS:
+                selected = [p for p in region_pairs if p["lead_band"] == label]
+                if selected:
+                    selected_hours = {p["valid_time_utc"] for p in selected}
+                    selected_errors = [p["absolute_error"] for p in selected]
+                    region_bands[label] = {
+                        "forecast_vintage_pair_count": len(selected),
+                        "unique_valid_hours": len(selected_hours),
+                        "status": "exploratory_metrics" if len(selected_hours) >= minimum_pairs else "insufficient_sample",
+                        "mae": round(sum(selected_errors) / len(selected_errors), 4),
+                    }
+            regional_enough = len(region_hours) >= minimum_pairs
+            regional[region_id] = {
+                "forecast_vintage_pair_count": len(region_pairs),
+                "unique_valid_hours": len(region_hours),
+                "status": "exploratory_metrics" if regional_enough else "insufficient_sample",
+                "mae": round(sum(region_errors) / len(region_errors), 4) if region_errors else None,
+                "rmse": round(math.sqrt(sum(x*x for x in region_errors) / len(region_errors)), 4) if region_errors else None,
+                "mean_bias": round(sum(region_signed) / len(region_signed), 4) if region_signed else None,
+                "lead_bands": region_bands,
+            }
         summaries[metric] = {
             "sample_count": len(errors),
             "forecast_vintage_pair_count": len(errors),
@@ -147,6 +175,8 @@ def build_verification(archive_root, minimum_pairs=5):
             "mae": round(sum(errors) / len(errors), 4) if errors else None,
             "rmse": round(math.sqrt(sum(x*x for x in errors) / len(errors)), 4) if errors else None,
             "mean_bias": round(sum(signed) / len(signed), 4) if signed else None,
+            "regions_with_exploratory_metrics": sum(item["status"] == "exploratory_metrics" for item in regional.values()),
+            "regional": regional,
             "lead_bands": bands,
         }
     matched_variable_pairs = sum(item["sample_count"] for item in summaries.values())

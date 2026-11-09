@@ -70,6 +70,26 @@ class ForecastSkillTests(unittest.TestCase):
             self.assertEqual(wave["status"],"exploratory_metrics")
             self.assertEqual(result["minimum_unique_region_valid_hours_for_exploratory_metrics"],2)
 
+    def test_regional_skill_metrics_are_separated_and_sample_gated(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            rows=[]
+            for region, forecast_height in (("yilan_suao",2.0),("taitung_south",3.0)):
+                for hour in range(12,17):
+                    valid=f"2026-11-09T{hour:02d}:00:00+08:00"
+                    observed_at=f"2026-11-09T{hour+1:02d}:00:00+08:00"
+                    rows.append(self.row("observation",valid,observed_at,region=region,env={"wave_height_m":1.0}))
+                    rows.append(self.row("forecast",valid,"2026-11-09T06:00:00+08:00",region=region,env={"wave_height_m":forecast_height}))
+            self.write_rows(root,rows)
+            result=build_verification(root,minimum_pairs=5)
+            wave=result["variables"]["wave_height_m"]
+            self.assertEqual(wave["regions_with_exploratory_metrics"],2)
+            self.assertEqual(wave["regional"]["yilan_suao"]["unique_valid_hours"],5)
+            self.assertEqual(wave["regional"]["yilan_suao"]["status"],"exploratory_metrics")
+            self.assertAlmostEqual(wave["regional"]["yilan_suao"]["mae"],1.0)
+            self.assertEqual(wave["regional"]["taitung_south"]["unique_valid_hours"],5)
+            self.assertAlmostEqual(wave["regional"]["taitung_south"]["mae"],2.0)
+
     def test_equivalent_timezone_offsets_count_as_one_region_valid_hour(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
