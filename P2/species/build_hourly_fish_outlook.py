@@ -106,6 +106,7 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                 else:
                     env_status="environment_match_summary_available"
                 evidence_ids=sorted({x for r in joined for x in r.get("activity_evidence_ids","").split(";") if x})
+                occurrence_ids=sorted({x for r in joined for x in r.get("occurrence_evidence_ids","").split(";") if x})
                 seasonal_ids=sorted({x for r in joined for x in r.get("seasonal_evidence_ids","").split(";") if x})
                 output.append({
                     "candidate_id":cid,"common_name_zh":candidate.get("common_name_zh",""),
@@ -127,7 +128,10 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                     "environment_match_min":f"{min(scores):.2f}" if scores else "",
                     "environment_match_max":f"{max(scores):.2f}" if scores else "",
                     "activity_evidence_status":activity_status,
-                    "activity_evidence_ids":";".join(evidence_ids),"seasonal_evidence_ids":";".join(seasonal_ids),
+                    "activity_evidence_ids":";".join(evidence_ids),
+                    "occurrence_evidence_count":str(len(occurrence_ids)),
+                    "occurrence_evidence_ids":";".join(occurrence_ids),
+                    "seasonal_evidence_ids":";".join(seasonal_ids),
                     "activity_score":"","catch_probability":"","best_fishing_window_status":"not_established",
                     "interpretation":"forecast_environment_summary_not_fish_activity_or_catch_probability",
                 })
@@ -149,7 +153,7 @@ def main():
         "tide_phase_known_hour_count","tide_phase_missing_hour_count","tide_phase_missing_forecast_hour_count",
         "tide_phase_coverage","tide_turning_hour_count","environment_match_hour_count",
         "environment_match_status","environment_match_mean","environment_match_min","environment_match_max",
-        "activity_evidence_status","activity_evidence_ids","seasonal_evidence_ids","activity_score",
+        "activity_evidence_status","activity_evidence_ids","occurrence_evidence_count","occurrence_evidence_ids","seasonal_evidence_ids","activity_score",
         "catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
