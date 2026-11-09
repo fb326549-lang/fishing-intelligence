@@ -486,7 +486,7 @@ function renderForecastCoverage(){
  const data=latest.forecastCoverage;if(!data)return;
  const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  const status={forecast_and_observation_present:'預報與實測均有資料',forecast_only_observation_unavailable_by_design:'僅預報；本區無 CWA 海象測站',forecast_only_observation_missing:'有預報；實測資料缺漏',observation_only_forecast_missing:'有實測；預報資料缺漏',no_data:'預報與實測均無資料'};
- $('forecastCoverageStatus').textContent='涵蓋 '+String(data.expected_region_count??0)+' 區｜預報完整區域 '+String(data.all_regions_with_expected_forecasts?'全部':'未全部')+'｜應有實測區域 '+String(data.regions_with_forecast_and_observation??0)+' 區有資料';
+ $('forecastCoverageStatus').textContent='涵蓋 '+String(data.expected_region_count??0)+' 區｜預報完整區域 '+String(data.all_expected_regions_have_forecasts?'全部':'未全部')+'｜應有實測區域 '+String(data.regions_with_forecast_and_observation??0)+' 區有資料';
  $('forecastCoverageRegions').innerHTML=(data.regions||[]).map(r=>'<div><strong>'+escapeP2Text(names[r.region_id]||r.region_id)+'</strong>：'+escapeP2Text(status[r.status]||r.status)+'｜預報 '+String(r.forecast?.unique_valid_hours??0)+' 有效時刻／'+String(r.forecast?.record_count??0)+' 筆｜實測 '+String(r.observation?.unique_valid_hours??0)+' 有效時刻／'+String(r.observation?.record_count??0)+' 筆</div>').join('');
 }
 async function loadForecastCoverage(){
