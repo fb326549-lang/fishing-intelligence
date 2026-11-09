@@ -388,3 +388,40 @@ python -m unittest P2.test_tide_current_context -v
 - Cowx et al. (1998), `https://agris.fao.org/search/en/records/65e00de37c7033e84bf001c6`
 
 驗收限制：此階段完成的是水文欄位上下文與外部/西部研究證據整理，不代表魚種潮汐反應模型已可預測。未來要升格為東部活動反應，必須有物種鑑定、精確釣點/觀察位置、有效時間、潮位與實測潮流、方法/努力量及中魚與未中魚紀錄，並先做跨日期/釣點驗證。
+
+
+## P2.4.5 環境適合度 × 活動證據整合（不虛構活性分數）
+
+新增：
+- `species/integrate_environment_and_activity.py`：以 candidate × region × valid_time 為鍵，整合 P2.3 環境適合度結果、活動證據及季節證據。
+- `schema/integrated_hourly_fish_assessment.schema.json`：整合結果契約。
+- `test_integrated_activity.py`：驗證活動分數/中魚機率不會由 context-only 文獻自動產生，物種鑑定 gate 不會被繞過，缺少環境適合度結果與重複鍵會明確處理。
+
+執行順序：
+```bash
+python P2/species/environment_match_engine.py \\
+  --environment-jsonl output/p2/hourly_environment.jsonl \\
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \\
+  --rules-csv P2/species/environment_response_rules_template.csv \\
+  --out output/p2/environment_match_scores.csv
+
+python P2/species/integrate_environment_and_activity.py \\
+  --environment-jsonl output/p2/hourly_environment.jsonl \\
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \\
+  --environment-match-csv output/p2/environment_match_scores.csv \\
+  --activity-csv P2/species/species_activity_evidence_register.csv \\
+  --seasonal-csv P2/species/species_seasonal_activity_register.csv \\
+  --out output/p2/integrated_hourly_fish_assessment.csv
+
+python -m unittest P2.test_integrated_activity -v
+```
+
+輸出將環境適合度與活動證據分欄：
+- `environment_match_status / environment_match_score`：只來自 P2.3 已審查的環境反應規則。
+- `activity_evidence_status`：區分物種/分布 gate、只有背景證據、缺乏東部活動證據、或直接證據尚待規則審查。
+- `activity_evidence_count / seasonal_evidence_count`：顯示可追溯的背景研究數量及 ID。
+- `activity_score`、`catch_probability` 保持空白；`best_fishing_window_status=not_established`。
+
+即使環境適合度已有分數，也不代表魚當下活躍或容易咬餌。外地研究、幼魚行為、繁殖/群聚背景、圈養攝食、物種資料庫概述及西台灣漁業模型，均不能自動升格成東部逐時活動規則。白毛屬群組、黑毛俗名待鑑種及分布衝突候選仍依既有 gate 阻擋。
+
+此階段完成資料整合介面與證據閘門，並未完成可預測的魚種活性模型；真正的活動分數仍須等待台灣東部物種級、具時間戳且包含觀察努力/未觀察到魚的直接資料與正式審查。

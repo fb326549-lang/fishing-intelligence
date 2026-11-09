@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/integrated_hourly_fish_assessment.schema.json",
+  "title": "Integrated hourly environmental match and activity evidence assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidate_id",
+    "common_name_zh",
+    "scientific_name",
+    "region_id",
+    "valid_time",
+    "data_type",
+    "taxon_gate",
+    "environment_match_status",
+    "environment_match_score",
+    "environment_rule_coverage",
+    "activity_evidence_status",
+    "activity_evidence_count",
+    "seasonal_evidence_count",
+    "activity_evidence_ids",
+    "seasonal_evidence_ids",
+    "activity_reason",
+    "activity_score",
+    "catch_probability",
+    "best_fishing_window_status",
+    "interpretation"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "common_name_zh": {
+      "type": "string"
+    },
+    "scientific_name": {
+      "type": "string"
+    },
+    "region_id": {
+      "type": "string"
+    },
+    "valid_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_type": {
+      "enum": [
+        "forecast",
+        "observation",
+        "hindcast",
+        "derived"
+      ]
+    },
+    "taxon_gate": {
+      "type": "string"
+    },
+    "environment_match_status": {
+      "type": "string"
+    },
+    "environment_match_score": {
+      "type": "string"
+    },
+    "environment_rule_coverage": {
+      "type": "string"
+    },
+    "activity_evidence_status": {
+      "enum": [
+        "taxon_or_distribution_gate",
+        "context_only_evidence_available",
+        "insufficient_east_taiwan_activity_evidence",
+        "direct_evidence_requires_activity_rule_review"
+      ]
+    },
+    "activity_evidence_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "seasonal_evidence_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "activity_evidence_ids": {
+      "type": "string"
+    },
+    "seasonal_evidence_ids": {
+      "type": "string"
+    },
+    "activity_reason": {
+      "type": "string"
+    },
+    "activity_score": {
+      "const": ""
+    },
+    "catch_probability": {
+      "const": ""
+    },
+    "best_fishing_window_status": {
+      "const": "not_established"
+    },
+    "interpretation": {
+      "const": "environment_match_is_not_fish_activity_or_catch_probability"
+    }
+  }
+}
