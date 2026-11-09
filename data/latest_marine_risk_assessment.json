@@ -2,8 +2,8 @@
   "schema_version": "1.0.0",
   "source": "CWA",
   "analysis_kind": "observed_marine_exposure_screening",
-  "generated_at": "2026-11-09T21:16:11.811576+00:00",
-  "source_snapshot_generated_at": "2026-11-09T21:16:11.786538+00:00",
+  "generated_at": "2026-11-09T22:10:16.422132+00:00",
+  "source_snapshot_generated_at": "2026-11-09T22:10:16.391814+00:00",
   "stale_after_minutes": 180,
   "threshold_policy": {
     "type": "internal_screening_only",
@@ -53,8 +53,8 @@
       "exposure_level": "high",
       "exposure_label": "高",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-10T04:00:00+08:00",
-      "observation_age_minutes": 76.2,
+      "latest_observation_time": "2026-11-10T05:00:00+08:00",
+      "observation_age_minutes": 70.3,
       "stale_after_minutes": 180,
       "station_count": 4,
       "mapped_station_count": 5,
@@ -62,7 +62,7 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 2.0,
+          "value": 1.6,
           "unit": "m",
           "level": "high",
           "label": "高",
@@ -70,19 +70,19 @@
         },
         {
           "factor": "wind_speed_ms",
-          "value": 8.8,
+          "value": 7.85,
           "unit": "m/s",
-          "level": "high",
-          "label": "高",
+          "level": "moderate",
+          "label": "中",
           "basis": "internal_screening_band_not_official_warning"
         }
       ],
       "other_observations": {
         "wave_period_s": 5.6,
-        "tide_height_m": -0.025,
+        "tide_height_m": 0.25,
         "current_speed_ms": null,
-        "wave_direction_deg": 56.0,
-        "wind_direction_deg": 349.0
+        "wave_direction_deg": 45.0,
+        "wind_direction_deg": 333.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-09T23:00:00+08:00",
@@ -115,11 +115,11 @@
       "region_id": "hualien_north",
       "region_name": "花蓮北段",
       "state": "assessed",
-      "exposure_level": "very_high",
-      "exposure_label": "極高",
+      "exposure_level": "high",
+      "exposure_label": "高",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-10T04:00:00+08:00",
-      "observation_age_minutes": 76.2,
+      "latest_observation_time": "2026-11-10T05:00:00+08:00",
+      "observation_age_minutes": 70.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
@@ -127,27 +127,27 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 2.6,
+          "value": 2.4,
           "unit": "m",
-          "level": "very_high",
-          "label": "極高",
+          "level": "high",
+          "label": "高",
           "basis": "internal_screening_band_not_official_warning"
         },
         {
           "factor": "wind_speed_ms",
-          "value": 6.85,
+          "value": 9.05,
           "unit": "m/s",
-          "level": "moderate",
-          "label": "中",
+          "level": "high",
+          "label": "高",
           "basis": "internal_screening_band_not_official_warning"
         }
       ],
       "other_observations": {
-        "wave_period_s": 6.1,
-        "tide_height_m": 0.11,
-        "current_speed_ms": 0.16,
+        "wave_period_s": 5.8,
+        "tide_height_m": 0.41,
+        "current_speed_ms": 0.1,
         "wave_direction_deg": 56.0,
-        "wind_direction_deg": 48.0
+        "wind_direction_deg": 41.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-09T23:00:00+08:00",
@@ -220,8 +220,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-10T04:00:00+08:00",
-      "observation_age_minutes": 76.2,
+      "latest_observation_time": "2026-11-10T05:00:00+08:00",
+      "observation_age_minutes": 70.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 2,
@@ -229,7 +229,7 @@
       "factors": [
         {
           "factor": "wind_speed_ms",
-          "value": 10.4,
+          "value": 9.5,
           "unit": "m/s",
           "level": "high",
           "label": "高",
@@ -238,10 +238,10 @@
       ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 0.21,
+        "tide_height_m": 0.47,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": 29.0
+        "wind_direction_deg": 26.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-09T23:00:00+08:00",
@@ -277,8 +277,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-10T04:00:00+08:00",
-      "observation_age_minutes": 76.2,
+      "latest_observation_time": "2026-11-10T05:00:00+08:00",
+      "observation_age_minutes": 70.3,
       "stale_after_minutes": 180,
       "station_count": 3,
       "mapped_station_count": 3,
@@ -286,7 +286,7 @@
       "factors": [
         {
           "factor": "wind_speed_ms",
-          "value": 3.3,
+          "value": 2.7,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -295,10 +295,10 @@
       ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 0.22,
+        "tide_height_m": 0.54,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": 356.0
+        "wind_direction_deg": 316.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-09T23:00:00+08:00",
@@ -334,8 +334,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-10T04:00:00+08:00",
-      "observation_age_minutes": 76.2,
+      "latest_observation_time": "2026-11-10T05:00:00+08:00",
+      "observation_age_minutes": 70.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
@@ -343,7 +343,7 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 2.1,
+          "value": 2.4,
           "unit": "m",
           "level": "high",
           "label": "高",
@@ -351,9 +351,9 @@
         }
       ],
       "other_observations": {
-        "wave_period_s": 6.2,
-        "tide_height_m": 0.16,
-        "current_speed_ms": 0.23,
+        "wave_period_s": 6.9,
+        "tide_height_m": 0.43,
+        "current_speed_ms": 0.29,
         "wave_direction_deg": null,
         "wind_direction_deg": null
       },
