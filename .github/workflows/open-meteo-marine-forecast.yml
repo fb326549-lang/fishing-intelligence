@@ -119,7 +119,7 @@ jobs:
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment data/forecast_verification/latest.json data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
+          git -C p2-history-data add data/hourly_environment data/forecast_verification/latest.json data/forecast_verification/environment_coverage.json data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
           if git -C p2-history-data diff --cached --quiet; then
             echo "No new hourly records or outlook changes."
           else
