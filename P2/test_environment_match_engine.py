@@ -74,7 +74,7 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
         env = [{"region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","environment":{}}]
         rows = evaluate(env, self.candidates[:1], load_fixture_rules([rule()]))
         self.assertEqual(rows[0]["status"], "insufficient_environment_data")
-        self.assertEqual(rows[0]["rule_coverage"], "0")
+        self.assertEqual(rows[0]["rule_coverage"], "0.0000")
 
     def test_approved_rule_requires_review_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:
