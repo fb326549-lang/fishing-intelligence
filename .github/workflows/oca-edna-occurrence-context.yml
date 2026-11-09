@@ -84,7 +84,7 @@ jobs:
           if latest_path.exists():
               latest = json.loads(latest_path.read_text(encoding="utf-8"))
               latest["edna_occurrence_context"] = context
-              latest_path.write_text(json.dumps(latest, ensure_ascii=False, separators=(",", ":")) + "\\n", encoding="utf-8")
+              latest_path.write_text(json.dumps(latest, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
           PY
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
