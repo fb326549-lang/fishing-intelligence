@@ -63,6 +63,7 @@ jobs:
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
           python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
+          python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
 
       - name: Commit append-only P2 hourly history
         run: |
