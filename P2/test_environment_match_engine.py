@@ -62,7 +62,35 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
             self.assertEqual(rabbit["status"], "scored")
             self.assertEqual(rabbit["environment_match_score"], "85.00")
             self.assertEqual(rabbit["rule_coverage"], "1.0000")
+            self.assertEqual(rabbit["rules_matched"], "1")
+            self.assertEqual(rabbit["rules_evaluated"], "1")
             self.assertEqual(rabbit["interpretation"], "environment_match_only_not_fish_activity_or_catch_probability")
+
+    def test_non_matching_environment_value_contributes_zero(self):
+        env = [{
+            "region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00",
+            "environment":{"sea_surface_temperature_c":32}
+        }]
+        rows = evaluate(env, self.candidates[:1], load_fixture_rules([rule()]))
+        self.assertEqual(rows[0]["environment_match_score"], "0.00")
+        self.assertEqual(rows[0]["rules_matched"], "0")
+        self.assertEqual(rows[0]["rules_evaluated"], "1")
+
+    def test_weighted_score_uses_match_result_for_each_rule(self):
+        env = [{
+            "region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00",
+            "environment":{"sea_surface_temperature_c":24,"wind_speed_10m_ms":3}
+        }]
+        rules = [
+            rule(weight="2"),
+            rule(rule_id="R2",environment_field="wind_speed_10m_ms",operator="at_least",
+                 minimum="5",maximum="",match_score="70",weight="1")
+        ]
+        rows = evaluate(env, self.candidates[:1], load_fixture_rules(rules))
+        self.assertEqual(rows[0]["environment_match_score"], "56.67")
+        self.assertEqual(rows[0]["rules_matched"], "1")
+        self.assertEqual(rows[0]["rules_evaluated"], "2")
+        self.assertEqual(rows[0]["rule_coverage"], "1.0000")
 
     def test_taxonomy_gate_prevents_scoring(self):
         rows = evaluate(self.environment, self.candidates, load_fixture_rules([rule()]))
@@ -75,6 +103,7 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
         rows = evaluate(env, self.candidates[:1], load_fixture_rules([rule()]))
         self.assertEqual(rows[0]["status"], "insufficient_environment_data")
         self.assertEqual(rows[0]["rule_coverage"], "0.0000")
+        self.assertEqual(rows[0]["rules_evaluated"], "0")
 
     def test_approved_rule_requires_review_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:
