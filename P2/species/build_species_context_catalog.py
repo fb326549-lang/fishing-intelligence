@@ -35,7 +35,7 @@ def read_csv(path: Path):
     with path.open(encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
 
-def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path):
+def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path, occurrence_path: Path | None = None):
     candidates = {r["candidate_id"]: r for r in read_csv(candidates_path)}
     evidence = {r["evidence_id"]: r for r in read_csv(evidence_path) if r.get("evidence_id")}
     with ecology_path.open(encoding="utf-8-sig", newline="") as handle:
@@ -75,13 +75,56 @@ def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path
             "limitations": row.get("limitations", ""),
         })
     records.sort(key=lambda r: (r["candidate_id"], r["category"], r["parameter_code"], r["ecology_record_id"]))
+    occurrence_path = occurrence_path or Path(__file__).with_name("species_regional_occurrence_register.csv")
+    occurrence_records = []
+    if occurrence_path.exists():
+        required_occurrence = {
+            "regional_occurrence_id", "candidate_id", "taxon_scientific_name", "site_name",
+            "region_id", "visit_number", "recorded_presence", "study_year",
+            "study_scope", "source_name", "source_url", "model_use_status", "limitations",
+        }
+        occurrence_rows = read_csv(occurrence_path)
+        with occurrence_path.open(encoding="utf-8-sig", newline="") as handle:
+            missing = required_occurrence - set(csv.DictReader(handle).fieldnames or [])
+        if missing:
+            raise ValueError("regional occurrence register missing fields: " + ", ".join(sorted(missing)))
+        for row in occurrence_rows:
+            cid = row.get("candidate_id", "").strip()
+            if cid not in candidates:
+                raise ValueError(f"unknown candidate_id {cid!r} in {row.get('regional_occurrence_id')}")
+            if not row.get("source_url", "").startswith(("https://", "http://")):
+                raise ValueError(f"missing traceable source URL for {row.get('regional_occurrence_id')}")
+            if not row.get("model_use_status", "").strip() or not row.get("limitations", "").strip():
+                raise ValueError(f"missing usage policy or limitations for {row.get('regional_occurrence_id')}")
+            occurrence_records.append({
+                "regional_occurrence_id": row.get("regional_occurrence_id", ""),
+                "candidate_id": cid,
+                "common_name_zh": candidates[cid].get("common_name_zh", ""),
+                "scientific_name": row.get("taxon_scientific_name", ""),
+                "site_code": row.get("site_code", ""),
+                "site_name": row.get("site_name", ""),
+                "region_id": row.get("region_id", ""),
+                "visit_number": row.get("visit_number", ""),
+                "recorded_presence": row.get("recorded_presence", ""),
+                "study_year": row.get("study_year", ""),
+                "study_scope": row.get("study_scope", ""),
+                "method": row.get("method", ""),
+                "source_name": row.get("source_name", ""),
+                "source_url": row.get("source_url", ""),
+                "confidence": row.get("confidence", ""),
+                "model_use_status": row.get("model_use_status", ""),
+                "limitations": row.get("limitations", ""),
+            })
+        occurrence_records.sort(key=lambda r: (r["candidate_id"], r["region_id"], r["site_code"], r["visit_number"]))
     return {
         "schema_version": 1,
-        "source": "P1 evidence-linked species ecology register",
+        "source": "P1 evidence-linked ecology plus P2 East Coast regional occurrence context",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "interpretation": "Species-level natural-history context only; not current presence, local fish abundance, fishing-depth advice, activity score, catch probability, or best fishing time.",
         "record_count": len(records),
         "records": records,
+        "regional_occurrence_records": occurrence_records,
+        "regional_occurrence_record_count": len(occurrence_records),
     }
 
 def main():
@@ -89,9 +132,10 @@ def main():
     parser.add_argument("--candidates", type=Path, required=True)
     parser.add_argument("--ecology", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--regional-occurrence-csv", type=Path, default=Path(__file__).with_name("species_regional_occurrence_register.csv"))
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    payload = build_catalog(args.candidates, args.ecology, args.evidence)
+    payload = build_catalog(args.candidates, args.ecology, args.evidence, args.regional_occurrence_csv)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print(f"Built {payload['record_count']} traceable species ecology context records; no fishing scores inferred.")
