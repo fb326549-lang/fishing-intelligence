@@ -75,9 +75,20 @@ jobs:
         run: |
           cp output/oca_edna_context/edna_candidate_region_context.json p2-history-data/data/edna_candidate_region_context.json
           cp output/oca_edna_context/manifest.json p2-history-data/data/edna_occurrence_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          history = Path("p2-history-data/data")
+          context = json.loads((history / "edna_candidate_region_context.json").read_text(encoding="utf-8"))
+          latest_path = history / "latest_hourly_fish_outlook.json"
+          if latest_path.exists():
+              latest = json.loads(latest_path.read_text(encoding="utf-8"))
+              latest["edna_occurrence_context"] = context
+              latest_path.write_text(json.dumps(latest, ensure_ascii=False, separators=(",", ":")) + "\\n", encoding="utf-8")
+          PY
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/edna_candidate_region_context.json data/edna_occurrence_manifest.json
+          git -C p2-history-data add data/edna_candidate_region_context.json data/edna_occurrence_manifest.json data/latest_hourly_fish_outlook.json
           if git -C p2-history-data diff --cached --quiet; then
             echo "No changes to compact eDNA occurrence context."
           else
