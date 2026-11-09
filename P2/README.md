@@ -122,3 +122,21 @@ Open-Meteo 工作流程每 4 小時排程執行，也可手動觸發；驗證通
 python P2/collector/build_hourly_history_catalog.py \
   --archive-root p2-history-data/data
 ```
+
+
+## P2.2.1 優先魚種環境反應證據缺口矩陣
+
+`P2/species/species_response_evidence_gaps.csv` 是研究排程與證據缺口登錄，不是模型參數表。第一批包含 8 個優先候選：瓜子鱲（黑毛）、白毛（舵魚屬）、臭肚、黑鯛、條紋豆娘魚、孟加拉豆娘魚、瑪拉巴石斑及點帶石斑；每種檢視 7 個反應面向：水溫、浪況、一般海流、潮汐、風、活動時段、鹽度，共 56 列。
+
+矩陣會顯示既有生態參數代碼、證據編號及來源 URL，但不把棲地、報告深度、食性等背景描述冒充為環境反應曲線。白毛維持舵魚屬集合，必須有物種級鑑定才可建立單一物種模型；點帶石斑維持東部本島分布證據衝突的審查狀態。所有列目前均不得直接作為模型反應門檻。
+
+重建：
+```bash
+python P2/species/build_species_response_gap_matrix.py \
+  --candidates P1/species/species_candidate_register.csv \
+  --ecology P1/species/species_ecology_parameters.csv \
+  --evidence P1/species/species_evidence_register.csv \
+  --out P2/species/species_response_evidence_gaps.csv
+```
+
+CI 會重建並逐位元比對矩陣，確保候選魚種及 P1 證據更新時，研究缺口登錄可追溯更新。
