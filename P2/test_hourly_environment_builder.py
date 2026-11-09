@@ -79,6 +79,14 @@ class HourlyBuilderTests(unittest.TestCase):
             self.assertIsNone(rec["environment"]["wave_height_m"])
             self.assertIn("missing_wave_height_m", rec["quality"]["flags"])
 
+    def test_cwa_aggregate_without_dataset_is_not_mislabelled_as_one_dataset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "obs.jsonl"
+            row = {"region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","collected_at":"2026-11-09T04:30:00Z","archive_scope":"rolling_48_hour","tide_height_m":"0.2"}
+            path.write_text(json.dumps(row) + "\n", encoding="utf-8")
+            rec = build_cwa_rows(path)[0]
+            self.assertEqual(rec["source_records"][0]["dataset"], "regional-marine-aggregate")
+            self.assertEqual(rec["source_records"][0]["url"], "https://opendata.cwa.gov.tw/")
     def test_cwa_observation_keeps_tide_height_separate_from_current(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "obs.jsonl"
@@ -100,6 +108,7 @@ class HourlyBuilderTests(unittest.TestCase):
             self.assertEqual(env["ocean_current_velocity_ms"], 0.31)
             self.assertNotIn("tidal_current_velocity_ms", env)
             self.assertEqual(rec["data_type"], "observation")
+            self.assertEqual(rec["source_records"][0]["dataset"], "O-B0075-001")
 
 if __name__ == "__main__":
     unittest.main()

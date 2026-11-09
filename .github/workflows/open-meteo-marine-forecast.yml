@@ -2,6 +2,8 @@ name: Open-Meteo marine forecast
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'
   push:
     branches:
       - p1-foundation
@@ -11,8 +13,12 @@ on:
       - 'P2/**'
       - '.github/workflows/open-meteo-marine-forecast.yml'
 
+concurrency:
+  group: p2-hourly-history-archive
+  cancel-in-progress: false
+
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   collect-forecast:
@@ -29,6 +35,12 @@ jobs:
         with:
           ref: tide-history
           path: tide-history-data
+
+      - name: Check out P2 append-only history branch
+        uses: actions/checkout@v4
+        with:
+          ref: p2-history
+          path: p2-history-data
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -49,6 +61,19 @@ jobs:
           python P1/species/build_species_environment_context.py --species-dir P1/species --regional-forecast "$latest_dir/regional_forecast_conditions_6_12_24.csv" --out "$latest_dir/species_environment_context.csv"
           python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --out "$latest_dir/hourly_environment_p2.jsonl"
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
+          python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+
+      - name: Commit append-only P2 hourly history
+        run: |
+          git -C p2-history-data config user.name "github-actions[bot]"
+          git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C p2-history-data add data/hourly_environment
+          if git -C p2-history-data diff --cached --quiet; then
+            echo "No new hourly records to archive."
+          else
+            git -C p2-history-data commit -m "Archive P2 hourly marine environment records"
+            git -C p2-history-data push origin HEAD:p2-history
+          fi
 
       - name: Upload forecast artifact
         if: always()

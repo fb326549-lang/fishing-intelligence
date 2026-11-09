@@ -169,8 +169,8 @@ def build_cwa_rows(jsonl_path: Path):
         # Current measurements are marine currents, not specifically tidal currents.
         available = sum(v is not None for v in env.values())
         archive_scope = row.get("archive_scope", "")
-        dataset = row.get("source_dataset") or ("O-B0075-002" if "30" in archive_scope else "O-B0075-001")
-        source_url = CWA_URLS[dataset]
+        dataset = row.get("source_dataset") or "regional-marine-aggregate"
+        source_url = CWA_URLS.get(dataset, "https://opendata.cwa.gov.tw/")
         output.append({
             "schema_version": "1.0.0", "region_id": region,
             "valid_time": parse_dt(valid, "Asia/Taipei").isoformat(),

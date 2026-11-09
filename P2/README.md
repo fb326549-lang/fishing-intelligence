@@ -76,3 +76,32 @@ python P2/validate_p2_data.py --species-csv P2/species/species_response_paramete
 ```
 
 目前匯入的是有來源的既有生態背景參數，不代表已經具備溫度、浪況、海流、潮汐等完整物種反應曲線。這些參數仍須逐項取得直接證據後才可新增；不會以通用生態敘述填補空白。
+
+
+## P2.1.1 逐時歷史資料保存
+
+新增 `P2/collector/archive_hourly_environment.py`，將已通過 P2 validator 的 JSONL 寫入專用 `p2-history` 分支，依有效日期分區：
+
+`data/hourly_environment/YYYY/MM/YYYY-MM-DD.jsonl`
+
+保存原則：
+- 每筆紀錄保留自己的 valid_time、collected_at、region_id、data_type 及 source_records。
+- 預報每次蒐集的 vintage 保留；同一有效小時的不同 collected_at 不會互相覆蓋。
+- CWA 實測的不同 revision 保留；forecast / observation 不會合併。
+- 以完整標準化 JSON 的 SHA-256 去重；完全相同的紀錄重跑時不會重複追加。
+- 寫檔採暫存檔後原子替換；既有歷史列不更新、不刪除。
+- 依 valid_time 的當地日期分區，保留時區資訊。
+
+執行：
+```bash
+python P2/collector/archive_hourly_environment.py \
+  --input output/p2/hourly_environment.jsonl \
+  --archive-root p2-history-data/data
+```
+
+Open-Meteo 工作流程每 4 小時排程執行，也可手動觸發；驗證通過後才追加歷史資料。使用 workflow concurrency 避免同時寫入造成競爭。GitHub Actions 使用 repository contents write 權限提交至 `p2-history`。
+
+資料路徑範例：
+`https://github.com/fb326549-lang/fishing-intelligence/tree/p2-history/data/hourly_environment`
+
+此為 Git 歷史資料保存，不等於資料庫服務；目前不會自動清理或覆寫舊資料。後續如需查詢 API、統計或大量歷史運算，再建立索引/快取層。
