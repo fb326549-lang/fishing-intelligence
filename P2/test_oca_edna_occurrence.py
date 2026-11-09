@@ -126,7 +126,8 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
                 "station_name": "A", "depth_m": None,
             })
             summary = build_monthly_summary(detections)
-            manifest = write_outputs(Path(tmp), detections, summary, "2026-11-09T00:00:00+00:00")
+            context = build_candidate_region_context(detections)
+            manifest = write_outputs(Path(tmp), detections, summary, context, "2026-11-09T00:00:00+00:00")
             disk_manifest = json.loads((Path(tmp) / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest, disk_manifest)
             self.assertEqual(manifest["exact_candidate_record_count"], 1)
