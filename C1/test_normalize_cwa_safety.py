@@ -1,7 +1,7 @@
 import sys,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).parent/"collector"))
-from normalize_cwa_safety_sources import regions_for_area,marine_alerts,source_coverage
+from normalize_cwa_safety_sources import regions_for_area,marine_alerts,source_coverage,deduplicate_alerts
 
 def payload(station,warning,field,value):
     elements={"WarningStatus":warning,field:value}
@@ -29,6 +29,12 @@ class RegionMappingTests(unittest.TestCase):
   self.assertFalse(coverage["hualien_south"])
   self.assertFalse(coverage["fengbin_shitiping"])
   self.assertTrue(coverage["hualien_north"])
+ def test_duplicate_feed_entries_merge_regions(self):
+  base={"alert_type":"strong_wind_land","effective_start":"2026-11-09T16:00:00+08:00","effective_end":"2026-11-10T20:00:00+08:00","status":"active","region_ids":["yilan_suao"],"severity":"moderate","message":"陸上強風","affected_area":"宜蘭縣"}
+  second=dict(base);second["region_ids"]=["hualien_north"];second["message"]="陸上強風影響花蓮縣"
+  merged=deduplicate_alerts([base,second])
+  self.assertEqual(len(merged),1)
+  self.assertEqual(merged[0]["region_ids"],["hualien_north","yilan_suao"])
  def test_large_tide_monitor_uses_o_b0069(self):
   p=payload("成功","超過大潮注意值","MaximumTideHeight","1.4")
   alerts,covered=marine_alerts("O-B0069-001",p,"2026-11-09T19:20:00+08:00")
