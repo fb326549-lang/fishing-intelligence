@@ -107,6 +107,6 @@ def main():
         "activity_reason","activity_score","catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
-        w=csv.DictWriter(f,fieldnames=fields,lineterminator="\\n");w.writeheader();w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=fields,lineterminator="\n");w.writeheader();w.writerows(rows)
     print(f"Integrated {len(rows)} candidate-region-hour rows; activity scores and catch probabilities remain unassigned.")
 if __name__=="__main__": main()
