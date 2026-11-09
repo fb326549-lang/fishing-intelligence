@@ -55,13 +55,16 @@ class HourlyHistoryAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "date does not match partition"):
                 audit_history(root)
 
-    def test_duplicate_records_are_rejected_even_with_rebuilt_catalog(self):
+    def test_catalog_builder_rejects_duplicate_records(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            folder = root / "hourly_environment" / "2026" / "11"
+            folder.mkdir(parents=True)
+            partition = folder / "2026-11-09.jsonl"
             row = make_record()
-            self.prepare(root, [row, row])
+            partition.write_text(json.dumps(row) + "\\n" + json.dumps(row) + "\\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "exact duplicate"):
-                audit_history(root)
+                build_catalog(root)
 
 if __name__ == "__main__":
     unittest.main()
