@@ -24,7 +24,12 @@ class RegionMappingTests(unittest.TestCase):
   self.assertEqual(covered,["chenggong_donghe","hualien_north","taitung_south","yilan_suao"])
   self.assertEqual(alerts[0]["region_ids"],["hualien_north"])
   self.assertEqual(alerts[0]["alert_type"],"long_wave")
- def test_east_monitor_coverage_does_not_invent_hualien_south_or_fengbin(self):\n  coverage=source_coverage("O-B0070-001")\n  self.assertFalse(coverage["hualien_south"]);self.assertFalse(coverage["fengbin_shitiping"])\n  self.assertTrue(coverage["hualien_north"])\n def test_large_tide_monitor_uses_o_b0069(self):
+ def test_east_monitor_coverage_does_not_invent_hualien_south_or_fengbin(self):
+  coverage=source_coverage("O-B0070-001")
+  self.assertFalse(coverage["hualien_south"])
+  self.assertFalse(coverage["fengbin_shitiping"])
+  self.assertTrue(coverage["hualien_north"])
+ def test_large_tide_monitor_uses_o_b0069(self):
   p=payload("成功","超過大潮注意值","MaximumTideHeight","1.4")
   alerts,covered=marine_alerts("O-B0069-001",p,"2026-11-09T19:20:00+08:00")
   self.assertEqual(alerts[0]["alert_type"],"large_tide")
