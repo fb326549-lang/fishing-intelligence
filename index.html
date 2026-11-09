@@ -16,7 +16,7 @@ header{position:sticky;top:0;background:#08283df2;padding:14px 16px;border-botto
 main{max-width:1000px;margin:auto;padding:14px;display:grid;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;min-width:0}.panel h2{font-size:16px;margin:0 0 12px}
 button,input,select{background:#19465e;color:var(--text);border:1px solid #39718d;border-radius:10px;padding:11px;font-size:14px}button{cursor:pointer}button:active{opacity:.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#163b51;border-radius:10px;padding:12px;min-width:0}.label{font-size:11px;color:var(--muted)}.value{font-size:21px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#map{height:330px;border-radius:12px;z-index:1}.wide{grid-column:1/-1}#settings{display:none}#settings.show{display:block}label{display:block;font-size:12px;color:var(--muted);margin-top:9px}input,select{width:100%;margin-top:5px}.notice{font-size:11px;line-height:1.5;color:var(--muted);background:#0a2333;padding:10px;border-radius:9px;margin-top:10px}.tag{display:inline-block;border:1px solid #39718d;border-radius:99px;padding:4px 8px;font-size:11px;color:#b9eafa}
-.favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
+.favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}.evidence-details{margin-top:7px;border-top:1px solid #28516a;padding-top:6px}.evidence-details summary{cursor:pointer;color:#b9eafa;font-size:12px}.evidence-item{margin-top:8px;padding:8px;background:#0e2b3e;border-radius:8px;overflow-wrap:anywhere}.evidence-item .small{margin-top:4px;line-height:1.45}.evidence-item a{color:#75d7f2}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
 </style></head>
 <body>
 <header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">台灣海域優先・智慧海釣助手</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
@@ -447,6 +447,26 @@ async function loadP2FishOutlook(){
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
 }
+function renderP2EvidenceContext(title,raw,kind){
+ let items=[];
+ try{items=JSON.parse(raw||'[]');if(!Array.isArray(items))items=[];}catch{items=[];}
+ if(!items.length)return '';
+ const rows=items.slice(0,4).map(x=>{
+  const headline=kind==='seasonal'?(x.reported_season||x.reported_pattern||'季節研究紀錄'):(x.reported_pattern||x.activity_dimension||x.evidence_kind||'證據紀錄');
+  const fields=[
+   ['研究地區',x.geographic_scope],['研究期間',x.study_period],['生命階段',x.life_stage],
+   ['樣本／方法',x.sample_size],['方法',x.method],['證據信心',x.confidence],
+   ['可轉移性',x.transferability],['模型用途',x.model_use_status],['限制',x.limitations]
+  ].filter(([,v])=>v);
+  const source=typeof x.source_url==='string'&&x.source_url.startsWith('https://')
+   ?'<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener noreferrer">查看原始來源'+(x.source_literature_id?'（'+escapeP2Text(x.source_literature_id)+'）':'')+'</a>':'';
+  return '<div class="evidence-item"><strong>'+escapeP2Text(x.id||'未編號')+'｜'+escapeP2Text(headline)+'</strong>'+
+   fields.map(([k,v])=>'<div class="small">'+k+'：'+escapeP2Text(v)+'</div>').join('')+
+   (source?'<div class="small">'+source+'</div>':'')+'</div>';
+ }).join('');
+ const more=items.length>4?'<div class="small">另有 '+(items.length-4)+' 筆，資料已保留於完整 JSON。</div>':'';
+ return '<details class="evidence-details"><summary>'+escapeP2Text(title)+'（'+items.length+' 筆）</summary>'+rows+more+'</details>';
+}
 function renderP2FishOutlook(){
  const data=latest.p2FishOutlook;
  if(!data)return;
@@ -480,9 +500,9 @@ function renderP2FishOutlook(){
   const occurrenceEvidence=Number(r.occurrence_evidence_count)||0;
   const occurrenceIds=(r.occurrence_evidence_ids||'').split(';').filter(Boolean);
   const seasonalEvidence=(r.seasonal_evidence_ids||'').split(';').filter(Boolean).length;
-  let seasonalContext=[];
-  try{seasonalContext=JSON.parse(r.seasonal_evidence_context_json||'[]');if(!Array.isArray(seasonalContext))seasonalContext=[];}catch{seasonalContext=[];}
-  const seasonalHtml=seasonalContext.length?'<div class="small">歷史季節研究背景（非即時作釣預測）：</div>'+seasonalContext.map(x=>'<div class="small">'+escapeP2Text(x.id)+'｜'+escapeP2Text(x.reported_season)+'｜'+escapeP2Text(x.geographic_scope)+'</div>').join(''):'';
+  const activityContextHtml=renderP2EvidenceContext('活動／生態研究來源（非即時咬況）',r.activity_evidence_context_json,'activity');
+  const occurrenceContextHtml=renderP2EvidenceContext('東部出現／標本紀錄（只證明曾出現）',r.occurrence_evidence_context_json,'occurrence');
+  const seasonalHtml=renderP2EvidenceContext('歷史季節研究背景（非即時作釣預測）',r.seasonal_evidence_context_json,'seasonal');
   const regionalOccurrenceRows=data.species_ecology_context&&Array.isArray(data.species_ecology_context.regional_occurrence_records)?data.species_ecology_context.regional_occurrence_records:[];
   const regionalOccurrences=regionalOccurrenceRows.filter(x=>x.candidate_id===r.candidate_id&&x.region_id===region&&x.recorded_presence==='present');
   const regionalOccurrenceHtml=regionalOccurrences.length?'<div class="small">東部海岸歷史調查出現紀錄（非即時魚況）：</div>'+regionalOccurrences.map(x=>'<div class="small">'+escapeP2Text(x.study_year)+'年｜'+escapeP2Text(x.common_name_zh||x.scientific_name)+'｜'+escapeP2Text(x.site_name)+'｜第'+escapeP2Text(x.visit_number)+'次調查有記錄'+ '｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源報告</a></div>').join(''):'';
@@ -505,7 +525,7 @@ function renderP2FishOutlook(){
   const aliasNames={c001:'瓜子鱲（黑毛俗名候選）',c002:'白毛（舵魚屬，未鑑種）',c036:'南方舵魚（白毛俗名群成員）',c037:'天竺舵魚（白毛俗名群成員）'};
   const displayName=aliasNames[r.candidate_id]||r.common_name_zh;
   const taxonNote=r.candidate_id==='c001'?'黑毛為地方俗名群，個體仍須形態鑑種；不可將所有黑毛都視為瓜子鱲。':r.candidate_id==='c002'?'白毛已對應舵魚屬俗名群，但可能包含多個物種；需鑑種後才可套用物種級規則.':'';
-  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ecologyHtml+seasonalHtml+regionalOccurrenceHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
+  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ecologyHtml+activityContextHtml+occurrenceContextHtml+seasonalHtml+regionalOccurrenceHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
  }).join(''):'<div class="small">此區域／時段沒有對應候選資料。請確認最新展望是否已涵蓋此區。</div>';
  $('p2FishFreshness').textContent='分析基準：'+(data.as_of||'未知')+'｜資料產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜來源：P2 六區逐時展望';
 }

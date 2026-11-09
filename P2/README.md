@@ -727,3 +727,8 @@ The evidence provenance fields produced by the hourly integration are carried th
 - `seasonal_evidence_context_json`: seasonal-study provenance and transferability limits.
 
 The window builder deduplicates repeated evidence IDs across forecast hours. If the same evidence ID carries conflicting metadata within one summary window, it fails rather than silently selecting one version. Empty context remains an empty JSON array. No activity score, catch probability, or best-fishing-window claim is created by exposing the metadata. Regression tests cover propagation, deduplication, conflicting metadata rejection, and publication.
+
+
+## P2.4.6 PWA evidence-source inspection
+
+The P2 outlook cards now expose expandable, source-traceable evidence sections for activity/ecology studies, East Taiwan occurrence/specimen records, and seasonal research. Each entry shows its geography, study period, life stage, method/sample context, confidence, transferability, model-use status and limitations when present, with an HTTPS source link when available. The UI keeps these evidence classes separate and explicitly labels occurrence as historical presence only; none of these sections creates an activity score, catch probability, or best-fishing-time claim. The hourly outlook schema now explicitly includes the seasonal evidence context field.

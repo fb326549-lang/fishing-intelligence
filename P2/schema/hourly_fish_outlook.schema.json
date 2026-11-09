@@ -28,7 +28,8 @@
     "best_fishing_window_status",
     "interpretation",
     "activity_evidence_context_json",
-    "occurrence_evidence_context_json"
+    "occurrence_evidence_context_json",
+    "seasonal_evidence_context_json"
   ],
   "properties": {
     "candidate_id": {
@@ -126,7 +127,11 @@
     },
     "occurrence_evidence_context_json": {
       "type": "string",
-      "description": "JSON-encoded, source-traceable evidence context array; context-only records do not create activity scores."
+      "description": "JSON-encoded, source-traceable evidence context array; occurrence-only records never become activity evidence."
+    },
+    "seasonal_evidence_context_json": {
+      "type": "string",
+      "description": "JSON-encoded seasonal context with study period, geography, source provenance, transferability and limitations."
     }
   }
 }
