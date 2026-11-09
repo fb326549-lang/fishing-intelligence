@@ -83,7 +83,7 @@ class HourlyBuilderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "obs.jsonl"
             row = {"region_id":"taitung_south","valid_time":"2026-11-09T12:00:00+08:00","collected_at":"2026-11-09T04:30:00Z","archive_scope":"rolling_48_hour","tide_height_m":"0.2"}
-            path.write_text(json.dumps(row) + "\\n", encoding="utf-8")
+            path.write_text(json.dumps(row) + "\n", encoding="utf-8")
             rec = build_cwa_rows(path)[0]
             self.assertEqual(rec["source_records"][0]["dataset"], "regional-marine-aggregate")
             self.assertEqual(rec["source_records"][0]["url"], "https://opendata.cwa.gov.tw/")
