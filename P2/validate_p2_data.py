@@ -32,11 +32,13 @@ def validate_environment(record):
             if not all(isinstance(s.get(k),str) and s[k].strip() for k in ("source_id","dataset","url")): errors.append(f"source_records[{i}] requires source_id, dataset, url")
     env=record.get("environment",{})
     if not isinstance(env,dict): errors.append("environment must be an object"); env={}
-    numeric={"wave_height_m":(0,None),"wave_period_s":(0,None),"wave_direction_deg":(0,360),"sea_surface_temperature_c":(-2,40),"ocean_current_velocity_ms":(0,None),"ocean_current_direction_deg":(0,360),"wind_speed_10m_ms":(0,None),"wind_direction_10m_deg":(0,360),"tidal_current_velocity_ms":(0,None),"tidal_current_direction_deg":(0,360),"precipitation_mm_h":(0,None)}
+    numeric={"wave_height_m":(0,None),"wave_period_s":(0,None),"wave_direction_deg":(0,360),"sea_surface_temperature_c":(-2,40),"ocean_current_velocity_ms":(0,None),"ocean_current_direction_deg":(0,360),"wind_speed_10m_ms":(0,None),"wind_direction_10m_deg":(0,360),"tidal_current_velocity_ms":(0,None),"tidal_current_direction_deg":(0,360),"precipitation_mm_h":(0,None),"showers_mm_h":(0,None),"precipitation_probability_pct":(0,100)}
     for key,(lo,hi) in numeric.items():
         v=env.get(key)
         if v is not None and (isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or (lo is not None and (v<lo if key not in ("wave_period_s",) else v<=lo)) or (hi is not None and v>=hi)):
             errors.append(f"environment.{key} has invalid value")
+    weather_code=env.get("weather_code")
+    if weather_code is not None and (isinstance(weather_code,bool) or not isinstance(weather_code,int) or weather_code<0): errors.append("environment.weather_code must be a non-negative integer or null")
     if env.get("tide_phase") not in (None,"rising","falling","high_slack","low_slack","unknown"): errors.append("invalid tide_phase")
     if env.get("thunderstorm_risk") not in (None,"none","low","moderate","high","unknown"): errors.append("invalid thunderstorm_risk")
     for key in ("tide_turning",):
