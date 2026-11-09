@@ -31,9 +31,15 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
     candidates=unique_candidates(candidate_rows)
     matches=index_matches(match_rows)
     activity_by={cid:[] for cid in candidates}
+    occurrence_by={cid:[] for cid in candidates}
     seasonal_by={cid:[] for cid in candidates}
     for row in activity_rows:
-        if row.get("candidate_id") in activity_by: activity_by[row["candidate_id"]].append(row)
+        cid=row.get("candidate_id")
+        if cid in activity_by:
+            if row.get("activity_dimension")=="occurrence_record":
+                occurrence_by[cid].append(row)
+            else:
+                activity_by[cid].append(row)
     for row in seasonal_rows:
         if row.get("candidate_id") in seasonal_by: seasonal_by[row["candidate_id"]].append(row)
     output=[]
@@ -44,6 +50,7 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
             match=matches.get((cid,region,valid,env.get("data_type","")))
             gate=candidate.get("eligibility_gate","")
             arows=activity_by[cid]
+            orows=occurrence_by[cid]
             srows=seasonal_by[cid]
             if gate!="verified_taxon":
                 activity_status="taxon_or_distribution_gate"
@@ -57,7 +64,10 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
                     activity_reason="East Taiwan direct evidence exists but no approved activity scoring rule is defined by this integration"
                 elif arows or srows:
                     activity_status="context_only_evidence_available"
-                    activity_reason="available evidence is external-region, non-target life-stage, descriptive, or otherwise context-only"
+                    activity_reason="available activity/seasonal evidence is external-region, non-target life-stage, descriptive, or otherwise context-only"
+                elif orows:
+                    activity_status="context_only_evidence_available"
+                    activity_reason="East Taiwan occurrence records confirm prior presence only; no hourly activity or catch-response inference is supported"
                 else:
                     activity_status="insufficient_east_taiwan_activity_evidence"
                     activity_reason="no traceable activity or seasonal evidence for this candidate"
@@ -74,9 +84,22 @@ def build_integrated_rows(environments,candidate_rows,match_rows,activity_rows,s
                 "environment_rule_coverage":match.get("rule_coverage","") if match else "",
                 "activity_evidence_status":activity_status,
                 "activity_evidence_count":str(len(arows)),
+                "occurrence_evidence_count":str(len(orows)),
                 "seasonal_evidence_count":str(len(srows)),
                 "activity_evidence_ids":";".join(sorted(r.get("activity_evidence_id","") for r in arows if r.get("activity_evidence_id"))),
+                "occurrence_evidence_ids":";".join(sorted(r.get("activity_evidence_id","") for r in orows if r.get("activity_evidence_id"))),
                 "seasonal_evidence_ids":";".join(sorted(r.get("seasonal_evidence_id","") for r in srows if r.get("seasonal_evidence_id"))),
+                "seasonal_evidence_context_json":json.dumps([
+                    {
+                        "id":r.get("seasonal_evidence_id",""),
+                        "reported_season":r.get("reported_season",""),
+                        "geographic_scope":r.get("geographic_scope",""),
+                        "model_use_status":r.get("model_use_status",""),
+                        "limitations":r.get("limitations",""),
+                    }
+                    for r in sorted(srows,key=lambda x:x.get("seasonal_evidence_id",""))
+                    if r.get("seasonal_evidence_id")
+                ],ensure_ascii=False,separators=(",",":")),
                 "activity_reason":activity_reason,
                 "activity_score":"",
                 "catch_probability":"",
@@ -103,7 +126,7 @@ def main():
         read_csv(a.activity_csv),read_csv(a.seasonal_csv))
     fields=["candidate_id","common_name_zh","scientific_name","region_id","valid_time","data_type","taxon_gate",
         "environment_match_status","environment_match_score","environment_rule_coverage","activity_evidence_status",
-        "activity_evidence_count","seasonal_evidence_count","activity_evidence_ids","seasonal_evidence_ids",
+        "activity_evidence_count","occurrence_evidence_count","seasonal_evidence_count","activity_evidence_ids","occurrence_evidence_ids","seasonal_evidence_ids","seasonal_evidence_context_json",
         "activity_reason","activity_score","catch_probability","best_fishing_window_status","interpretation"]
     a.out.parent.mkdir(parents=True,exist_ok=True)
     with a.out.open("w",encoding="utf-8",newline="") as f:
