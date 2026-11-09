@@ -476,3 +476,33 @@ PWA 從下列 raw JSON 讀取最新展望：
 - 活動分數、中魚機率與最佳作釣時段一律不建立。
 - P2.4.6 展望是預報環境摘要，不是魚群偵測或安全許可。
 - 展望以 workflow 最新成功執行產出為準；前端若資料超過 8 小時會顯示可能過期。
+
+
+## P2.5.1 真實釣況 Ground Truth 資料契約
+
+P2.5 先建立可稽核的實際釣況資料，不急著訓練或輸出中魚率。
+
+### 兩張表分離
+- `P2/field_data/fishing_session_template.csv`：一筆代表一次完整出勤/釣況時段，包含開始/結束時間、六區代碼、釣法、實際有效作釣分鐘及總漁獲數。
+- `P2/field_data/catch_event_template.csv`：一筆代表同一時段內某一魚種的一次漁獲批次，保留俗名、候選物種 ID、鑑定信心、數量、尺寸、重量、放流狀態及照片參照。
+- JSON Schema 分別位於 `P2/schema/fishing_session.schema.json` 與 `P2/schema/catch_event.schema.json`。
+
+### 關鍵資料規則
+1. **零漁獲也必須記錄**：只要確實作釣且 effort_minutes > 0，就必須建立 session，catch_count 可為 0，catch event 可為空。這是避免模型只看成功案例而高估魚況的必要條件。
+2. 有漁獲時，session.catch_count 必須等於其 catch events 的 count 加總。
+3. 每個 catch event 必須連回有效 session，時間需落在該次 session 之內。
+4. 時間必須包含時區；台灣資料建議使用 ISO 8601 +08:00。
+5. 不確定魚種時保留俗名及 low/unconfirmed，不可猜測學名或 candidate_id。
+6. 不要求上傳精確私人座標；location_label 記錄到可分析但不暴露私人進出資訊的程度。
+7. 不從記憶補寫海溫、浪高、潮位等量測值。環境條件應由系統依區域與時間，從 P2 歷史資料配對；缺值維持缺值。
+8. effort_minutes 是實際有效作釣時間，不是單純停留時間。
+
+### 驗證
+```bash
+python P2/field_data/validate_fishing_logs.py \
+  --sessions P2/field_data/fishing_session_template.csv \
+  --catches P2/field_data/catch_event_template.csv
+python -m unittest P2.test_fishing_logs -v
+```
+
+目前資料契約只驗證紀錄完整性與 session/catch 關聯，不會推論魚種活動分數、環境偏好或中魚率。下一步才建立環境快照配對器，並以「每次出勤」為樣本單位，避免把同一次出勤的多尾魚當成多次獨立成功樣本。
