@@ -30,7 +30,7 @@ class IntegratedActivityTests(unittest.TestCase):
             {"candidate_id":"c037","activity_evidence_id":"AE015","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
             {"candidate_id":"c001","activity_evidence_id":"AE013","activity_dimension":"occurrence_record","model_use_status":"context_only_east_taiwan_occurrence","transferability":"high_for_occurrence_only_no_activity_transfer"},
         ]
-        self.seasonal=[{"candidate_id":"c003","seasonal_evidence_id":"SE003","model_use_status":"context_only_northern_taiwan_field_study","transferability":"low_for_east_taiwan"}]
+        self.seasonal=[{"candidate_id":"c003","seasonal_evidence_id":"SE003","reported_season":"春季至6月上旬","geographic_scope":"Shimen coast, northern Taiwan","model_use_status":"context_only_northern_taiwan_field_study","transferability":"low_for_east_taiwan","limitations":"Secondary northern Taiwan context only."}]
 
     def test_context_only_evidence_does_not_create_activity_score(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
