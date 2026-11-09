@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "collector"))
 from fetch_oca_edna_occurrence import (
     build_monthly_summary, collect, load_region_stations, normalize_fields,
-    parse_payload, parse_year_month, write_outputs,
+    match_candidate, parse_payload, parse_year_month, write_outputs,
 )
 
 ROOT = Path(__file__).parent
@@ -44,6 +44,11 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
             archive.writestr("records.csv", csv_bytes)
         self.assertEqual(parse_payload(zipped.getvalue())[0]["學名(Science Name)"], "Siganus fuscescens")
 
+    def test_multi_species_edna_label_is_not_forced_into_one_candidate(self):
+        candidates = {"abudefduf vaigiensis": "c027", "siganus fuscescens": "c003"}
+        self.assertEqual(match_candidate("Abudefduf sexfasciatus/vaigiensis", candidates), ("", "ambiguous_multi_species_taxon", "c027"))
+        self.assertEqual(match_candidate("Siganus canaliculatus/fuscescens", candidates), ("", "ambiguous_multi_species_taxon", "c003"))
+        self.assertEqual(match_candidate("Abudefduf vaigiensis", candidates), ("c027", "exact_scientific_name", ""))
     def test_nearest_region_mapping_is_context_only_and_distance_limited(self):
         mapping = ROOT.parent / "P1" / "stations" / "east_region_station_mapping.csv"
         stations = load_region_stations(mapping)
@@ -61,6 +66,8 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
         near = next(x for x in detections if x["station_name"] == "成功外海站")
         far = next(x for x in detections if x["station_name"] == "遠洋站")
         self.assertEqual(near["candidate_id"], "c027")
+        self.assertEqual(near["candidate_match_status"], "exact_scientific_name")
+        self.assertEqual(near["possible_candidate_ids"], "")
         self.assertEqual(near["region_id"], "chenggong_donghe")
         self.assertEqual(near["region_mapping_status"], "nearest_station_context_only")
         self.assertEqual(far["region_id"], "")
@@ -87,7 +94,10 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
     def test_output_manifest_declares_occurrence_only_interpretation(self):
         with tempfile.TemporaryDirectory() as tmp:
             detections = [{
-                "record_id": "abc", "dataset_id": "d1", "model_use_status": "context_only_edna_occurrence",
+                "record_id": "abc", "dataset_id": "d1", "candidate_id": "c027",
+                "candidate_match_status": "exact_scientific_name",
+                "region_mapping_status": "nearest_station_context_only",
+                "model_use_status": "context_only_edna_occurrence",
             }]
             with self.assertRaises(KeyError):
                 # Monthly aggregation needs full fields; this guards against silently
