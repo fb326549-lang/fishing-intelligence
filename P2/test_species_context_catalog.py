@@ -42,15 +42,15 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             evidence=root/"evidence.csv"
             occurrence=root/"occurrence.csv"
             candidates.write_text(
-                "candidate_id,common_name_zh,scientific_name,taxonomy_status\\n"
-                "c036,南方舵魚,Kyphosus bigibbus,verified_taxon\\n",encoding="utf-8")
+                "candidate_id,common_name_zh,scientific_name,taxonomy_status\n"
+                "c036,南方舵魚,Kyphosus bigibbus,verified_taxon\n",encoding="utf-8")
             ecology.write_text(
-                "ecology_record_id,candidate_id,scientific_name,parameter_code,parameter_value,unit_or_format,geographic_scope,evidence_id,confidence,model_use_status,limitations\\n",
+                "ecology_record_id,candidate_id,scientific_name,parameter_code,parameter_value,unit_or_format,geographic_scope,evidence_id,confidence,model_use_status,limitations\n",
                 encoding="utf-8")
-            evidence.write_text("evidence_id,source_name,source_url\\n",encoding="utf-8")
+            evidence.write_text("evidence_id,source_name,source_url\n",encoding="utf-8")
             occurrence.write_text(
-                "regional_occurrence_id,candidate_id,taxon_scientific_name,common_name_zh,site_code,site_name,region_id,visit_number,recorded_presence,study_year,study_scope,method,source_name,source_url,confidence,model_use_status,limitations\\n"
-                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\\n",
+                "regional_occurrence_id,candidate_id,taxon_scientific_name,common_name_zh,site_code,site_name,region_id,visit_number,recorded_presence,study_year,study_scope,method,source_name,source_url,confidence,model_use_status,limitations\n"
+                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\n",
                 encoding="utf-8")
             catalog=build_catalog(candidates,ecology,evidence,occurrence)
             self.assertEqual(catalog["record_count"],0)
