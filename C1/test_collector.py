@@ -1,6 +1,6 @@
 import sys,unittest
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).parent))
+sys.path.insert(0,str(Path(__file__).parent / "collector"))
 from fetch_cwa_safety_sources import validate_json_payload,validate_cap_payload
 class CollectorValidationTests(unittest.TestCase):
  def test_accepts_cwa_json_records(self):
