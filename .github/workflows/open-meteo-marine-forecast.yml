@@ -65,6 +65,8 @@ jobs:
         run: |
           python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
           python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
+          python P1/collector/export_cwa_tide_forecast_json.py --input output/cwa_tides/regional_tide_forecast.csv --out p2-history-data/data/latest_cwa_tide_forecast.json
+          cp p2-history-data/data/latest_cwa_tide_forecast.json output/cwa_tides/latest_cwa_tide_forecast.json
 
       - name: Fetch Open-Meteo forecasts for six East Taiwan regions
         run: |
@@ -106,7 +108,7 @@ jobs:
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json
+          git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
           if git -C p2-history-data diff --cached --quiet; then
             echo "No new hourly records or outlook changes."
           else
