@@ -21,19 +21,29 @@ on:
   schedule:
     - cron: "17 3 1 * *"
   workflow_dispatch:
+concurrency:
+  group: p2-hourly-history-archive
+  cancel-in-progress: false
 permissions:
-  contents: read
+  contents: write
 jobs:
   collect-edna-context:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Check out P2 append-only history branch
+        uses: actions/checkout@v4
+        with:
+          ref: p2-history
+          path: p2-history-data
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Run eDNA collector contract tests
         run: python -m unittest P2.test_oca_edna_occurrence -v
+      - name: Install JSON Schema validator
+        run: python -m pip install --disable-pip-version-check jsonschema
       - name: Fetch and normalize OCA eDNA datasets
         run: |
           python P2/collector/fetch_oca_edna_occurrence.py \
@@ -45,18 +55,54 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          from jsonschema import Draft202012Validator
           root = Path("output/oca_edna_context")
           manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          schema = json.loads(Path("P2/schema/edna_occurrence_context.schema.json").read_text(encoding="utf-8"))
+          Draft202012Validator.check_schema(schema)
+          validator = Draft202012Validator(schema)
           assert manifest["detection_record_count"] > 0
           assert manifest["source_datasets"] and len(manifest["source_datasets"]) == 3
           rows = [json.loads(line) for line in (root / "edna_occurrence_context.jsonl").read_text(encoding="utf-8").splitlines() if line]
           assert len(rows) == manifest["detection_record_count"]
+          assert manifest["detection_record_count"] == manifest["exact_candidate_record_count"] + manifest["ambiguous_taxon_record_count"] + manifest["unmatched_taxon_record_count"]
+          for number, row in enumerate(rows, 1):
+              errors = list(validator.iter_errors(row))
+              if errors:
+                  raise ValueError(f"JSON Schema failure on record {number}: {errors[0].message}")
           assert all(row["model_use_status"] == "context_only_edna_occurrence" for row in rows)
           assert all(row["detection_type"] == "positive_edna_detection_record" for row in rows)
-          assert all(row["candidate_match_status"] in {"exact_scientific_name", "ambiguous_multi_species_taxon", "no_exact_candidate_match"} for row in rows)
           assert all("fish_count" not in row and "activity_score" not in row and "catch_probability" not in row for row in rows)
-          print(f"Validated {len(rows)} positive eDNA records; no abundance or activity inference.")
+          print(f"Validated {len(rows)} positive eDNA records against JSON Schema; no abundance or activity inference.")
           PY
+      - name: Publish curated eDNA summary to P2 history
+        if: github.event_name != 'pull_request'
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from datetime import datetime, timezone
+          from pathlib import Path
+          source = Path("output/oca_edna_context")
+          manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
+          date = datetime.fromisoformat(manifest["generated_at_utc"].replace("Z", "+00:00")).strftime("%Y-%m-%d")
+          root = Path("p2-history-data/data/oca_edna")
+          archive = root / "archive" / date
+          archive.mkdir(parents=True, exist_ok=True)
+          shutil.copy2(source / "edna_species_monthly_summary.csv", root / "latest_edna_species_monthly_summary.csv")
+          shutil.copy2(source / "manifest.json", root / "latest_edna_manifest.json")
+          shutil.copy2(source / "edna_species_monthly_summary.csv", archive / "edna_species_monthly_summary.csv")
+          shutil.copy2(source / "manifest.json", archive / "manifest.json")
+          PY
+          cd p2-history-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/oca_edna/
+          if git diff --cached --quiet; then
+            echo "No eDNA summary changes to publish."
+          else
+            git commit -m "Archive OCA fish eDNA occurrence context"
+            git push
+          fi
       - name: Upload normalized occurrence context
         if: always()
         uses: actions/upload-artifact@v4
