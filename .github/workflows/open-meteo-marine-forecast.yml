@@ -106,6 +106,7 @@ jobs:
           latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
           test -n "$latest_dir"
           python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+          python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P1/collector/audit_environment_coverage.py --catalog p2-history-data/data/hourly_environment/catalog.json --out p2-history-data/data/forecast_verification/environment_coverage.json
           python P1/collector/evaluate_forecast_skill.py --archive-root p2-history-data/data --out p2-history-data/data/forecast_verification/latest.json
           cp p2-history-data/data/forecast_verification/latest.json "$latest_dir/forecast_verification.json"
