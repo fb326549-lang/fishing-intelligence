@@ -62,6 +62,7 @@ jobs:
           python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --out "$latest_dir/hourly_environment_p2.jsonl"
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
           python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+          python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
 
       - name: Commit append-only P2 hourly history
         run: |
