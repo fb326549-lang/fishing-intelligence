@@ -9,7 +9,7 @@ on:
       - "C1/collector/**"
       - "C1/test_collector.py"
       - "C1/test_normalize_cwa_safety.py"
-      - "C1/test_safety_decision.py"
+      - "C1/test_safety_decision.py"\n      - "C1/test_marine_regions.py"
       - "C1/safety_decision.py"
       - ".github/workflows/c1-safety-collection.yml"
 permissions:
@@ -46,11 +46,13 @@ jobs:
           fi
           python C1/collector/fetch_cwa_safety_sources.py --out output/c1_safety_sources
           python C1/collector/normalize_cwa_safety_sources.py --input output/c1_safety_sources --out output/c1_safety_decisions
+          python P1/collector/fetch_cwa_marine.py --out output/c1_marine_sources
+          python C1/collector/normalize_cwa_marine_regions.py --input output/c1_marine_sources --stations P1/stations/east_region_station_mapping.csv --out output/c1_marine_decisions/latest_marine_conditions.json
       - name: Publish normalized safety decision snapshots
         run: |
           mkdir -p tide-history-data/data
           cp output/c1_safety_decisions/safety_decisions.json tide-history-data/data/latest_safety_decisions.json
-          cp output/c1_safety_decisions/source_status.json tide-history-data/data/latest_safety_source_status.json
+          cp output/c1_safety_decisions/source_status.json tide-history-data/data/latest_safety_source_status.json\n          cp output/c1_marine_decisions/latest_marine_conditions.json tide-history-data/data/latest_marine_conditions.json
           git -C tide-history-data config user.name "github-actions[bot]"
           git -C tide-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C tide-history-data add data/latest_safety_decisions.json data/latest_safety_source_status.json
@@ -67,6 +69,6 @@ jobs:
           name: c1-official-safety-sources
           path: |
             output/c1_safety_sources/
-            output/c1_safety_decisions/
+            output/c1_safety_decisions/\n            output/c1_marine_sources/\n            output/c1_marine_decisions/
           if-no-files-found: warn
           retention-days: 7
