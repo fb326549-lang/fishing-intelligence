@@ -373,5 +373,62 @@ class MarineNormalizationTests(unittest.TestCase):
         self.assertIn("taitung_south", REGIONS)
 
 
+
+
+class CwaRegionalMarineObservationTests(unittest.TestCase):
+    def test_historical_mode_keeps_records_from_stations_now_inactive(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            observations_path = root / "observations.csv"
+            mapping_path = root / "mapping.csv"
+            stations_path = root / "stations.csv"
+            out_dir = root / "regional_30d"
+
+            with observations_path.open("w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=[
+                    "dataset_id", "station_id", "valid_time", "WaveHeight",
+                    "WavePeriod", "WaveDirection", "SeaTemperature"
+                ])
+                writer.writeheader()
+                writer.writerow({
+                    "dataset_id": "O-B0075-002", "station_id": "S1",
+                    "valid_time": "2026-11-01T10:00:00+08:00",
+                    "WaveHeight": "1.2", "WavePeriod": "8",
+                    "WaveDirection": "359", "SeaTemperature": "25"
+                })
+
+            with mapping_path.open("w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["station_id", "region_id"])
+                writer.writeheader()
+                writer.writerow({"station_id": "S1", "region_id": "yilan_suao"})
+
+            with stations_path.open("w", encoding="utf-8-sig", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["station_id", "station_status", "observed_properties"])
+                writer.writeheader()
+                writer.writerow({
+                    "station_id": "S1", "station_status": "0",
+                    "observed_properties": json.dumps({"WaveHeight": 0, "WavePeriod": 0})
+                })
+
+            result = subprocess.run([
+                sys.executable, str(COLLECTOR / "build_east_region_conditions.py"),
+                "--input", str(observations_path), "--mapping", str(mapping_path),
+                "--stations", str(stations_path), "--out", str(out_dir), "--historical"
+            ], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+            output_path = out_dir / "east_region_conditions.csv"
+            with output_path.open(encoding="utf-8-sig", newline="") as f:
+                rows = list(csv.DictReader(f))
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["data_kind"], "observed_historical_window")
+            self.assertEqual(rows[0]["wave_height_m"], "1.2")
+            self.assertEqual(rows[0]["wave_period_s"], "8.0")
+
+            summary = json.loads((out_dir / "east_region_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["source_datasets"], ["O-B0075-002"])
+            self.assertEqual(summary["temporal_scope"], "rolling_30_day")
+            self.assertEqual(summary["regions"][0]["stations_with_observations"], 1)
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
