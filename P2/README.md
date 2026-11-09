@@ -314,3 +314,33 @@ python -m unittest P2.test_solar_time_context -v
 ```
 
 P2.4.2 僅產生日夜/晨昏的中性時間特徵；魚種對晨昏的反應仍須有對應物種、地區、季節、生命階段及研究方法的直接證據後，才可進入後續活動模型。
+
+
+## P2.4.3 季節性活動證據（證據層，不產生季節分數）
+
+新增：
+- `species/species_seasonal_activity_register.csv`：物種季節性活動證據登錄。
+- `schema/species_seasonal_activity.schema.json`：季節證據資料契約。
+- `species/validate_seasonal_activity.py`：驗證候選物種、學名、文獻來源、URL、用途限制。
+- `test_seasonal_activity.py`：測試來源追溯、錯誤學名、白毛俗名群組隔離及禁止升格計分。
+- `species/species_response_literature_register.csv` 新增 L021：臭肚北台灣北海岸近岸群聚自然史解說來源。
+
+第一批季節性證據：
+- SE001 瓜子鱲：基隆附近北台灣岩岸歷史月採樣，成魚冬季及早春群聚（L008）。這是北台灣單一岩岸歷史資料，不是台東/花蓮季節釣況；黑毛俗名仍須個體鑑種。
+- SE002 南方舵魚：日本壹岐/九州消波塊周邊調查記錄 1–4 月群聚及研究場域的低水溫關聯（L001）。只適用已鑑定 K. bigibbus，不能套用天竺舵魚或台灣白毛俗名群組。
+- SE003 臭肚：中研院生命科學圖書館自然史解說提及北台灣石門海岸春季至 5 月/6 月初近岸群聚；幼魚覓食與成魚繁殖需分開理解（L021）。該文不是原始定量長期研究，信心低，不可外推台灣東部。
+- SE004 黑鯛：西台灣 2015–2018 刺網資料/MaxEnt 模型呈現 12 月至翌年 4 月近岸分布較集中（L014）。這是西部漁法與漁場的季節空間分布，不是東部磯釣活動或中魚率。
+
+區域尺度研究另顯示台灣東部外海魚類群聚組成具有季節變化，並與黑潮動態相關；該研究使用 eDNA 群聚資料，不能據此推斷上述任一目標魚種的東部繁殖月份、近岸活動量或釣獲率。參考：國立臺灣大學學位論文「利用環境DNA高通量複合分子條碼技術以探究臺灣東部及西部外海魚類群聚在空間和季節上之差異」（2023 年季節採樣，24 個離岸採樣點）。
+
+驗證：
+```bash
+python P2/species/validate_seasonal_activity.py \\
+  --seasonal-csv P2/species/species_seasonal_activity_register.csv \\
+  --candidates-csv P1/species/species_candidate_register.csv \\
+  --literature-csv P2/species/species_response_literature_register.csv
+python -m unittest P2.test_seasonal_activity -v
+python -m unittest discover -s P2 -p 'test_*.py' -v
+```
+
+限制：所有 SE001–SE004 均維持 `context_only_*`。本階段不建立月份權重、不宣稱東部魚種最佳月份、不將繁殖期/漁業分布/群聚觀察轉成咬況或釣獲機率。後續若要形成東部季節性活動分數，必須有可定位到東部區域、物種鑑定、時間戳、漁法/觀察方法與足夠樣本量的連續資料，並將 effort 與未釣獲樣本納入，避免只用成功釣獲紀錄造成偏差。
