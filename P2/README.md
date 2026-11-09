@@ -190,3 +190,41 @@ Open-Meteo 歸檔 workflow 已將此稽核放在提交 p2-history 之前；任�
 - Black sea bream habitat distribution model, *Journal of Marine Science and Engineering* 9(12), 1442 (2021): https://doi.org/10.3390/jmse9121442
 
 研究證據只用來更新證據登錄與研究缺口狀態；不得將西台灣、北台灣或養殖/圈養研究的數值直接轉成台灣東部魚情分數。
+
+
+## P2.3 證據門檻式環境適合度引擎（第一版）
+
+新增：
+- `P2/species/environment_match_engine.py`：依已審查的物種反應規則，將單一區域/有效小時環境資料轉成環境匹配分數。
+- `P2/species/environment_response_rules_template.csv`：反應規則登錄模板。
+- `P2/test_environment_match_engine.py`：驗證證據門檻、物種鑑定門檻及缺測行為。
+
+**只有同時符合以下條件的規則才會進入計分：**
+1. `model_use_status=eligible_for_environment_scoring`。
+2. `evidence_basis=east_taiwan_direct_field`。
+3. confidence 為 high 或 medium。
+4. 有 evidence_id、HTTP(S) source_url、reviewed_by 及 reviewed_at。
+5. 環境欄位、運算子、數值範圍、區域及權重通過格式檢查。
+6. 候選魚種的 `eligibility_gate` 必須是 `verified_taxon`。
+
+白毛舵魚屬、俗名黑毛待形態鑑種，以及東部出現紀錄仍有衝突的候選魚種，不會進入計分。研究外地文獻、養殖資料、物種棲地描述及 context-only 參數均不會被當作反應規則。
+
+執行前，環境 JSONL 必須先通過 `P2/validate_p2_data.py`；候選魚種 CSV 使用已重建的 `species_response_evidence_gaps.csv`（提供 eligibility_gate）；規則 CSV 使用審查模板：
+
+```bash
+python P2/validate_p2_data.py --environment-jsonl records.jsonl
+python P2/species/environment_match_engine.py \
+  --environment-jsonl records.jsonl \
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \
+  --rules-csv P2/species/environment_response_rules_template.csv \
+  --out output/p2/environment_match_scores.csv
+```
+
+輸出狀態：
+- `scored`：有完整適用的已核准規則。
+- `partial_environment_data`：部分規則所需環境欄位缺測，分數只根據已觀測規則計算，並揭露 coverage。
+- `insufficient_evidence`：沒有已核准的台灣東部直接研究反應規則。
+- `insufficient_environment_data`：有規則但所有必要環境欄位均缺測。
+- `taxon_or_distribution_gate`：物種鑑定或區域出現資格未通過。
+
+分數名稱為 `environment_match_score`，代表環境條件與已審查反應規則的匹配程度，**不是魚類活動強度、咬餌機率或中魚機率**。目前正式規則模板保持空白；現有 122 筆遷移參數沒有任何一筆被自動升格為反應規則，因此在補齊直接證據前，系統正確回報證據不足，不會虛構魚情分數。
