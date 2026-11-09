@@ -98,7 +98,7 @@ def build_catalog(candidates_path: Path, ecology_path: Path, evidence_path: Path
             occurrence_records.append({
                 "regional_occurrence_id": row.get("regional_occurrence_id", ""),
                 "candidate_id": cid,
-                "common_name_zh": candidates[cid].get("common_name_zh", ""),
+                "common_name_zh": row.get("common_name_zh", "") or candidates[cid].get("common_name_zh", ""),
                 "scientific_name": row.get("taxon_scientific_name", ""),
                 "site_code": row.get("site_code", ""),
                 "site_name": row.get("site_name", ""),
