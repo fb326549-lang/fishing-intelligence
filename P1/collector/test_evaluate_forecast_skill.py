@@ -49,6 +49,19 @@ class ForecastSkillTests(unittest.TestCase):
             direction=result["variables"]["wind_direction_deg"]
             self.assertAlmostEqual(direction["mae"],3.0)
 
+    def test_no_time_aligned_observations_is_reported_as_waiting_not_zero_skill(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            rows=[
+                self.row("observation","2026-11-09T11:00:00+08:00","2026-11-09T12:00:00+08:00",env={"wave_height_m":1.0}),
+                self.row("forecast","2026-11-09T13:00:00+08:00","2026-11-09T12:30:00+08:00",env={"wave_height_m":2.0}),
+            ]
+            self.write_rows(root,rows)
+            result=build_verification(root)
+            self.assertEqual(result["status"],"awaiting_time_aligned_observations")
+            self.assertEqual(result["forecast_observation_hour_pairs"],0)
+            self.assertEqual(result["variables"],{})
+
     def test_latest_observation_revision_is_used_and_small_samples_are_flagged(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
