@@ -309,6 +309,70 @@ class CwaTideHistoryArchiveTests(unittest.TestCase):
             self.assertEqual({row["snapshot_id"] for row in archived}, {"run-1", "run-2"})
             self.assertEqual({row["height_above_twvd_cm"] for row in archived}, {"70"})
 
+
+    def test_archive_regional_series_deduplicates_identical_rows_and_keeps_revisions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs, fc, pair, regional48, regional30, history = [
+                root / n for n in ("obs.csv", "fc.csv", "pair.csv", "r48.csv", "r30.csv", "history")
+            ]
+            observations = [{
+                "station_id": "S1", "station_name": "測站", "latitude": "23.0",
+                "longitude": "121.0", "valid_time": "2026-11-09T01:00:00+08:00",
+                "TideHeight": "0.71"
+            }]
+            forecasts = [{
+                "location_id": "L1", "location_name": "預報地點", "region_id": "taitung_south",
+                "valid_time": "2026-11-09T01:00:00+08:00", "tide": "滿潮",
+                "height_above_twvd_cm": "70", "height_above_local_msl_cm": "80",
+                "height_above_chart_datum_cm": "150", "fetched_at_utc": "2026-11-08T00:00:00+00:00"
+            }]
+            pairing = [{"station_id": "S1", "location_id": "L1", "matching_status": "matched"}]
+            regional = [{
+                "dataset_id": "O-B0075-002", "region_id": "taitung_south",
+                "region_name": "台東南段", "valid_time": "2026-11-09T01:00:00+08:00",
+                "wave_height_m": "1.2", "wave_height_m_sample_count": "2",
+                "data_kind": "observed_historical_window"
+            }]
+            for path, rows in [
+                (obs, observations), (fc, forecasts), (pair, pairing),
+                (regional48, regional), (regional30, regional)
+            ]:
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+                    writer.writeheader()
+                    writer.writerows(rows)
+
+            def run(snapshot):
+                return subprocess.run([
+                    sys.executable, str(COLLECTOR / "archive_cwa_tide_history.py"),
+                    "--observations", str(obs), "--forecasts", str(fc),
+                    "--pairing", str(pair), "--regional-48h", str(regional48),
+                    "--regional-30d", str(regional30), "--history-dir", str(history),
+                    "--snapshot-id", snapshot, "--collected-at", "2026-11-09T02:00:00+00:00"
+                ], capture_output=True, text=True)
+
+            first = run("run-1")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            second = run("run-2")
+            self.assertEqual(second.returncode, 0, second.stderr)
+            regional[0]["wave_height_m"] = "1.3"
+            for path in (regional48, regional30):
+                with path.open("w", encoding="utf-8-sig", newline="") as f:
+                    writer = csv.DictWriter(f, fieldnames=list(regional[0]))
+                    writer.writeheader()
+                    writer.writerows(regional)
+            third = run("run-3")
+            self.assertEqual(third.returncode, 0, third.stderr)
+
+            for filename in ("regional_marine_observations_48h.jsonl", "regional_marine_observations_30d.jsonl"):
+                records = [json.loads(line) for line in (history / filename).read_text(encoding="utf-8").splitlines()]
+                self.assertEqual(len(records), 2)
+                self.assertEqual({row["wave_height_m"] for row in records}, {"1.2", "1.3"})
+            summary = json.loads((history / "history_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["regional_48h_history_records"], 2)
+            self.assertEqual(summary["regional_30d_history_records"], 2)
+
     def test_archive_rejects_invalid_history_json(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
