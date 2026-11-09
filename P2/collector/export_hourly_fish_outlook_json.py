@@ -5,7 +5,7 @@ import argparse,csv,json
 from datetime import datetime,timezone
 from pathlib import Path
 
-def build_payload(rows, edna_context=None, generated_at=None):
+def build_payload(rows, edna_context=None, generated_at=None, species_context=None):
     if not rows:
         raise ValueError("Refusing to publish an empty P2 outlook")
     as_ofs={r.get("as_of","") for r in rows}
@@ -29,6 +29,18 @@ def build_payload(rows, edna_context=None, generated_at=None):
         for field in ("exact_positive_detection_record_count","ambiguous_positive_detection_record_count"):
             if not isinstance(row.get(field), int) or row[field] < 0:
                 raise ValueError(f"invalid eDNA context count: {field}")
+    ecology = species_context or {
+        "schema_version": 1,
+        "generated_at": None,
+        "record_count": 0,
+        "interpretation": "No species ecology context catalog is available; this is not evidence of absence.",
+        "records": [],
+    }
+    if ecology.get("schema_version") != 1 or not isinstance(ecology.get("records"), list):
+        raise ValueError("species ecology context schema is invalid")
+    for record in ecology["records"]:
+        if not record.get("candidate_id") or not record.get("parameter_code") or not record.get("source_url"):
+            raise ValueError("species ecology context record is missing candidate, parameter or provenance")
     return {
         "schema_version":1,
         "source":"fishing-intelligence-p2.6",
@@ -45,6 +57,7 @@ def build_payload(rows, edna_context=None, generated_at=None):
             "safety_assessment":"not_included; consult official marine warnings and local conditions"
         },
         "edna_occurrence_context":context,
+        "species_ecology_context":ecology,
         "rows":rows
     }
 
@@ -53,13 +66,17 @@ def main():
     p.add_argument("--input",type=Path,required=True)
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--edna-context-json",type=Path)
+    p.add_argument("--species-context-json",type=Path)
     a=p.parse_args()
     with a.input.open(encoding="utf-8-sig",newline="") as f:
         rows=list(csv.DictReader(f))
     context=None
     if a.edna_context_json and a.edna_context_json.exists():
         context=json.loads(a.edna_context_json.read_text(encoding="utf-8"))
-    payload=build_payload(rows,context)
+    species_context=None
+    if a.species_context_json and a.species_context_json.exists():
+        species_context=json.loads(a.species_context_json.read_text(encoding="utf-8"))
+    payload=build_payload(rows,context,species_context=species_context)
     a.out.parent.mkdir(parents=True,exist_ok=True)
     a.out.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
     print(f"Published {len(rows)} hourly outlook records and {len(payload['edna_occurrence_context']['records'])} historical eDNA candidate-region context records.")

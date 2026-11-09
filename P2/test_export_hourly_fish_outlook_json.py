@@ -49,6 +49,29 @@ class ExportHourlyFishOutlookTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"cannot be promoted"):
             build_payload(self.rows,context)
 
+    def test_species_ecology_context_is_embedded_with_provenance(self):
+        context={
+            "schema_version":1,
+            "record_count":1,
+            "interpretation":"Natural-history context only.",
+            "records":[{
+                "candidate_id":"c027","parameter_code":"habitat",
+                "parameter_value":"reef; coastal",
+                "source_url":"https://fishdb.sinica.edu.tw/taxon/example",
+                "model_use_status":"eligible_as_species_context",
+            }],
+        }
+        payload=build_payload(self.rows,species_context=context)
+        record=payload["species_ecology_context"]["records"][0]
+        self.assertEqual(record["candidate_id"],"c027")
+        self.assertEqual(record["parameter_value"],"reef; coastal")
+        self.assertIn("fish abundance",payload["species_ecology_context"]["interpretation"])
+
+    def test_species_context_requires_source_provenance(self):
+        context={"schema_version":1,"records":[{"candidate_id":"c027","parameter_code":"habitat"}]}
+        with self.assertRaisesRegex(ValueError,"missing candidate, parameter or provenance"):
+            build_payload(self.rows,species_context=context)
+
     def test_requires_all_three_horizons(self):
         with self.assertRaisesRegex(ValueError,"6/12/24-hour"):
             build_payload(self.rows[:2])

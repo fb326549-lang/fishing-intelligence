@@ -75,6 +75,7 @@ jobs:
           test -n "$latest_dir"
           python P2/species/validate_activity_evidence.py --activity-csv P2/species/species_activity_evidence_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
           python P2/species/validate_seasonal_activity.py --seasonal-csv P2/species/species_seasonal_activity_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
+          python P2/species/build_species_context_catalog.py --candidates P1/species/species_candidate_register.csv --ecology P1/species/species_ecology_parameters.csv --evidence P1/species/species_evidence_register.csv --out "$latest_dir/species_ecology_context.json"
           python P2/species/environment_match_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/environment_response_rules_template.csv --out "$latest_dir/environment_match.csv"
           python P2/species/integrate_environment_and_activity.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --environment-match-csv "$latest_dir/environment_match.csv" --activity-csv P2/species/species_activity_evidence_register.csv --seasonal-csv P2/species/species_seasonal_activity_register.csv --out "$latest_dir/integrated_hourly_fish_assessment.csv"
           as_of=$(python -c 'from datetime import datetime,timedelta; from zoneinfo import ZoneInfo; n=datetime.now(ZoneInfo("Asia/Taipei")); h=n.replace(minute=0,second=0,microsecond=0); print((h+timedelta(hours=1) if n!=h else h).isoformat())')
@@ -83,7 +84,11 @@ jobs:
           if [ -f p2-history-data/data/edna_candidate_region_context.json ]; then
             edna_args+=(--edna-context-json p2-history-data/data/edna_candidate_region_context.json)
           fi
-          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}"
+          ecology_args=()
+          if [ -f "$latest_dir/species_ecology_context.json" ]; then
+            ecology_args+=(--species-context-json "$latest_dir/species_ecology_context.json")
+          fi
+          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}" "${ecology_args[@]}"
 
       - name: Validate history and commit P2 history plus live outlook
         run: |
