@@ -25,5 +25,18 @@ jobs:
         run: python -m json.tool C1/schema/safety_alert.schema.json > /dev/null
       - name: Install collector dependency
         run: python -m pip install --disable-pip-version-check -r P1/collector/requirements.txt
+      - name: Validate PWA inline JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script\\b[^>]*>(.*?)</script>", html, flags=re.S)
+          inline = next((item for item in reversed(scripts) if item.strip()), None)
+          if inline is None:
+              raise SystemExit("No inline application script found")
+          Path("/tmp/fishing-intelligence-pwa.js").write_text(inline, encoding="utf-8")
+          PY
+          node --check /tmp/fishing-intelligence-pwa.js
       - name: Run C1 safety decision tests
         run: python -m unittest discover -s C1 -p 'test_*.py' -v
