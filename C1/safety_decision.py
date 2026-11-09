@@ -4,8 +4,8 @@ import argparse,json
 from datetime import datetime
 from pathlib import Path
 REGIONS=("yilan_suao","hualien_north","hualien_south","fengbin_shitiping","chenggong_donghe","taitung_south")
-REQUIRED_SOURCES=("W-C0033-001","W-C0033-002","W-C0033-003","W-C0033-006","W-C0034-001")
-HIGH_RISK_TYPES={"typhoon"}
+REQUIRED_SOURCES=("W-C0033-001","W-C0033-002","W-C0033-003","W-C0033-006","W-C0034-001","O-B0069-001","O-B0070-001")
+HIGH_RISK_TYPES={"typhoon","high_wave","storm_surge"}
 def parse_time(value):
     if not isinstance(value,str): return None
     try:
@@ -20,7 +20,7 @@ def validate_alert(a):
     if a.get("source_id") not in ("CWA_OPENDATA","CWA_OCEAN_PLATFORM"): errors.append("invalid source_id")
     if not str(a.get("source_url","")).startswith("https://"): errors.append("source_url must be HTTPS")
     if not isinstance(a.get("region_ids"),list) or any(x not in REGIONS for x in a.get("region_ids",[])): errors.append("invalid region_ids")
-    if a.get("alert_type") not in {"typhoon","strong_wind_land","heavy_rain","thunderstorm","long_wave","high_wave","storm_surge","cold_surge","marine_warning","other"}: errors.append("invalid alert_type")
+    if a.get("alert_type") not in {"typhoon","strong_wind_land","heavy_rain","thunderstorm","long_wave","high_wave","storm_surge","cold_surge","large_tide","marine_warning","other"}: errors.append("invalid alert_type")
     if a.get("severity") not in {"extreme","severe","moderate","minor","unknown"}: errors.append("invalid severity")
     if a.get("status") not in {"active","cancelled","expired","unknown"}: errors.append("invalid status")
     for k in ("issued_at","effective_start","effective_end","collected_at"):
