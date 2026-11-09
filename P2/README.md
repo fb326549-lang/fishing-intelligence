@@ -455,3 +455,24 @@ python -m unittest P2.test_hourly_fish_outlook -v
 每筆摘要分開呈現預報完整度、環境適合度可用時數及環境匹配分數的平均/最低/最高值；這些統計僅描述環境匹配，不是魚類活動強度。活動證據狀態及來源 ID 一併保留。由於目前沒有足夠的東部成魚逐時活動/釣獲資料，`activity_score`、`catch_probability` 保持空白，`best_fishing_window_status=not_established`；本階段不會把環境分數最高的小時稱為最佳作釣時段。
 
 此輸出是 P2.4 的逐時展望資料層，尚未接入 PWA，也不是已驗證中魚機率模型。後續須以實際釣獲與空軍紀錄、作釣努力量及東部物種級直接觀察，逐步建立並驗證活動/中魚模型。
+
+
+## P2.4.6 → PWA 即時展望發布管線
+
+Open-Meteo 六區預報 workflow 在標準化逐時資料與驗證通過後，依序執行：
+1. 驗證魚種活動及季節證據登錄表；所有現有證據維持 context-only。
+2. 使用 `environment_response_rules_template.csv` 的已審查規則（目前模板為空，不得自行建立數值門檻）執行環境匹配。
+3. 以 candidate × region × valid_time × data_type 整合環境匹配、活動與季節證據；forecast 與 observation 即使有效時間相同也保持分離。
+4. 產生六區未來 6/12/24 小時展望，缺資料區域仍明確輸出。
+5. 匯出 `data/latest_hourly_fish_outlook.json` 至 `p2-history` 分支，供 PWA 讀取。
+
+PWA 從下列 raw JSON 讀取最新展望：
+`https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json`
+
+前端目前顯示四個已建立俗名對應的目標：黑毛（保留鑑種 gate）、白毛（舵魚屬群組 gate）、臭肚、黑鯛。其他魚種尚未接上此版 P2 物種登錄。前端呈現每個 horizon 的預報時數/完整度、環境反應規則狀態及活動證據狀態。
+
+重要限制：
+- 目前環境反應規則模板沒有任何經審查的東部數值規則，因此環境匹配分數應為空白/證據不足，不可從網站舊 heuristic 分數回填。
+- 活動分數、中魚機率與最佳作釣時段一律不建立。
+- P2.4.6 展望是預報環境摘要，不是魚群偵測或安全許可。
+- 展望以 workflow 最新成功執行產出為準；前端若資料超過 8 小時會顯示可能過期。
