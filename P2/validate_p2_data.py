@@ -8,7 +8,7 @@ from pathlib import Path
 REGIONS = {"yilan_suao","hualien_north","hualien_south","fengbin_shitiping","chenggong_donghe","taitung_south"}
 DATA_TYPES = {"forecast","observation","hindcast","derived"}
 CONFIDENCE = {"high","medium","low","unknown"}
-PARAMETER_CODES = {"temperature_range","depth_range","habitat","wave_preference","current_preference","tide_response","wind_sensitivity","activity_period","salinity_preference"}
+PARAMETER_CODES = {"temperature_range","depth_range","habitat","wave_preference","current_preference","tide_response","wind_sensitivity","activity_period","salinity_preference","vertical_movement","activity_water_layer","diel_activity","diet","spawning_period","feeding","aggregation","reproductive_behavior","seasonal_diet","regional_fishery_season","typical_habitat_depth_min","typical_habitat_depth_max","foraging_behavior","typical_depth_min","typical_depth_max","juvenile_habitat","social_behavior","sex_change","substrate","salinity_tolerance","fishery_occurrence","foraging_aggregation","sex_specific_social_behavior","juvenile_aggregation","movement_behavior","adult_social_behavior","juvenile_social_behavior","juvenile_diet","adult_diet","adult_aggregation","nocturnal_social_behavior","conservation_status","reported_depth_min","reported_depth_max"}
 
 def iso(value):
     if not isinstance(value,str): return False
