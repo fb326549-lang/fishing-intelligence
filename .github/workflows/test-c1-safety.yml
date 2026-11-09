@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - "C1/**"
+      - "index.html"
       - ".github/workflows/test-c1-safety.yml"
   workflow_dispatch:
 permissions:
@@ -31,7 +32,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\\b[^>]*>(.*?)</script>", html, flags=re.S)
+          scripts = re.findall(r"<script\b[^>]*>(.*?)</script>", html, flags=re.S)
           inline = next((item for item in reversed(scripts) if item.strip()), None)
           if inline is None:
               raise SystemExit("No inline application script found")
