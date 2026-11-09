@@ -53,3 +53,26 @@ python P2/validate_p2_data.py --environment-jsonl output/p2/hourly_environment.j
 ```
 
 此版尚未將潮汐事件轉成逐時 phase，也未將 P2 JSONL 接入 PWA；不得將缺值解讀為零。
+
+
+## P2.2 既有生態證據遷移
+
+`P2/species/migrate_p1_ecology_parameters.py` 將 P1 的 122 筆生態參數逐筆遷移到 `P2/species/species_response_parameters.csv`，並以 evidence_id 對應 P1 證據登錄表的 source_url。
+
+遷移採無損保留：
+- 原 parameter_code、parameter_value、unit、geographic_scope、confidence、model_use_status 不轉換。
+- 來源限制與 source_type 保留在 notes。
+- P1 未分別記載 life_stage 與 habitat_scope，因此明確填入 not_specified / not_separately_specified，不推測生命階段或微棲地。
+- 每筆必須能連回同一 candidate_id 的 evidence_id 及 HTTP(S) source_url；缺少或衝突時遷移失敗。
+- 保留 context_only、candidate_feature_only 等既有用途限制；不能把物種棲息深度當成釣棚建議，也不能把季節性或一般生態描述當成即時活動預測。
+
+重新產生資料：
+```bash
+python P2/species/migrate_p1_ecology_parameters.py \
+  --ecology-csv P1/species/species_ecology_parameters.csv \
+  --evidence-csv P1/species/species_evidence_register.csv \
+  --out P2/species/species_response_parameters.csv
+python P2/validate_p2_data.py --species-csv P2/species/species_response_parameters.csv
+```
+
+目前匯入的是有來源的既有生態背景參數，不代表已經具備溫度、浪況、海流、潮汐等完整物種反應曲線。這些參數仍須逐項取得直接證據後才可新增；不會以通用生態敘述填補空白。
