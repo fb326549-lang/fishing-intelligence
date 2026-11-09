@@ -153,3 +153,21 @@ CI 會重建並逐位元比對矩陣，確保候選魚種及 P1 證據更新時�
 - 目前 7 筆文獻全數不具備直接作為台灣東部魚情模型門檻的資格。
 
 缺口矩陣已改為同時讀取 P1 生態背景與 P2 外部文獻登錄表；有外部文獻的領域標記為 `external_literature_found_context_only`，白毛物種級鑑定限制及點帶石斑東部分布衝突仍優先於文獻存在狀態。CI 會重建矩陣並逐位元比對。
+
+
+## P2.1.3 歷史資料完整性稽核
+
+`P2/collector/validate_hourly_history.py` 在每次新增分區並重建 catalog 後執行，稽核：
+- 歷史分區與 catalog 的檔案集合一致，沒有漏列或過期索引。
+- 每個分區檔案 SHA-256、位元組大小及紀錄數與 catalog 相符。
+- JSONL 每列具有完整標準記錄必要欄位、合法六區 ID、合法 data_type、有效時區時間及 environment 物件。
+- valid_time 的當地日期與所屬 YYYY/MM/YYYY-MM-DD 分區一致。
+- 分區內沒有完全相同的重複紀錄。
+- 全庫 record_count、partition_count、regions 及 data_types 統計與 catalog 相符。
+
+執行：
+```bash
+python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
+```
+
+Open-Meteo 歸檔 workflow 已將此稽核放在提交 p2-history 之前；任何 checksum、分區、重複或索引錯誤都會讓該次歸檔 job 失敗，不會提交不一致的歷史索引。此稽核是資料完整性檢查，不取代 P2 JSON Schema / validator，也不代表觀測值本身已通過物理合理性校正。
