@@ -3,7 +3,15 @@ name: Test marine pipeline
 on:
   push:
     branches:
+      - main
       - p1-foundation
+    paths:
+      - "P1/collector/**"
+      - "index.html"
+      - ".github/workflows/test-marine-pipeline.yml"
+  pull_request:
+    branches:
+      - main
     paths:
       - "P1/collector/**"
       - "index.html"
@@ -20,7 +28,7 @@ jobs:
       - name: Checkout development branch
         uses: actions/checkout@v4
         with:
-          ref: p1-foundation
+          ref: ${{ github.ref }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
