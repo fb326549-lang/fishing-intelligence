@@ -27,7 +27,17 @@ def validate_json_payload(payload, dataset):
     if success is not None and str(success).strip().lower() not in {"true", "1"}:
         raise ValueError("provider application-level success flag is false")
     if "Records" not in payload and "records" not in payload:
-        raise ValueError("JSON response has no Records object; schema may have changed")
+        root = payload.get("cwaopendata")
+        if not isinstance(root, dict):
+            raise ValueError("JSON response has no Records or cwaopendata envelope")
+        resources = root.get("Resources", {}).get("Resource", {})
+        data = resources.get("Data", {}) if isinstance(resources, dict) else {}
+        if not isinstance(data, dict) or "SeaSurfaceObs" not in data:
+            raise ValueError("cwaopendata envelope has no SeaSurfaceObs data")
+        expected = {"O-B0069-001": "大潮", "O-B0070-001": "長浪"}
+        actual = str(root.get("DatasetName", ""))
+        if dataset in expected and expected[dataset] not in actual:
+            raise ValueError(f"dataset identity mismatch: {dataset} returned {actual}")
     return payload
 
 def validate_cap_payload(body):
