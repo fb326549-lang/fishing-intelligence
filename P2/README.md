@@ -578,8 +578,8 @@ python -m unittest P2.test_oca_edna_occurrence -v
 1. eDNA 陽性偵測只代表該次採樣在該站點檢出物種 DNA，不代表個體數、族群密度、生物量、釣獲率或即時活動強度。
 2. 沒有檢出不代表魚不存在；不得把未檢出紀錄當作負樣本，因採樣努力量、季節、檢測靈敏度及環境 DNA 傳輸/降解可能不同。
 3. 依最近東部參考站的區域對應僅供地理上下文，並保留距離；超出 35 公里不強行分配六區，也不把參考站當成實際採樣站或釣點。
-4. 只對已能以學名精確對應的候選物種填入 candidate_id；俗名群組、屬級候選及未確認物種不做模糊配對。
-5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。
+4. 只對已能以學名精確對應的候選物種填入 candidate_id；斜線合併的多物種名稱（例如 Abudefduf sexfasciatus/vaigiensis、Siganus canaliculatus/fuscescens）保留 possible_candidate_ids 並標記 ambiguous_multi_species_taxon，不會強制歸到其中一種。俗名群組、屬級候選及未確認物種不做模糊配對。
+5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。manifest 另分開報告精確候選、模糊多物種與未匹配資料筆數。
 6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
 
 只有在成功取得三組來源、資料解析通過且輸出筆數大於零時才產生 artifact。此階段先建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
