@@ -150,8 +150,10 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
                 for hour, height in [(0, 0.2), (1, 0.5), (2, 0.3), (3, -0.2), (4, -0.5), (5, -0.1)]
             ]
             forecasts = [
+                {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "45", "fetched_at_utc": "2026-11-08T00:00:00+00:00"},
+                {"location_id": "L1", "valid_time": "2026-11-09T03:30:00+08:00", "tide": "乾潮", "height_above_twvd_cm": "-45", "fetched_at_utc": "2026-11-08T00:00:00+00:00"},
+                {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "45", "fetched_at_utc": "2026-11-09T02:00:00+00:00"},
                 {"location_id": "L1", "valid_time": "2026-11-09T01:30:00+08:00", "tide": "滿潮", "height_above_twvd_cm": "45"},
-                {"location_id": "L1", "valid_time": "2026-11-09T03:30:00+08:00", "tide": "乾潮", "height_above_twvd_cm": "-45"},
             ]
             pairings = [{
                 "station_id": "S1", "station_name": "測試潮位站",
@@ -173,7 +175,13 @@ class CwaTideObservationForecastComparisonTests(unittest.TestCase):
             with out_path.open(encoding="utf-8-sig", newline="") as f:
                 matches = list(csv.DictReader(f))
             self.assertEqual(len(matches), 2)
+            self.assertTrue(all(row["forecast_issue_time_utc"] for row in matches))
+            self.assertTrue(all(float(row["lead_time_hours"]) > 0 for row in matches))
             self.assertEqual(matches[0]["forecast_above_twvd_m"], "0.45")
+            summary = json.loads(out_path.with_name("tide_forecast_observation_comparison_summary.json").read_text(encoding="utf-8"))
+            self.assertEqual(summary["stations"][0]["forecast_events_missing_issue_time"], 1)
+            self.assertEqual(summary["stations"][0]["forecast_events_issued_at_or_after_target"], 1)
+            self.assertEqual(summary["stations"][0]["forecast_events_eligible_for_verification"], 2)
             self.assertAlmostEqual(float(matches[0]["height_error_observed_minus_forecast_m"]), 0.05, places=3)
             summary = json.loads(out_path.with_name("tide_forecast_observation_comparison_summary.json").read_text(encoding="utf-8"))
             self.assertEqual(summary["matched_event_count"], 2)
