@@ -60,6 +60,19 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
         for hours in HORIZONS:
             end=as_of+timedelta(hours=hours)
             window=[r for r in region_rows if as_of<=parse_dt(r["valid_time"],"valid_time")<end]
+            # Tide phases are hydrodynamic context only, not a fish-activity score.
+            phase_counts={phase:0 for phase in ("rising","falling","high_slack","low_slack")}
+            turning_hours=0
+            for record in window:
+                env=record.get("environment") or {}
+                phase=env.get("tide_phase")
+                if phase in phase_counts:
+                    phase_counts[phase]+=1
+                if env.get("tide_turning") is True:
+                    turning_hours+=1
+            phase_known=sum(phase_counts.values())
+            phase_missing=len(window)-phase_known
+            forecast_missing=hours-len(window)
             # Keep one record per hour after forecast vintage selection; absent hours remain absent.
             for cid,candidate in sorted(candidates.items()):
                 joined=[integrated.get((cid,region,r.get("valid_time",""),"forecast")) for r in window]
@@ -100,6 +113,15 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
                     "as_of":as_of.isoformat(),"horizon_hours":str(hours),"window_end":end.isoformat(),
                     "forecast_hour_count":str(len(window)),"expected_hour_count":str(hours),
                     "forecast_coverage":f"{len(window)/hours:.4f}",
+                    "tide_phase_rising_hours":str(phase_counts["rising"]),
+                    "tide_phase_falling_hours":str(phase_counts["falling"]),
+                    "tide_phase_high_slack_hours":str(phase_counts["high_slack"]),
+                    "tide_phase_low_slack_hours":str(phase_counts["low_slack"]),
+                    "tide_phase_known_hour_count":str(phase_known),
+                    "tide_phase_missing_hour_count":str(phase_missing),
+                    "tide_phase_missing_forecast_hour_count":str(forecast_missing),
+                    "tide_phase_coverage":f"{phase_known/hours:.4f}",
+                    "tide_turning_hour_count":str(turning_hours),
                     "environment_match_hour_count":str(len(scores)),"environment_match_status":env_status,
                     "environment_match_mean":f"{sum(scores)/len(scores):.2f}" if scores else "",
                     "environment_match_min":f"{min(scores):.2f}" if scores else "",
@@ -122,7 +144,10 @@ def main():
     records=[json.loads(x) for x in a.environment_jsonl.read_text(encoding="utf-8").splitlines() if x.strip()]
     rows=build_window_summaries(records,read_csv(a.candidates_csv),read_csv(a.integrated_csv),parse_dt(a.as_of,"--as-of"))
     fields=["candidate_id","common_name_zh","scientific_name","region_id","as_of","horizon_hours","window_end",
-        "forecast_hour_count","expected_hour_count","forecast_coverage","environment_match_hour_count",
+        "forecast_hour_count","expected_hour_count","forecast_coverage",
+        "tide_phase_rising_hours","tide_phase_falling_hours","tide_phase_high_slack_hours","tide_phase_low_slack_hours",
+        "tide_phase_known_hour_count","tide_phase_missing_hour_count","tide_phase_missing_forecast_hour_count",
+        "tide_phase_coverage","tide_turning_hour_count","environment_match_hour_count",
         "environment_match_status","environment_match_mean","environment_match_min","environment_match_max",
         "activity_evidence_status","activity_evidence_ids","seasonal_evidence_ids","activity_score",
         "catch_probability","best_fishing_window_status","interpretation"]
