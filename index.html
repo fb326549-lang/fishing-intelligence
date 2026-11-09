@@ -414,7 +414,7 @@ function renderP2FishOutlook(){
   const ecologyRecords=data.species_ecology_context&&Array.isArray(data.species_ecology_context.records)?data.species_ecology_context.records:[];
   const ecologyItems=ecologyRecords.filter(x=>x.candidate_id===r.candidate_id&&['habitat','depth','activity','feeding','reproduction','fishery'].includes(x.category)).slice(0,5);
   const ecologyLabels={habitat:'棲地背景',depth:'記載水深',activity:'活動描述',feeding:'食性',reproduction:'繁殖背景',fishery:'漁業季節'};
-  const ecologyHtml=ecologyItems.length?'<div class="small">物種生態資料（非即時魚況／非作釣深度建議）：</div>'+ecologyItems.map(x=>'<div class="small">'+escapeP2Text(ecologyLabels[x.category]||x.category)+'：'+escapeP2Text(x.parameter_value)+(x.unit_or_format&&x.unit_or_format!=='controlled_vocabulary'?' '+escapeP2Text(x.unit_or_format):'')+'｜'+escapeP2Text(x.geographic_scope)+'｜'+escapeP2Text(x.evidence_id)+'</div>').join(''):'';
+  const ecologyHtml=ecologyItems.length?'<div class="small">物種生態資料（非即時魚況／非作釣深度建議）：</div>'+ecologyItems.map(x=>'<div class="small">'+escapeP2Text(ecologyLabels[x.category]||x.category)+'：'+escapeP2Text(x.parameter_value)+(x.unit_or_format&& !['controlled_vocabulary','qualitative'].includes(x.unit_or_format)?' '+escapeP2Text(x.unit_or_format):'')+'｜'+escapeP2Text(x.geographic_scope)+'｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源：'+escapeP2Text(x.source_name)+'（'+escapeP2Text(x.evidence_id)+'）</a></div>').join(''):'';
   const ednaRows=data.edna_occurrence_context&&Array.isArray(data.edna_occurrence_context.records)?data.edna_occurrence_context.records:[];
   const edna=ednaRows.find(x=>x.candidate_id===r.candidate_id&&x.region_id===region);
   let ednaHtml='<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
