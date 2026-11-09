@@ -24,7 +24,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_generates_three_horizons_and_never_best_fishing_window(self):
         env=[forecast(h) for h in range(10,22)]
         joined=[integrated(h,"72") for h in range(10,22)]
-        rows=build_window_summaries(env,[candidate()],joined,AS_OF)
+        rows=[r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south"]
         self.assertEqual([r["horizon_hours"] for r in rows],["6","12","24"])
         self.assertEqual([r["forecast_hour_count"] for r in rows],["6","12","12"])
         self.assertTrue(all(r["best_fishing_window_status"]=="not_established" for r in rows))
@@ -70,5 +70,14 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_as_of_must_be_hour_aligned(self):
         with self.assertRaisesRegex(ValueError,"aligned to the start of an hour"):
             build_window_summaries([], [candidate()], [], datetime.fromisoformat("2026-11-09T10:30:00+08:00"))
+
+    def test_all_six_regions_are_reported_even_without_forecast_records(self):
+        rows=build_window_summaries([], [candidate()], [], AS_OF)
+        self.assertEqual(len(rows),18)
+        self.assertEqual({r["region_id"] for r in rows},{
+            "yilan_suao","hualien_north","hualien_south",
+            "fengbin_shitiping","chenggong_donghe","taitung_south"})
+        self.assertTrue(all(r["environment_match_status"]=="no_forecast_records" for r in rows))
+        self.assertTrue(all(r["forecast_coverage"]=="0.0000" for r in rows))
 
 if __name__=="__main__": unittest.main()
