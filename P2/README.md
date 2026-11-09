@@ -708,3 +708,13 @@ P2 整合器現在保留每個候選魚種的季節研究 ID、報告季節、�
 
 `build_species_context_catalog.py` 會將這些紀錄一併輸出至 `species_ecology_context.json` 的 `regional_occurrence_records`，PWA 可依魚種及區域顯示歷史出現證據與原始報告連結；此層仍標記為 `context_only_east_coast_biodiversity_survey`，不參與活動分數或中魚機率。
 
+## P2.4.5 活動／出現／季節證據可追溯上下文
+
+`P2/species/integrate_environment_and_activity.py` now exports source-level evidence context alongside evidence IDs and counts:
+- `activity_evidence_context_json`: activity dimension, evidence kind, reported pattern, geographic scope, study period, sample size, life stage, method, literature ID, source URL, confidence, transferability, model-use status, and limitations.
+- `occurrence_evidence_context_json`: the same provenance fields for occurrence-only records, kept separate from activity evidence.
+- `seasonal_evidence_context_json`: expanded with study period, life stage, method, literature ID, source URL, confidence, transferability, model-use status, and limitations.
+
+This lets downstream PWA/API consumers explain why a record is context-only (for example, northern Taiwan, western Taiwan fishery, captive feeding, juvenile-only behaviour, external-region telemetry, or a single East Taiwan occurrence). Occurrence records remain a separate evidence class and are never counted as activity observations. This change does not create activity scores, environmental-response scores, catch probabilities, or best-fishing windows. The existing blank score fields and taxonomy gates remain unchanged.
+
+Validation is covered by `P2/test_integrated_activity.py`: source URL/literature traceability, transferability and limitations are preserved, and occurrence-only evidence remains separate from activity evidence.
