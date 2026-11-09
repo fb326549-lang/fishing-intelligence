@@ -55,7 +55,8 @@ def build_window_summaries(records,candidate_rows,integrated_rows,as_of):
     by_region={}
     for row in forecast: by_region.setdefault(row.get("region_id",""),[]).append(row)
     output=[]
-    for region in REGIONS:\n        region_rows=by_region.get(region,[])
+    for region in REGIONS:
+        region_rows=by_region.get(region,[])
         for hours in HORIZONS:
             end=as_of+timedelta(hours=hours)
             window=[r for r in region_rows if as_of<=parse_dt(r["valid_time"],"valid_time")<end]
