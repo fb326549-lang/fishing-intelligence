@@ -114,6 +114,7 @@ $('test').onclick=async()=>{if(!saveSettings())return;const c=config(),u=new URL
 async function loadTide(){
 const c=config();
 $('tideLevel').textContent='查詢中…';$('tidePhase').textContent='—';$('tideDetail').textContent='正在取得中央氣象署潮汐預報…';
+try{
 let valid=[],tideSource='CWA 快取';
 try{
  const snapshotResponse=await fetch(CWA_TIDE_SNAPSHOT_URL);
