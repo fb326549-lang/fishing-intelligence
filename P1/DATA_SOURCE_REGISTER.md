@@ -34,7 +34,7 @@ Status meanings:
 - Academia Sinica technology-transfer listing: https://ticket.apps.sinica.edu.tw/tech/30T-991105
 - TBIA API documentation: https://tbiadata.tw/zh-hant/api/doc
 
-This register records metadata research, not successful live API ingestion. Dataset schemas and terms must be rechecked before production use.
+The initial rows above record source discovery. The CWA integration status below records live API ingestion tests and generated regional outputs. Dataset schemas, quotas, and terms still require periodic rechecking; successful ingestion does not grant unrestricted redistribution rights.
 
 ## CWA live integration verification (reviewed 2026-11-09)
 
@@ -43,7 +43,7 @@ The following official CWA products are now implemented in the P1 collector work
 | Dataset | Product / fields | Official cadence and fee | P1 handling |
 |---|---|---|---|
 | O-B0075-001 | 48-hour buoy and tide-station marine observations: station ID, observation time, tide height, wave height/direction/period, sea temperature, air temperature/pressure, wind, gusts, current layer/direction/speed | 4 updates/hour; free; CWA OpenData platform usage rules | Integrated through fetch, normalization and reviewed station-to-region mapping. Values retain source time, units and missing status. |
-| O-B0075-002 | 30-day buoy and tide-station marine observations | Available in the CWA REST API / Swagger; fee and cadence must be rechecked on its dataset page before routine use | Not currently used by the daily P1 ingestion; avoid adding unnecessary duplicate volume. |
+| O-B0075-002 | 30-day buoy and tide-station marine observations | CWA REST API / Swagger; latest live fetch validated in P1 | Integrated into the daily workflow as a separate rolling-30-day regional history output. Historical aggregation does not apply today's station-active status to past records. Output is retained as a 3-day workflow artifact, not yet a permanent environmental archive. |
 | F-A0021-001 | One-month tide forecast: location ID/name/coordinates, high/low event time, tide range and three separate height datums | Updated daily; free; CWA OpenData platform usage rules | Integrated as forecast events, not continuous observed tide. TWVD, local MSL and chart datum remain separate. |
 | O-B0076-001 | Buoy/tide-station metadata and available observation elements | Hourly metadata update; free | Used to discover stations and their supported elements; metadata is not a measurement. |
 
@@ -56,9 +56,12 @@ The following official CWA products are now implemented in the P1 collector work
 
 ### Data and verification status
 
-- The `tide-history` branch currently contains 288 observed-tide records from six explicitly paired mainland stations and 20,384 forecast-vintage records from six collection snapshots (latest archive summary: 2026-11-08 23:15 UTC).
-- The current historical verification report has zero matched forecast-extremum events. Therefore no MAE or timing-accuracy statistic is reported yet. This is an insufficient-history result, not evidence that the CWA forecast is inaccurate.
-- Continue daily append-only collection. Do not overwrite forecast vintages, mix vertical datums, or interpret hourly observations as exact high/low event times.
+- The `tide-history` branch currently contains 324 observed-tide records from six explicitly paired mainland stations and 32,171 forecast-vintage records across nine collection snapshots (latest archive summary: 2026-11-09 04:34 UTC).
+- The historical verifier currently has 12 matched forecast-extremum samples across the six station/location pairs. This remains below the 30-sample reporting threshold; interpretation stays `Insufficient evidence`. Do not present these early samples as a calibrated accuracy score.
+- The latest rolling 48-hour comparison had zero eligible forecast events because the tide forecast events within the observed window had been issued at or after their target times. They were correctly excluded. This is not a failed forecast result.
+- The daily CWA workflow now also generates a separate O-B0075-002 rolling-30-day regional context file. Latest run: 3,595 region/time rows; station coverage by region was 宜蘭蘇澳5、花蓮北段3、花蓮南段0、豐濱石梯坪2、成功東河3、台東南段3. This output is currently a short-retention workflow artifact, not a permanent archive.
+- The 48-hour region output had 240 region/time rows. CWA currently has no mapped station for 花蓮南段; this region must remain explicitly unobserved in CWA station data rather than being filled with interpolated or invented measurements.
+- Continue daily append-only tide history collection. Do not overwrite forecast vintages, mix vertical datums, or interpret hourly observations as exact high/low event times.
 
 ### Official CWA references
 
