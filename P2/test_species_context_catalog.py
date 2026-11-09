@@ -57,7 +57,7 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             catalog=build_catalog(candidates,ecology,evidence,occurrence)
             self.assertEqual(catalog["record_count"],0)
             self.assertEqual(catalog["regional_occurrence_record_count"],2)
-            row=catalog["regional_occurrence_records"][0]
+            row=next(x for x in catalog["regional_occurrence_records"] if x["candidate_id"]=="c036")
             self.assertEqual(row["candidate_id"],"c036")
             self.assertEqual(row["region_id"],"chenggong_donghe")
             self.assertEqual(row["recorded_presence"],"present")
