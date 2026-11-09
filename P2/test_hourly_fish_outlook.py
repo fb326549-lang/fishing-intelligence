@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from datetime import datetime
@@ -29,6 +30,57 @@ class HourlyFishOutlookTests(unittest.TestCase):
         self.assertEqual([r["forecast_hour_count"] for r in rows],["6","12","12"])
         self.assertTrue(all(r["best_fishing_window_status"]=="not_established" for r in rows))
         self.assertTrue(all(r["activity_score"]=="" and r["catch_probability"]=="" for r in rows))
+
+    def test_tide_phase_counts_are_context_only_and_missing_hours_stay_visible(self):
+        env=[forecast(h) for h in range(10,16)]
+        phases=["rising","rising","falling","high_slack","low_slack",None]
+        for row,phase in zip(env,phases):
+            row["environment"]={"tide_phase":phase,"tide_turning":phase in {"high_slack","low_slack"}}
+        joined=[integrated(h,"") for h in range(10,16)]
+        row=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF) if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        self.assertEqual(row["tide_phase_rising_hours"],"2")
+        self.assertEqual(row["tide_phase_falling_hours"],"1")
+        self.assertEqual(row["tide_phase_high_slack_hours"],"1")
+        self.assertEqual(row["tide_phase_low_slack_hours"],"1")
+        self.assertEqual(row["tide_phase_known_hour_count"],"5")
+        self.assertEqual(row["tide_phase_missing_hour_count"],"1")
+        self.assertEqual(row["tide_phase_missing_forecast_hour_count"],"0")
+        self.assertEqual(row["tide_phase_coverage"],"0.8333")
+        self.assertEqual(row["tide_turning_hour_count"],"2")
+        self.assertEqual(row["activity_score"],"")
+        self.assertEqual(row["catch_probability"],"")
+
+    def test_occurrence_records_are_aggregated_separately_from_activity_evidence(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"") for h in range(10,16)]
+        for row in joined:
+            row["activity_evidence_ids"]=""
+            row["occurrence_evidence_ids"]="AE011;AE012"
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        self.assertEqual(result["occurrence_evidence_count"],"2")
+        self.assertEqual(result["occurrence_evidence_ids"],"AE011;AE012")
+        self.assertEqual(result["activity_evidence_ids"],"")
+        self.assertEqual(result["activity_score"],"")
+        self.assertEqual(result["catch_probability"],"")
+
+    def test_seasonal_context_is_deduplicated_and_preserved_in_outlook(self):
+        env=[forecast(h) for h in range(10,16)]
+        joined=[integrated(h,"") for h in range(10,16)]
+        context=[
+            {"id":"SE005","reported_season":"April–June and October–December","geographic_scope":"Eastern Taiwan offshore commercial longline grounds","model_use_status":"context_only_east_taiwan_commercial_fishery","limitations":"Not shore-angling catch data."},
+            {"id":"SE006","reported_season":"March–August spawning stage; peak April–July","geographic_scope":"Eastern Taiwan; Taitung XinGang fish market","model_use_status":"context_only_east_taiwan_reproductive_biology","limitations":"Not nearshore availability or catch probability."}
+        ]
+        for row in joined:
+            row["seasonal_evidence_ids"]="SE005;SE006"
+            row["seasonal_evidence_context_json"]=json.dumps(context,ensure_ascii=False)
+        result=next(r for r in build_window_summaries(env,[candidate()],joined,AS_OF)
+                    if r["region_id"]=="taitung_south" and r["horizon_hours"]=="6")
+        saved=json.loads(result["seasonal_evidence_context_json"])
+        self.assertEqual([x["id"] for x in saved],["SE005","SE006"])
+        self.assertEqual(result["seasonal_evidence_ids"],"SE005;SE006")
+        self.assertEqual(result["activity_score"],"")
+        self.assertEqual(result["catch_probability"],"")
 
     def test_latest_forecast_vintage_before_as_of_is_selected(self):
         old=forecast(10,collected="2026-11-09T08:00:00+08:00")
