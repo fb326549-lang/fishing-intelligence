@@ -20,7 +20,7 @@ def validate_alert(a):
     if a.get("source_id") not in ("CWA_OPENDATA","CWA_OCEAN_PLATFORM"): errors.append("invalid source_id")
     if not str(a.get("source_url","")).startswith("https://"): errors.append("source_url must be HTTPS")
     if not isinstance(a.get("region_ids"),list) or any(x not in REGIONS for x in a.get("region_ids",[])): errors.append("invalid region_ids")
-    if a.get("alert_type") not in {"typhoon","strong_wind_land","heavy_rain","thunderstorm","long_wave","high_wave","storm_surge","cold_surge","marine_warning","other"}: errors.append("invalid alert_type")
+    if a.get("alert_type") not in {"typhoon","strong_wind_land","heavy_rain","thunderstorm","long_wave","high_wave","storm_surge","cold_surge","large_tide","marine_warning","other"}: errors.append("invalid alert_type")
     if a.get("severity") not in {"extreme","severe","moderate","minor","unknown"}: errors.append("invalid severity")
     if a.get("status") not in {"active","cancelled","expired","unknown"}: errors.append("invalid status")
     for k in ("issued_at","effective_start","effective_end","collected_at"):
