@@ -15,7 +15,7 @@ def candidate(cid="c003",gate="verified_taxon"):
     return {"candidate_id":cid,"common_name_zh":"臭肚","scientific_name":"Siganus fuscescens","eligibility_gate":gate}
 
 def integrated(hour,score="",activity="context_only_evidence_available",cid="c003"):
-    return {"candidate_id":cid,"region_id":"taitung_south",
+    return {"candidate_id":cid,"region_id":"taitung_south","data_type":"forecast",
         "valid_time":f"2026-11-09T{hour:02d}:00:00+08:00",
         "environment_match_score":score,"environment_match_status":"scored" if score!="" else "insufficient_evidence",
         "activity_evidence_status":activity,"activity_evidence_ids":"AE003","seasonal_evidence_ids":"SE003"}
