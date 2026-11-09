@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/tide_current_context.schema.json",
+  "title": "Neutral tide and current context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "region_id",
+    "valid_time",
+    "collected_at",
+    "data_type",
+    "source_records",
+    "tide_height_m",
+    "tide_phase",
+    "tide_turning",
+    "tidal_current_velocity_ms",
+    "tidal_current_direction_deg",
+    "ocean_current_velocity_ms",
+    "ocean_current_direction_deg",
+    "availability",
+    "derivation",
+    "interpretation",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "region_id": {
+      "type": "string"
+    },
+    "valid_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_type": {
+      "enum": [
+        "forecast",
+        "observation",
+        "hindcast",
+        "derived"
+      ]
+    },
+    "source_records": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "tide_height_m": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "tide_phase": {
+      "enum": [
+        "rising",
+        "falling",
+        "high_slack",
+        "low_slack",
+        "unknown"
+      ]
+    },
+    "tide_turning": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "tidal_current_velocity_ms": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "tidal_current_direction_deg": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 360
+    },
+    "ocean_current_velocity_ms": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "ocean_current_direction_deg": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 360
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tide_height",
+        "tide_phase",
+        "tidal_current",
+        "ocean_current"
+      ],
+      "properties": {
+        "tide_height": {
+          "enum": [
+            "available",
+            "missing"
+          ]
+        },
+        "tide_phase": {
+          "enum": [
+            "available",
+            "unknown"
+          ]
+        },
+        "tidal_current": {
+          "enum": [
+            "available",
+            "missing"
+          ]
+        },
+        "ocean_current": {
+          "enum": [
+            "available",
+            "missing"
+          ]
+        }
+      }
+    },
+    "derivation": {
+      "const": "direct_field_passthrough_no_interpolation"
+    },
+    "interpretation": {
+      "const": "neutral_hydrodynamic_context_not_fish_activity_or_catch_probability"
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
