@@ -425,3 +425,33 @@ python -m unittest P2.test_integrated_activity -v
 即使環境適合度已有分數，也不代表魚當下活躍或容易咬餌。外地研究、幼魚行為、繁殖/群聚背景、圈養攝食、物種資料庫概述及西台灣漁業模型，均不能自動升格成東部逐時活動規則。白毛屬群組、黑毛俗名待鑑種及分布衝突候選仍依既有 gate 阻擋。
 
 此階段完成資料整合介面與證據閘門，並未完成可預測的魚種活性模型；真正的活動分數仍須等待台灣東部物種級、具時間戳且包含觀察努力/未觀察到魚的直接資料與正式審查。
+
+
+## P2.4.6 未來 6/12/24 小時逐時展望彙整
+
+新增：
+- `species/build_hourly_fish_outlook.py`：依六個東部區域、候選魚種與 6/12/24 小時窗口彙整逐時預報。
+- `schema/hourly_fish_outlook.schema.json`：展望摘要輸出契約。
+- `test_hourly_fish_outlook.py`：驗證三種窗口、預報版本選擇、觀測/預報隔離、缺時段不補值、物種 gate、活動分數留白及六區無資料狀態。
+
+預報版本選擇：
+- 只取 `data_type=forecast`，不混入 observation。
+- `collected_at` 必須不晚於 `--as-of`，避免使用分析時間之後才蒐集到的未來版本。
+- 同一區域/有效小時保留截至 as-of 最新的 forecast vintage。
+- `--as-of` 必須有時區且對齊整點；每個 horizon 以 [as-of, as-of + N hours) 計算。
+- 6/12/24 小時缺少的預報小時不插值、不補值，輸出 coverage；六區即使完全沒有預報，也會回報 no_forecast_records。
+
+執行：
+```bash
+python P2/species/build_hourly_fish_outlook.py \\
+  --environment-jsonl output/p2/hourly_environment.jsonl \\
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \\
+  --integrated-csv output/p2/integrated_hourly_fish_assessment.csv \\
+  --as-of 2026-11-09T10:00:00+08:00 \\
+  --out output/p2/hourly_fish_outlook.csv
+python -m unittest P2.test_hourly_fish_outlook -v
+```
+
+每筆摘要分開呈現預報完整度、環境適合度可用時數及環境匹配分數的平均/最低/最高值；這些統計僅描述環境匹配，不是魚類活動強度。活動證據狀態及來源 ID 一併保留。由於目前沒有足夠的東部成魚逐時活動/釣獲資料，`activity_score`、`catch_probability` 保持空白，`best_fishing_window_status=not_established`；本階段不會把環境分數最高的小時稱為最佳作釣時段。
+
+此輸出是 P2.4 的逐時展望資料層，尚未接入 PWA，也不是已驗證中魚機率模型。後續須以實際釣獲與空軍紀錄、作釣努力量及東部物種級直接觀察，逐步建立並驗證活動/中魚模型。

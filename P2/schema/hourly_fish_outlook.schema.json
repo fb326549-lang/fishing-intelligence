@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fb326549-lang.github.io/fishing-intelligence/P2/schema/hourly_fish_outlook.schema.json",
+  "title": "6/12/24-hour hourly fish outlook summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidate_id",
+    "common_name_zh",
+    "scientific_name",
+    "region_id",
+    "as_of",
+    "horizon_hours",
+    "window_end",
+    "forecast_hour_count",
+    "expected_hour_count",
+    "forecast_coverage",
+    "environment_match_hour_count",
+    "environment_match_status",
+    "environment_match_mean",
+    "environment_match_min",
+    "environment_match_max",
+    "activity_evidence_status",
+    "activity_evidence_ids",
+    "seasonal_evidence_ids",
+    "activity_score",
+    "catch_probability",
+    "best_fishing_window_status",
+    "interpretation"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "common_name_zh": {
+      "type": "string"
+    },
+    "scientific_name": {
+      "type": "string"
+    },
+    "region_id": {
+      "type": "string"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "horizon_hours": {
+      "enum": [
+        "6",
+        "12",
+        "24"
+      ]
+    },
+    "window_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "forecast_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "expected_hour_count": {
+      "type": "string",
+      "pattern": "^(6|12|24)$"
+    },
+    "forecast_coverage": {
+      "type": "string",
+      "pattern": "^(0(\\.[0-9]{4})?|1\\.0000)$"
+    },
+    "environment_match_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "environment_match_status": {
+      "enum": [
+        "no_forecast_records",
+        "insufficient_evidence",
+        "taxon_or_distribution_gate",
+        "environment_match_unavailable",
+        "partial_environment_match_coverage",
+        "environment_match_summary_available"
+      ]
+    },
+    "environment_match_mean": {
+      "type": "string"
+    },
+    "environment_match_min": {
+      "type": "string"
+    },
+    "environment_match_max": {
+      "type": "string"
+    },
+    "activity_evidence_status": {
+      "enum": [
+        "taxon_or_distribution_gate",
+        "context_only_evidence_available",
+        "direct_evidence_requires_activity_rule_review",
+        "insufficient_east_taiwan_activity_evidence",
+        "missing_activity_assessment"
+      ]
+    },
+    "activity_evidence_ids": {
+      "type": "string"
+    },
+    "seasonal_evidence_ids": {
+      "type": "string"
+    },
+    "activity_score": {
+      "const": ""
+    },
+    "catch_probability": {
+      "const": ""
+    },
+    "best_fishing_window_status": {
+      "const": "not_established"
+    },
+    "interpretation": {
+      "const": "forecast_environment_summary_not_fish_activity_or_catch_probability"
+    }
+  }
+}
