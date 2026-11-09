@@ -46,7 +46,7 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.open-meteo.com/v1/marine',weatherUrl:'https://api.open-meteo.com/v1/forecast',tideUrl:'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-A0021-001',tideKey:''},KEY='fishing_intelligence_config_v1';
 const CWA_SNAPSHOT_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json';
 let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null},p2Outlook=null;
-const P2_OUTLOOK_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json';
+
 const map=L.map('map').setView([23.7,121],7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
 function config(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}}
@@ -369,57 +369,6 @@ function renderDecisionHome(){
  [6,12,24].forEach(n=>{let valid=0;for(let i=0;i<times.length;i++){const t=new Date(times[i]).getTime();if(t>=now&&t<now+n*3600000&&[h.wind_speed_10m?.[i],h.wind_gusts_10m?.[i],mh.wave_height?.[i]].some(v=>v!==null&&v!==undefined&&v!==''))valid++}lines.push('未來 '+n+' 小時：'+valid+'/'+n+' 小時有風浪資料')});
  $('decisionHorizon').textContent=lines.join('｜')+'。魚種活動最佳時段尚未經證據驗證。';
 }
-function p2ActivityLabel(status){
- const labels={taxon_or_distribution_gate:'物種鑑定／分布限制',context_only_evidence_available:'目前只有背景證據',direct_evidence_requires_activity_rule_review:'有直接證據，尚待規則審查',insufficient_east_taiwan_activity_evidence:'東部活動證據不足',missing_activity_assessment:'缺少活動分析資料'};
- return labels[status]||'資料不足';
-}
-function renderP2Outlook(){
- const region=selectedCwaRegion(),regionNames={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
- $('p2Region').textContent=regionNames[region]||'請選擇東部區域';
- const fishIndex=$('targetFish').value,fish=fishIndex==='all'?null:(FISH_DB[detectFishRegion()]||[])[Number(fishIndex)];
- $('p2Fish').textContent=fish?fish[0]:'請選擇單一目標魚種';
- const ids={'黑毛':'c001','瓜子鱲':'c001','白毛':'c002','臭肚':'c003','黑鯛（烏格）':'c004','黑鯛':'c004'};
- const candidateId=fish?ids[fish[0]]:null;
- const box=$('p2OutlookCards');box.replaceChildren();
- const addText=(parent,tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.className=cls;el.textContent=value;parent.append(el);return el};
- if(!p2Outlook||!Array.isArray(p2Outlook.rows)){
-  addText(box,'div','metric','P2.4.6 展望資料尚未發布，請稍後重新查詢。');
-  $('p2ActivityStatus').textContent='尚未取得';$('p2ActivityNote').textContent='不會以舊版 heuristic 分數代替 P2 活動分析。';$('p2AsOf').textContent='資料時間：無';return;
- }
- if(!region||!candidateId){
-  addText(box,'div','metric',!region?'目前釣點不在六個東部分析區，請從上方手動選擇東部區域。':'請選擇黑毛、白毛、臭肚或黑鯛，查看目前已建檔的物種證據。');
-  $('p2ActivityStatus').textContent='等待選擇';$('p2ActivityNote').textContent='目前 P2.4.6 已建立上述四個俗名對應；其他魚種仍在資料建置中。';$('p2AsOf').textContent='資料基準：'+(p2Outlook.as_of||'無');return;
- }
- const selected=p2Outlook.rows.filter(r=>r.candidate_id===candidateId&&r.region_id===region);
- const horizons=[6,12,24];
- horizons.forEach(hours=>{
-  const r=selected.find(x=>Number(x.horizon_hours)===hours),card=document.createElement('div');card.className='metric';
-  addText(card,'div','label','未來 '+hours+' 小時');
-  if(!r){addText(card,'div','value','無資料');addText(card,'div','small','此區尚無對應展望紀錄');box.append(card);return;}
-  addText(card,'div','value',r.forecast_hour_count+'/'+r.expected_hour_count+' 小時');
-  addText(card,'div','small','預報完整度 '+Math.round(Number(r.forecast_coverage||0)*100)+'%');
-  const score=r.environment_match_mean?('環境匹配 '+r.environment_match_mean+'/100'):'環境反應規則尚未建立';
-  addText(card,'div','small',score);
-  addText(card,'div','small',r.environment_match_status==='no_forecast_records'?'沒有預報資料':r.environment_match_status==='partial_environment_match_coverage'?'預報時數不完整':r.environment_match_status==='environment_match_summary_available'?'環境匹配摘要可用':'缺少經審查的環境反應參數');
-  box.append(card);
- });
- const first=selected.find(x=>Number(x.horizon_hours)===6)||selected[0];
- $('p2ActivityStatus').textContent=p2ActivityLabel(first?.activity_evidence_status);
- $('p2ActivityNote').textContent='活動分數：未建立｜中魚機率：未建立｜最佳作釣時段：尚未具備判定證據。'+(first?.activity_evidence_ids?' 活動證據：'+first.activity_evidence_ids+'.':'')+(first?.seasonal_evidence_ids?' 季節證據：'+first.seasonal_evidence_ids+'.':'');
- $('p2AsOf').textContent='預報基準：'+(p2Outlook.as_of||'無')+'｜展望更新：'+(p2Outlook.generated_at||'無');
-}
-async function loadP2Outlook(){
- $('p2Status').textContent='取得 P2.4.6 六區逐時展望中…';
- try{
-  const response=await fetch(P2_OUTLOOK_URL+'?t='+Date.now(),{cache:'no-store'});
-  if(!response.ok)throw Error('HTTP '+response.status);
-  const payload=await response.json();
-  if(payload.schema_version!==1||payload.source!=='fishing-intelligence-p2.4.6'||!Array.isArray(payload.rows))throw Error('P2 展望資料格式不符');
-  p2Outlook=payload;renderP2Outlook();
-  const age=Date.now()-new Date(payload.generated_at).getTime();
-  $('p2Status').textContent=Number.isFinite(age)&&age>8*3600000?'資料可能已超過 8 小時未更新，請重新查詢並確認來源狀態。':'P2.4.6 展望資料已載入｜'+payload.record_count+' 筆｜'+(payload.regions||[]).length+' 個區域。';
- }catch(e){p2Outlook=null;renderP2Outlook();$('p2Status').textContent='P2.4.6 展望資料尚未取得：'+e.message+'。原有海象、天氣及潮汐功能不受影響。'}
-}
 function detectCwaRegion(){
  const lat=Number(point.lat),lon=Number(point.lon);
  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lon<120.8||lon>122.5)return null;
@@ -488,7 +437,7 @@ async function loadCwaSnapshot(){
 
 $('cwaRegion').addEventListener('change',()=>{renderCwaObserved();renderDecisionHome()});
 $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFishing();renderDecisionHome()});
-$('targetFish').addEventListener('change',()=>{calculateFishing();renderP2Outlook()});
+$('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
 renderFishOptions();
 initFavorites();
 async function loadData(){loadCwaSnapshot();loadTide();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
