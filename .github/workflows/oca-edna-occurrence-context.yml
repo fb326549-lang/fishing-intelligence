@@ -56,6 +56,12 @@ jobs:
           from pathlib import Path
           root = Path("output/oca_edna_context")
           manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          coverage = manifest["regional_reference_coverage"]
+          regions = set(coverage["region_ids"])
+          active = set(coverage["active_reference_regions"])
+          missing = set(coverage["regions_without_active_reference_stations"])
+          assert active.isdisjoint(missing) and active | missing == regions
+          print("Regional eDNA reference coverage gaps:", ", ".join(sorted(missing)) or "none")
           assert manifest["detection_record_count"] > 0
           assert manifest["source_datasets"] and len(manifest["source_datasets"]) == 3
           rows = [json.loads(line) for line in (root / "edna_occurrence_context.jsonl").read_text(encoding="utf-8").splitlines() if line]
