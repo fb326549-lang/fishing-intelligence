@@ -16,7 +16,7 @@ FIELDS = [
 ]
 
 def read_csv(path: Path):
-    with path.open(encoding="utf-8-sig", newline="") as f:
+    with path.open(encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f))
 
 def migrate(ecology_path: Path, evidence_path: Path):
@@ -84,7 +84,7 @@ def main():
     rows = migrate(args.ecology_csv, args.evidence_csv)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDS)
+        writer = csv.DictWriter(f, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     print(f"Migrated {len(rows)} evidence-linked ecology records; no values inferred.")
