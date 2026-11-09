@@ -19,7 +19,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
         cinerascens_crosswalk = next(r for r in rows if r["literature_record_id"] == "L018")
         self.assertEqual(southern_specimen["model_use_status"], "occurrence_only_no_environment_response")
         self.assertEqual(cinerascens_crosswalk["model_use_status"], "occurrence_record_conflict_requires_reconciliation")
-        self.assertIn("Taitung Sanxiantai", southern_specimen["geographic_scope"])
+        self.assertIn("台東三仙台", southern_specimen["geographic_scope"])
 
 
     def test_matrix_flags_taxonomy_and_distribution_gates(self):
