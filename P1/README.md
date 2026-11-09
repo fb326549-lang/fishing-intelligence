@@ -142,6 +142,10 @@ The PWA can estimate a P1 planning region from the selected coordinate or allow 
 
 CWA observed values are currently displayed as a separate evidence layer. They are not blended into the existing heuristic fish score. The existing score is not a calibrated catch probability or a trained local fish-activity model.
 
+## Forecast horizon coverage
+
+The collector requests three forecast days even though the current decision snapshots are +6h, +12h, and +24h. This buffer is intentional: the horizon selector chooses the first hourly model timestamp at or after the exact target and never backfills from an earlier hour. A two-day response can end before a +24h target when collection occurs late in the local hour (for example, target 23:17 while the feed ends at 23:00), producing a missing horizon despite a healthy API response. The extra forecast day prevents this avoidable end-of-range gap; the selected valid timestamp remains visible and may be slightly later than the nominal target.
+
 ## Archived marine forecast verification against CWA observations
 
 The scheduled Open-Meteo workflow now appends each normalized hourly forecast/observation batch to the P2 history branch before rebuilding the history catalog. Exact duplicate records are skipped; forecast vintages and observation revisions are retained.

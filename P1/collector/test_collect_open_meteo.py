@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -7,6 +8,11 @@ from collect_open_meteo import normalize_hourly, resolve_source_location
 
 
 class OpenMeteoSourceLocationTests(unittest.TestCase):
+    def test_config_fetches_three_days_to_cover_24h_horizon_after_hour_boundary(self):
+        config_path = Path(__file__).parent / "config.example.json"
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        self.assertGreaterEqual(config["forecast_days"], 3)
+
     def test_marine_can_use_offshore_coordinates_without_moving_weather_point(self):
         location = {
             "id": "hualien_south",
