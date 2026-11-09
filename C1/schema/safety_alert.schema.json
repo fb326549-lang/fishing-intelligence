@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fishing Intelligence official safety alert",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "alert_id",
+    "source_id",
+    "dataset_id",
+    "source_url",
+    "region_ids",
+    "alert_type",
+    "severity",
+    "status",
+    "issued_at",
+    "effective_start",
+    "effective_end",
+    "collected_at",
+    "message"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "alert_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_id": {
+      "enum": [
+        "CWA_OPENDATA",
+        "CWA_OCEAN_PLATFORM"
+      ]
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source_alert_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "region_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "yilan_suao",
+          "hualien_north",
+          "hualien_south",
+          "fengbin_shitiping",
+          "chenggong_donghe",
+          "taitung_south"
+        ]
+      }
+    },
+    "unmapped_area": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "alert_type": {
+      "enum": [
+        "typhoon",
+        "strong_wind_land",
+        "heavy_rain",
+        "thunderstorm",
+        "long_wave",
+        "high_wave",
+        "storm_surge",
+        "cold_surge",
+        "marine_warning",
+        "other"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "extreme",
+        "severe",
+        "moderate",
+        "minor",
+        "unknown"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "cancelled",
+        "expired",
+        "unknown"
+      ]
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effective_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effective_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "message": {
+      "type": "string"
+    },
+    "affected_area": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "raw_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
