@@ -83,7 +83,7 @@ def main():
     args = parser.parse_args()
     rows = migrate(args.ecology_csv, args.evidence_csv)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    with args.out.open("w", encoding="utf-8-sig", newline="") as f:
+    with args.out.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
