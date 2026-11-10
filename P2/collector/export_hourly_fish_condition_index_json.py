@@ -2,7 +2,7 @@
 """Export the evidence-gated hourly fish-condition index for the PWA."""
 from __future__ import annotations
 import argparse, csv, json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -31,6 +31,8 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
     as_of_dt = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
     if as_of_dt.tzinfo is None:
         raise ValueError("--as-of must include timezone")
+    if as_of_dt.minute or as_of_dt.second or as_of_dt.microsecond:
+        raise ValueError("--as-of must be aligned to the start of an hour")
     with input_path.open(encoding="utf-8-sig", newline="") as f:
         rows = list(csv.DictReader(f))
     normalized = []
@@ -38,7 +40,7 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
         if row.get("data_type") != "forecast" or row.get("region_id") not in REGIONS:
             continue
         valid = datetime.fromisoformat(row["valid_time"].replace("Z", "+00:00"))
-        if not as_of_dt <= valid < as_of_dt.replace(minute=0, second=0, microsecond=0) + __import__("datetime").timedelta(hours=24):
+        if not as_of_dt <= valid < as_of_dt + timedelta(hours=24):
             continue
         normalized.append({
             "candidate_id": row.get("candidate_id", ""),
