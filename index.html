@@ -74,10 +74,6 @@ a{color:#8be8ef}
 #radarDashboard .radar-info{background:rgba(3,37,55,.72);border:1px solid rgba(85,185,190,.24);border-radius:11px;padding:11px;min-width:0}
 #radarDashboard .radar-info-label{font-size:10px;color:#a8d1d6}
 #radarDashboard .radar-info-value{font-size:14px;font-weight:800;color:#e7fff7;margin-top:6px}
-#radarDashboard .radar-safety{margin-top:9px;border-radius:11px;padding:11px;background:rgba(4,47,59,.9);border:1px solid rgba(86,197,174,.35)}
-#radarDashboard .radar-safety[data-level="danger"]{border-color:rgba(255,107,107,.75);background:rgba(91,25,37,.38)}
-#radarDashboard .radar-safety[data-level="warning"]{border-color:rgba(255,190,92,.65);background:rgba(92,62,22,.28)}
-#radarDashboard .radar-safety-title{font-size:12px;font-weight:800}
 #radarDashboard .radar-footnote{font-size:10px;line-height:1.55;color:#a9cbd1;margin-top:9px}
 @media(max-width:380px){#radarDashboard .radar-score-layout{grid-template-columns:122px minmax(0,1fr);gap:10px}#radarDashboard .radar-gauge{width:122px;height:122px}#radarDashboard .radar-number{font-size:33px}#radarDashboard .radar-indicators{gap:5px}#radarDashboard .radar-indicator{padding:9px 6px}#radarDashboard .radar-indicator-value{font-size:12px}}
 
@@ -106,7 +102,6 @@ a{color:#8be8ef}
   <div class="radar-info"><div class="radar-info-label">預估最佳時段</div><div class="radar-info-value" id="radarBestWindow">尚未建立</div><div class="radar-sub" id="radarBestNote">不會把風浪較平穩的時段直接當成魚類最佳攝食時段。</div></div>
   <div class="radar-info"><div class="radar-info-label">分析對象</div><div class="radar-info-value" id="radarTarget">等待選擇魚種</div><div class="radar-sub" id="radarForecastState">等待六區逐時展望資料</div></div>
  </div>
- <div class="radar-safety" id="radarSafetyPanel" data-level="unknown"><div class="radar-head"><div class="radar-safety-title">🛟 出釣安全評估</div><strong class="radar-safety-title" id="radarSafetyState">安全尚未確認</strong></div><div class="radar-sub" id="radarSafetyNote">安全判斷優先於魚情指數；資料不足不代表安全。</div></div>
  <div class="radar-footnote" id="radarFreshness">魚情資料載入中。歷史 eDNA／標本只作物種曾出現的背景，不代表即時魚群或活動量。</div>
 </section>
 <div class="metric" style="margin-top:9px" id="integratedSafetyPanel">
@@ -741,20 +736,6 @@ function renderRadarDashboard(){
  const stale=!Number.isFinite(age)||age>8||age<-.25;
  $('radarForecastState').textContent=data?(stale?'逐時展望可能過期':'六區 6／12／24 小時展望已接入'):'逐時展望資料暫不可用';
  $('radarModelStatus').textContent=!candidateId?'等待目標魚種':!data?'資料暫不可用':stale?'資料可能過期':'模型證據不足';
- const safety=latest.safety?.regions?.[regionId],risk=latest.marineRisk?.regions?.[regionId];
- let level='unknown',safetyText='安全尚未確認',safetyNote='官方安全資料或區域海象資料不足；不可將缺值解讀為安全，也不可只憑魚情分數出釣。';
- if(safety?.state==='high_risk'||risk?.exposure_level==='very_high'){
-  level='danger';safetyText='不建議出竿';safetyNote='官方安全決策或海象暴露資料顯示高風險。即使魚情條件有利，也必須停止出釣判斷。';
- }else if(safety?.state==='warning'||risk?.exposure_level==='high'||risk?.exposure_level==='moderate'){
-  level='warning';safetyText='注意風險';safetyNote='本區有官方警示或海象暴露風險，請優先重新評估行程與現場狀況。';
- }else if(safety?.state==='no_active_alerts_reported'&&risk?.state==='assessed'&&risk?.exposure_level==='low'){
-  level='normal';safetyText='未回報有效警特報';safetyNote='已查核來源目前未回報有效警特報且暴露篩檢為低；這不是安全許可，仍須確認現場浪況、岸際公告與裝備。';
- }else if(safety?.state==='insufficient_data'||risk?.state==='partial_data'){
-  level='unknown';safetyText='安全資料不完整';safetyNote='部分官方來源或測站資料缺漏，無法可靠判斷安全；請勿把資料不足視為可出釣。';
- }
- $('radarSafetyPanel').dataset.level=level;
- $('radarSafetyState').textContent=safetyText;
- $('radarSafetyNote').textContent=safetyNote;
  $('radarFreshness').textContent='海域：'+(names[regionId]||'未選擇')+'｜魚種：'+(candidateId?name:'未選擇')+'｜展望產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'無法取得')+'。eDNA／標本為歷史出現背景，不代表目前有魚。';
 }
 
