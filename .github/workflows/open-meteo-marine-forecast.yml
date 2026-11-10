@@ -123,9 +123,11 @@ jobs:
           payload=p2-history-data/data/latest_hourly_fish_outlook.json
           test -s "$payload"
           python - "$payload" <<'PY'
-          import json,sys
+          import json,sys,re
+          from datetime import datetime
           from pathlib import Path
           data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          schema=json.loads(Path("P2/schema/hourly_fish_outlook.schema.json").read_text(encoding="utf-8"))
           assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-p2.6"
           assert len(data.get("regions",[]))==6
           assert data.get("horizons_hours")==[6,12,24]
@@ -134,13 +136,27 @@ jobs:
           assert len({r.get("candidate_id") for r in rows})==21
           assert len({r.get("region_id") for r in rows})==6
           assert {str(r.get("horizon_hours")) for r in rows}=={"6","12","24"}
+          required=set(schema["required"])
+          properties=schema["properties"]
+          for index,row in enumerate(rows):
+              missing=required-set(row)
+              extra=set(row)-set(properties) if schema.get("additionalProperties") is False else set()
+              assert not missing, f"row {index} missing schema fields: {sorted(missing)}"
+              assert not extra, f"row {index} has undeclared fields: {sorted(extra)}"
+              for key,rule in properties.items():
+                  if key not in row: continue
+                  if rule.get("type")=="string": assert isinstance(row[key],str), f"row {index} {key} is not string"
+                  if "const" in rule: assert row[key]==rule["const"], f"row {index} {key} violates const"
+                  if "enum" in rule: assert row[key] in rule["enum"], f"row {index} {key} violates enum"
+                  if "pattern" in rule: assert re.fullmatch(rule["pattern"],row[key]), f"row {index} {key} violates pattern"
+                  if rule.get("format")=="date-time": datetime.fromisoformat(row[key].replace("Z","+00:00"))
           assert all(r.get("activity_score")=="" and r.get("catch_probability")=="" for r in rows)
           assert all(r.get("best_fishing_window_status")=="not_established" for r in rows)
           edna=data.get("edna_occurrence_context",{}).get("records",[])
           assert edna and all(r.get("model_use_status")=="context_only_edna_occurrence" for r in edna)
           ecology=data.get("species_ecology_context",{}).get("records",[])
           assert ecology and all(r.get("source_url") for r in ecology)
-          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":21,"edna_context_records":len(edna),"ecology_records":len(ecology),"scores_withheld":True})
+          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":21,"edna_context_records":len(edna),"ecology_records":len(ecology),"schema_rows_validated":len(rows),"scores_withheld":True})
           PY
           cp "$payload" "$latest_dir/latest_hourly_fish_outlook.json"
 
