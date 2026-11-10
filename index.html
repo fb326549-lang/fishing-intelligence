@@ -530,6 +530,19 @@ async function loadMarineRisk(){
 function escapeP2Text(value){
  return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
+async function loadFishConditionIndex(){
+ try{
+  const response=await fetch(FISH_CONDITION_INDEX_URL+'?t='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.schema_version!==1||data.source!=='fishing-intelligence-fci-1.0'||!Array.isArray(data.rows)||!Array.isArray(data.regions)||!Array.isArray(data.horizons_hours))throw Error('魚情指數資料格式不符');
+  if(!data.horizons_hours.includes(6)||!data.horizons_hours.includes(12)||!data.horizons_hours.includes(24))throw Error('魚情指數預報時段不完整');
+  latest.fishConditionIndex=data;
+ }catch(e){
+  latest.fishConditionIndex=null;
+ }
+}
+
 async function loadP2FishOutlook(){
  try{
   const response=await fetch(P2_FISH_OUTLOOK_URL+'?t='+Date.now(),{cache:'no-store'});
@@ -546,6 +559,7 @@ async function loadP2FishOutlook(){
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
  renderDecisionFishOptions(selectedCwaRegion());
+ await loadFishConditionIndex();
  renderRadarDashboard();
 }
 function renderForecastVerification(){
