@@ -150,17 +150,22 @@ def rule_matches(rule, value):
     return value <= rule["_maximum"]
 
 def score_indicator(candidate_id, region_id, features, rules, indicator):
-    applicable = [
+    candidates = [
         r for r in rules
         if r["candidate_id"] == candidate_id
         and r["indicator_code"] == indicator
         and r["region_scope"] in {region_id, "all_east_taiwan"}
     ]
-    if not applicable:
+    if not candidates:
         return {"status": "insufficient_evidence", "score": "", "coverage": "0.0000", "trace": []}
     groups = {}
-    for rule in applicable:
+    for rule in candidates:
         groups.setdefault(rule["response_group"], []).append(rule)
+    # A region-specific profile overrides its all-East-Taiwan fallback for that group.
+    for group_id, bands in list(groups.items()):
+        specific = [r for r in bands if r["region_scope"] == region_id]
+        if specific:
+            groups[group_id] = specific
     evaluated, missing, trace = [], [], []
     for group_id, bands in sorted(groups.items()):
         fields = {r["environment_field"] for r in bands}
@@ -261,6 +266,9 @@ def assess_hour(record, candidates, rules, weights):
 def rank_best_hours(rows):
     groups = {}
     for row in rows:
+        if row.get("data_type") != "forecast":
+            output_row = dict(row, best_hour_status="not_rankable_data_type", best_hour_rank="")
+            continue
         groups.setdefault((row["candidate_id"], row["region_id"]), []).append(row)
     output = []
     for key, group in groups.items():
