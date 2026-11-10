@@ -168,6 +168,21 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "overlapping score bands"):
             assess_hour(self.record, CANDIDATES, rules, weights)
 
+
+    def test_best_hour_is_ranked_separately_for_6_12_and_24_hour_horizons(self):
+        base = {
+            "candidate_id": "c036", "region_id": "taitung_south", "data_type": "forecast",
+            "overall_fish_condition_index": "80.00", "valid_time": "2026-11-10T10:00:00+08:00",
+        }
+        later = dict(base, overall_fish_condition_index="92.00", valid_time="2026-11-10T17:00:00+08:00")
+        rows = rank_best_hours([base, later], datetime.fromisoformat("2026-11-10T10:00:00+08:00"))
+        first = next(r for r in rows if r["valid_time"] == base["valid_time"])
+        second = next(r for r in rows if r["valid_time"] == later["valid_time"])
+        self.assertEqual(first["best_hour_status_6h"], "best_hour")
+        self.assertEqual(second["best_hour_status_6h"], "outside_horizon")
+        self.assertEqual(second["best_hour_status_12h"], "best_hour")
+        self.assertEqual(second["best_hour_status_24h"], "best_hour")
+
     def test_nonforecast_records_are_not_best_hour_candidates(self):
         row = {
             "candidate_id": "c036", "region_id": "taitung_south",
