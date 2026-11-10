@@ -13,7 +13,7 @@ FIELDS = {
 }
 DIMENSIONS = {"occurrence_record","diel_activity","diel_feeding","seasonal_aggregation","seasonal_distribution","spawning_timing","feeding_activity","movement_activity","diel_activity_proxy","tide_associated_behavior","current_associated_distribution"}
 KINDS = {"verified_museum_specimen","direct_field_observation","telemetry_proxy","captive_feeding_trial","fishery_catch_model","taxonomic_summary","larval_field_survey"}
-CONTEXT_ONLY = {"context_only_northern_taiwan_field_study","context_only_taxonomic_database","context_only_captive_feeding","context_only_western_taiwan_fishery_model","context_only_external_region","context_only_western_taiwan_fishery_model","context_only_east_taiwan_occurrence"}
+CONTEXT_ONLY = {"context_only_northern_taiwan_field_study","context_only_taxonomic_database","context_only_captive_feeding","context_only_western_taiwan_fishery_model","context_only_external_region","context_only_western_taiwan_fishery_model","context_only_east_taiwan_occurrence", "context_only_taiwan_fishery_reference"}
 
 def read_csv(path: Path):
     with path.open(encoding="utf-8-sig", newline="") as f:
