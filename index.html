@@ -51,6 +51,35 @@ button:active{background:#218b98}
 .season-note{color:#a8f0d8}
 .sub,.small,.status,.label{color:#b5dce2}
 a{color:#8be8ef}
+
+/* Radar dashboard: scoped presentation only; preserve existing ocean theme and other panels. */
+#radarDashboard{margin-top:12px;background:linear-gradient(150deg,rgba(3,36,54,.98),rgba(5,67,79,.96));border:1px solid rgba(72,205,196,.48);border-radius:16px;padding:14px;box-shadow:inset 0 1px 0 rgba(170,255,244,.08),0 12px 28px rgba(0,12,25,.24)}
+#radarDashboard .radar-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#radarDashboard .radar-title{font-size:15px;font-weight:800;letter-spacing:.5px}
+#radarDashboard .radar-score-layout{display:grid;grid-template-columns:148px minmax(0,1fr);align-items:center;gap:14px;margin-top:14px}
+#radarDashboard .radar-gauge{width:148px;height:148px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from 220deg,#1a8793 0deg,#35d5bb 115deg,rgba(61,178,180,.16) 116deg 280deg,transparent 281deg 360deg);position:relative;filter:drop-shadow(0 0 12px rgba(49,217,193,.14))}
+#radarDashboard .radar-gauge:before{content:"";position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 28%,#0b5262,#062b40 72%);border:1px solid rgba(123,230,218,.28)}
+#radarDashboard .radar-gauge-inner{position:relative;text-align:center;z-index:1}
+#radarDashboard .radar-number{font-size:38px;line-height:1;font-weight:850;letter-spacing:-1px;color:#b9ffe7;text-shadow:0 0 16px rgba(63,255,191,.34)}
+#radarDashboard .radar-denom{font-size:12px;color:#a6d5d7;margin-top:4px}
+#radarDashboard .radar-summary{min-width:0}
+#radarDashboard .radar-grade{font-size:17px;font-weight:800;color:#d6fff3}
+#radarDashboard .radar-sub{font-size:11px;line-height:1.55;color:#b5dce2;margin-top:6px}
+#radarDashboard .radar-indicators{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:14px}
+#radarDashboard .radar-indicator{background:linear-gradient(145deg,rgba(18,100,116,.88),rgba(8,62,79,.94));border:1px solid rgba(91,197,195,.25);border-radius:11px;padding:10px 8px;min-width:0}
+#radarDashboard .radar-indicator-label{font-size:10px;color:#b5dce2}
+#radarDashboard .radar-indicator-value{font-size:14px;font-weight:800;color:#e4fff7;margin-top:6px;overflow-wrap:anywhere}
+#radarDashboard .radar-lower{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+#radarDashboard .radar-info{background:rgba(3,37,55,.72);border:1px solid rgba(85,185,190,.24);border-radius:11px;padding:11px;min-width:0}
+#radarDashboard .radar-info-label{font-size:10px;color:#a8d1d6}
+#radarDashboard .radar-info-value{font-size:14px;font-weight:800;color:#e7fff7;margin-top:6px}
+#radarDashboard .radar-safety{margin-top:9px;border-radius:11px;padding:11px;background:rgba(4,47,59,.9);border:1px solid rgba(86,197,174,.35)}
+#radarDashboard .radar-safety[data-level="danger"]{border-color:rgba(255,107,107,.75);background:rgba(91,25,37,.38)}
+#radarDashboard .radar-safety[data-level="warning"]{border-color:rgba(255,190,92,.65);background:rgba(92,62,22,.28)}
+#radarDashboard .radar-safety-title{font-size:12px;font-weight:800}
+#radarDashboard .radar-footnote{font-size:10px;line-height:1.55;color:#a9cbd1;margin-top:9px}
+@media(max-width:380px){#radarDashboard .radar-score-layout{grid-template-columns:122px minmax(0,1fr);gap:10px}#radarDashboard .radar-gauge{width:122px;height:122px}#radarDashboard .radar-number{font-size:33px}#radarDashboard .radar-indicators{gap:5px}#radarDashboard .radar-indicator{padding:9px 6px}#radarDashboard .radar-indicator-value{font-size:12px}}
+
 </style></head>
 <body>
 <header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">漁獵AI助手・東海岸</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
@@ -60,6 +89,25 @@ a{color:#8be8ef}
 <div class="row"><h2>🧭 漁獵雷達</h2><span class="tag">決策首頁・建置中</span></div>
 <p class="small">先確認安全，再分析海況與目標魚種。環境條件不等於中魚機率。</p>
 <div class="grid"><div class="metric"><div class="label">分析海域</div><div class="value" id="decisionRegion">尚未選擇</div></div><div class="metric"><div class="label">目標魚種</div><select id="decisionFishSelect" aria-label="依所選海域選擇目標魚種" style="width:100%;margin-top:8px"><option value="">請先選擇海域</option></select><div class="small" id="decisionFishScope" style="margin-top:7px">只顯示本區有物種級歷史陽性紀錄的魚種。</div></div></div>
+
+<section id="radarDashboard" aria-live="polite">
+ <div class="radar-head"><div class="radar-title">◉ 智慧魚情儀表板</div><span class="tag" id="radarModelStatus">模型證據檢查中</span></div>
+ <div class="radar-score-layout">
+  <div class="radar-gauge" aria-label="綜合魚情指數尚無可驗證分數"><div class="radar-gauge-inner"><div class="radar-number" id="radarIndex">—</div><div class="radar-denom">/ 100</div></div></div>
+  <div class="radar-summary"><div class="radar-grade" id="radarGrade">尚未具備可核准計分條件</div><div class="radar-sub" id="radarScoreNote">目前沒有經審查的台灣東部魚種環境反應規則與逐時活動模型；不以舊版通用權重或歷史出現紀錄填補分數。</div></div>
+ </div>
+ <div class="radar-indicators">
+  <div class="radar-indicator"><div class="radar-indicator-label">覓食條件</div><div class="radar-indicator-value" id="radarForage">尚未建立</div></div>
+  <div class="radar-indicator"><div class="radar-indicator-label">環境適合度</div><div class="radar-indicator-value" id="radarEnvironment">無核准規則</div></div>
+  <div class="radar-indicator"><div class="radar-indicator-label">魚類活動力</div><div class="radar-indicator-value" id="radarActivity">尚無模型</div></div>
+ </div>
+ <div class="radar-lower">
+  <div class="radar-info"><div class="radar-info-label">預估最佳時段</div><div class="radar-info-value" id="radarBestWindow">尚未建立</div><div class="radar-sub" id="radarBestNote">不會把風浪較平穩的時段直接當成魚類最佳攝食時段。</div></div>
+  <div class="radar-info"><div class="radar-info-label">分析對象</div><div class="radar-info-value" id="radarTarget">等待選擇魚種</div><div class="radar-sub" id="radarForecastState">等待六區逐時展望資料</div></div>
+ </div>
+ <div class="radar-safety" id="radarSafetyPanel" data-level="unknown"><div class="radar-head"><div class="radar-safety-title">🛟 出釣安全評估</div><strong class="radar-safety-title" id="radarSafetyState">安全尚未確認</strong></div><div class="radar-sub" id="radarSafetyNote">安全判斷優先於魚情指數；資料不足不代表安全。</div></div>
+ <div class="radar-footnote" id="radarFreshness">魚情資料載入中。歷史 eDNA／標本只作物種曾出現的背景，不代表即時魚群或活動量。</div>
+</section>
 <div class="metric" style="margin-top:9px" id="integratedSafetyPanel">
  <div class="row"><strong>🛟 氣象</strong><span class="tag" id="decisionSafetyTag">未驗證安全</span></div>
  <div id="decisionSafety" class="small" style="margin-top:7px">正在取得中央氣象署官方警報與海象風險資料…</div>
@@ -501,6 +549,7 @@ async function loadP2FishOutlook(){
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
  renderDecisionFishOptions(selectedCwaRegion());
+ renderRadarDashboard();
 }
 function renderForecastVerification(){
  const data=latest.forecastVerification;
@@ -661,6 +710,52 @@ function renderDecisionFishOptions(regionId){
  const p2Select=$('p2FishCandidate');if(p2Select)p2Select.value=select.value||'all';
  scope.textContent=unique.length?regionNames[regionId]+'｜僅列本區歷史 eDNA 物種級精確陽性紀錄（'+unique.length+' 種）；不代表目前有魚或即時魚群。':'本區目前沒有可確認到物種的歷史 eDNA 陽性紀錄，因此不提供魚種選項；不代表本區沒有這些魚。';
 }
+
+function renderRadarDashboard(){
+ const regionId=selectedCwaRegion(),candidateId=$('decisionFishSelect')?.value||'',data=latest.p2FishOutlook;
+ const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ const aliases={c001:'瓜子鱲（黑毛俗名候選）',c002:'白毛（舵魚屬未鑑種）',c036:'南方舵魚',c037:'天竺舵魚'};
+ const row=data?.rows?.find(r=>r.region_id===regionId&&r.candidate_id===candidateId&&String(r.horizon_hours)==='6');
+ const name=row?(aliases[row.candidate_id]||row.common_name_zh||row.candidate_id):'尚未選擇';
+ $('radarTarget').textContent=name;
+ $('radarIndex').textContent='—';
+ $('radarGrade').textContent=candidateId?'證據不足・暫不評分':'請先選擇目標魚種';
+ $('radarScoreNote').textContent='目前 P2 沒有任何經審查的東部數值環境反應規則，活動分數與最佳時段也明確維持未建立；因此不產生虛構的 0–100 分。';
+ $('radarForage').textContent='尚未建立';
+ $('radarActivity').textContent='無活動模型';
+ $('radarBestWindow').textContent='尚未建立';
+ $('radarBestNote').textContent='現有逐時展望只彙整環境與潮勢，不代表魚類覓食活動；最佳時段尚未經驗證。';
+ let env='無核准規則';
+ if(row){
+  const labels={taxon_or_distribution_gate:'物種資格未通過',insufficient_evidence:'缺少直接環境證據',insufficient_environment_data:'環境資料不足',no_forecast_records:'沒有預報資料',environment_match_unavailable:'環境匹配不可用',partial_environment_match_coverage:'資料覆蓋不完整',environment_match_summary_available:'環境摘要可用'};
+  env=labels[row.environment_match_status]||'證據不足';
+  if(row.environment_match_mean)env='僅環境摘要 '+row.environment_match_mean+'/100';
+  const activityLabels={taxon_or_distribution_gate:'物種資格未通過',context_only_evidence_available:'僅背景證據',direct_evidence_requires_activity_rule_review:'直接證據待審查',insufficient_east_taiwan_activity_evidence:'缺少東部活動證據',missing_activity_assessment:'尚無活動評估'};
+  $('radarActivity').textContent=activityLabels[row.activity_evidence_status]||'尚無模型';
+ }
+ $('radarEnvironment').textContent=env;
+ const generated=new Date(data?.generated_at||'');
+ const age=(Date.now()-generated.getTime())/3600000;
+ const stale=!Number.isFinite(age)||age>8||age<-.25;
+ $('radarForecastState').textContent=data?(stale?'逐時展望可能過期':'六區 6／12／24 小時展望已接入'):'逐時展望資料暫不可用';
+ $('radarModelStatus').textContent=!candidateId?'等待目標魚種':!data?'資料暫不可用':stale?'資料可能過期':'模型證據不足';
+ const safety=latest.safety?.regions?.[regionId],risk=latest.marineRisk?.regions?.[regionId];
+ let level='unknown',safetyText='安全尚未確認',safetyNote='官方安全資料或區域海象資料不足；不可將缺值解讀為安全，也不可只憑魚情分數出釣。';
+ if(safety?.state==='high_risk'||risk?.exposure_level==='very_high'){
+  level='danger';safetyText='不建議出竿';safetyNote='官方安全決策或海象暴露資料顯示高風險。即使魚情條件有利，也必須停止出釣判斷。';
+ }else if(safety?.state==='warning'||risk?.exposure_level==='high'||risk?.exposure_level==='moderate'){
+  level='warning';safetyText='注意風險';safetyNote='本區有官方警示或海象暴露風險，請優先重新評估行程與現場狀況。';
+ }else if(safety?.state==='no_active_alerts_reported'&&risk?.state==='assessed'&&risk?.exposure_level==='low'){
+  level='normal';safetyText='未回報有效警特報';safetyNote='已查核來源目前未回報有效警特報且暴露篩檢為低；這不是安全許可，仍須確認現場浪況、岸際公告與裝備。';
+ }else if(safety?.state==='insufficient_data'||risk?.state==='partial_data'){
+  level='unknown';safetyText='安全資料不完整';safetyNote='部分官方來源或測站資料缺漏，無法可靠判斷安全；請勿把資料不足視為可出釣。';
+ }
+ $('radarSafetyPanel').dataset.level=level;
+ $('radarSafetyState').textContent=safetyText;
+ $('radarSafetyNote').textContent=safetyNote;
+ $('radarFreshness').textContent='海域：'+(names[regionId]||'未選擇')+'｜魚種：'+(candidateId?name:'未選擇')+'｜展望產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'無法取得')+'。eDNA／標本為歷史出現背景，不代表目前有魚。';
+}
+
 function renderDecisionHome(){
  const regionId=selectedCwaRegion(),names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  $('decisionRegion').textContent=names[regionId]||'請選擇分析區域';
@@ -708,6 +803,7 @@ function renderDecisionHome(){
  [6,12,24].forEach(n=>{let valid=0;for(let i=0;i<times.length;i++){const t=new Date(times[i]).getTime();if(t>=now&&t<now+n*3600000&&[h.wind_speed_10m?.[i],h.wind_gusts_10m?.[i],mh.wave_height?.[i]].some(v=>v!==null&&v!==undefined&&v!==''))valid++}lines.push('未來 '+n+' 小時：'+valid+'/'+n+' 小時有風浪資料')});
  $('decisionHorizon').textContent=lines.join('｜')+'。魚種活動最佳時段尚未經證據驗證。';
 }
+ renderRadarDashboard();
 function detectCwaRegion(){
  const lat=Number(point.lat),lon=Number(point.lon);
  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lon<120.8||lon>122.5)return null;
@@ -776,7 +872,7 @@ async function loadCwaSnapshot(){
 
 $('cwaRegion').addEventListener('change',()=>{renderCwaObserved();renderDecisionHome();renderP2FishOutlook()});
 $('p2FishCandidate').addEventListener('change',renderP2FishOutlook);
-$('decisionFishSelect').addEventListener('change',()=>{const id=$('decisionFishSelect').value;if(id)$('p2FishCandidate').value=id;else $('p2FishCandidate').value='all';renderP2FishOutlook();});
+$('decisionFishSelect').addEventListener('change',()=>{const id=$('decisionFishSelect').value;if(id)$('p2FishCandidate').value=id;else $('p2FishCandidate').value='all';renderP2FishOutlook();renderRadarDashboard();});
 $('p2FishHorizon').addEventListener('change',renderP2FishOutlook);
 $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFishing();renderDecisionHome()});
 $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
