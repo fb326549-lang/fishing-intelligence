@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "species"))
-from indicator_score_engine import assess_hour, load_rules, load_weights, rank_best_hours
+from indicator_score_engine import assess_hour, load_rules, load_weights, rank_best_hours, unique_candidates
 
 CANDIDATES = [{
     "candidate_id": "c036",
@@ -112,6 +112,14 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         ranked = rank_best_hours([base, other, missing])
         self.assertEqual(next(r for r in ranked if r["valid_time"] == other["valid_time"])["best_hour_status"], "best_hour")
         self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status"], "unscored_hour")
+
+
+    def test_candidate_matrix_rows_are_deduplicated_by_species(self):
+        repeated = CANDIDATES + [dict(CANDIDATES[0], response_domain="activity_period")]
+        self.assertEqual(len(unique_candidates(repeated)), 1)
+        conflict = CANDIDATES + [dict(CANDIDATES[0], eligibility_gate="taxonomy_gate")]
+        with self.assertRaisesRegex(ValueError, "conflicting eligibility_gate"):
+            unique_candidates(conflict)
 
     def test_rule_cannot_score_without_direct_east_taiwan_basis(self):
         bad = dict(self.rule_rows[0], evidence_basis="western_taiwan_fishery")
