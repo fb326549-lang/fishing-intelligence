@@ -307,8 +307,6 @@ def rank_best_hours(rows, as_of):
             continue
         groups.setdefault((row["candidate_id"], row["region_id"]), []).append(row)
     for key, group in groups.items():
-        scored_rows = [r for r in group if r.get("overall_fish_condition_index", "") != ""]
-        by_time = {r["valid_time"]: dict(r) for r in group}
         for row in group:
             row["best_hour_status"] = "outside_horizon"
             row["best_hour_rank"] = ""
