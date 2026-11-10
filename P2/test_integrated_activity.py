@@ -1,3 +1,4 @@
+import csv
 import json
 import sys
 import unittest
@@ -83,6 +84,24 @@ class IntegratedActivityTests(unittest.TestCase):
         fish=next(r for r in rows if r["candidate_id"]=="c002")
         self.assertEqual(fish["activity_evidence_status"],"taxon_or_distribution_gate")
         self.assertEqual(fish["activity_score"],"")
+
+
+    def test_southern_drummer_context_studies_do_not_create_activity_score(self):
+        register=Path(__file__).parent/"species"/"species_activity_evidence_register.csv"
+        with register.open(encoding="utf-8-sig",newline="") as f:
+            evidence=list(csv.DictReader(f))
+        southern=[r for r in evidence if r["candidate_id"]=="c036" and r["activity_evidence_id"] in {"AE017","AE018","AE019","AE020"}]
+        self.assertEqual(len(southern),4)
+        rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity+southern,self.seasonal)
+        fish=next(r for r in rows if r["candidate_id"]=="c036")
+        self.assertEqual(fish["activity_evidence_status"],"context_only_evidence_available")
+        self.assertEqual(fish["activity_evidence_count"],"4")
+        self.assertEqual(fish["activity_score"],"")
+        self.assertEqual(fish["catch_probability"],"")
+        self.assertEqual(fish["best_fishing_window_status"],"not_established")
+        context=json.loads(fish["activity_evidence_context_json"])
+        self.assertEqual({x["id"] for x in context},{"AE017","AE018","AE019","AE020"})
+        self.assertTrue(all(x["model_use_status"].startswith("context_only_") for x in context))
 
     def test_environment_match_score_is_separate_from_activity_status(self):
         rows=build_integrated_rows(self.env,self.candidates,self.matches,self.activity,self.seasonal)
