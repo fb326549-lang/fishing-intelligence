@@ -111,7 +111,7 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         missing = dict(base, overall_fish_condition_index="", valid_time="2026-11-10T12:00:00+08:00")
         ranked = rank_best_hours([base, other, missing])
         self.assertEqual(next(r for r in ranked if r["valid_time"] == other["valid_time"])["best_hour_status"], "best_hour")
-        self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status"], "ranked_hour")
+        self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status"], "unscored_hour")
 
     def test_rule_cannot_score_without_direct_east_taiwan_basis(self):
         bad = dict(self.rule_rows[0], evidence_basis="western_taiwan_fishery")
