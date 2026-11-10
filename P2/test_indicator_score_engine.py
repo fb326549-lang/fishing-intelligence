@@ -1,5 +1,6 @@
 import sys
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "species"))
@@ -109,9 +110,9 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         }
         other = dict(base, overall_fish_condition_index="88.00", valid_time="2026-11-10T11:00:00+08:00")
         missing = dict(base, overall_fish_condition_index="", valid_time="2026-11-10T12:00:00+08:00")
-        ranked = rank_best_hours([base, other, missing])
-        self.assertEqual(next(r for r in ranked if r["valid_time"] == other["valid_time"])["best_hour_status"], "best_hour")
-        self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status"], "unscored_hour")
+        ranked = rank_best_hours([base, other, missing], datetime.fromisoformat("2026-11-10T10:00:00+08:00"))
+        self.assertEqual(next(r for r in ranked if r["valid_time"] == other["valid_time"])["best_hour_status_6h"], "best_hour")
+        self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status_6h"], "unscored_hour")
 
 
 
@@ -173,8 +174,8 @@ class IndicatorScoreEngineTests(unittest.TestCase):
             "valid_time": "2026-11-10T12:00:00+08:00", "data_type": "observation",
             "overall_fish_condition_index": "99.00",
         }
-        ranked = rank_best_hours([row])
-        self.assertEqual(ranked[0]["best_hour_status"], "not_rankable_data_type")
+        ranked = rank_best_hours([row], datetime.fromisoformat("2026-11-10T10:00:00+08:00"))
+        self.assertEqual(ranked[0]["best_hour_status_6h"], "not_rankable_data_type")
         self.assertEqual(ranked[0]["best_hour_rank"], "")
 
     def test_rule_cannot_score_without_direct_east_taiwan_basis(self):
