@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),27)
+        self.assertEqual(len(rows),30)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -77,6 +77,20 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(temp["model_use_status"],"context_only_captive_feeding")
         self.assertIn("12°C",temp["reported_pattern"])
         self.assertIn("不得直接套用台灣東部",temp["limitations"])
+
+
+    def test_taiwan_wide_fishery_guides_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        selected={r["activity_evidence_id"]:r for r in rows if r["activity_evidence_id"] in {"AE028","AE029","AE030"}}
+        self.assertEqual(set(selected),{"AE028","AE029","AE030"})
+        self.assertEqual(selected["AE028"]["source_literature_id"],"L043")
+        self.assertIn("冬季盛產",selected["AE028"]["reported_pattern"])
+        self.assertEqual(selected["AE029"]["source_literature_id"],"L044")
+        self.assertIn("冬季味美",selected["AE029"]["reported_pattern"])
+        self.assertEqual(selected["AE030"]["source_literature_id"],"L045")
+        self.assertIn("春冬",selected["AE030"]["reported_pattern"])
+        self.assertTrue(all(r["model_use_status"]=="context_only_taiwan_fishery_reference" for r in selected.values()))
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
