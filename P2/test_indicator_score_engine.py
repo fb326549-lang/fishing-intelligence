@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "species"))
-from indicator_score_engine import assess_hour, load_rules, load_weights, rank_best_hours, unique_candidates
+from indicator_score_engine import assess_hour, load_rules, load_weights, rank_best_hours, unique_candidates, select_latest_forecast_vintages
 
 CANDIDATES = [{
     "candidate_id": "c036",
@@ -113,6 +113,17 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         self.assertEqual(next(r for r in ranked if r["valid_time"] == other["valid_time"])["best_hour_status"], "best_hour")
         self.assertEqual(next(r for r in ranked if r["valid_time"] == missing["valid_time"])["best_hour_status"], "unscored_hour")
 
+
+
+    def test_latest_forecast_vintage_is_selected_per_region_and_hour(self):
+        older = dict(self.record, collected_at="2026-11-10T06:00:00+08:00")
+        newer = dict(self.record, collected_at="2026-11-10T07:00:00+08:00")
+        other_hour = dict(self.record, valid_time="2026-11-10T13:00:00+08:00",
+                          collected_at="2026-11-10T07:00:00+08:00")
+        selected = select_latest_forecast_vintages([older, newer, other_hour])
+        self.assertEqual(len(selected), 2)
+        self.assertIn(newer, selected)
+        self.assertNotIn(older, selected)
 
     def test_candidate_matrix_rows_are_deduplicated_by_species(self):
         repeated = CANDIDATES + [dict(CANDIDATES[0], response_domain="activity_period")]
