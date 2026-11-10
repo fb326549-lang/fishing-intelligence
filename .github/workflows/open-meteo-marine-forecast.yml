@@ -173,8 +173,19 @@ jobs:
           assert isinstance(data.get("rows"),list)
           assert all(row.get("data_type")=="forecast" for row in data["rows"])
           assert all(row.get("interpretation")=="species_specific_relative_fish_condition_index_not_catch_probability" for row in data["rows"])
-          assert all(row.get("overall_fish_condition_index") is None for row in data["rows"]), "No validated species weights/rules are approved yet; scores must remain withheld."
-          print({"status":"passed","rows":len(data["rows"]),"scores_withheld":True})
+          scored=[row for row in data["rows"] if row.get("overall_fish_condition_index") is not None]
+          for row in scored:
+              assert row.get("model_status")=="scored"
+              assert all(row.get(key) is not None for key in ("feeding_condition_score","environment_suitability_score","fish_activity_score"))
+              weights=row.get("species_weights") or {}
+              assert set(weights)=={"feeding_condition","environment_suitability","fish_activity"}
+              assert abs(sum(weights.values())-1.0)<1e-6
+          for row in data["rows"]:
+              if row.get("overall_fish_condition_index") is None:
+                  assert row.get("best_hour_status_6h") not in {"best_hour","ranked_hour"}
+                  assert row.get("best_hour_status_12h") not in {"best_hour","ranked_hour"}
+                  assert row.get("best_hour_status_24h") not in {"best_hour","ranked_hour"}
+          print({"status":"passed","rows":len(data["rows"]),"scored_rows":len(scored),"scores_withheld":not bool(scored)})
           PY
           cp "$fci_payload" "$latest_dir/latest_hourly_fish_condition_index.json"
 
