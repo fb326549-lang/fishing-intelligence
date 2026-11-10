@@ -261,11 +261,11 @@ def assess_hour(record, candidates, rules, weights):
         for key in INDICATORS:
             trace.extend([dict(item, indicator_code=key) for item in indicators[key]["trace"]])
         profile = weights.get(cid)
-        if not profile:
-            status = "species_weights_not_validated"
-            overall = ""
-        elif any(indicators[k]["status"] != "scored" for k in INDICATORS):
+        if any(indicators[k]["status"] != "scored" for k in INDICATORS):
             status = "one_or_more_indicators_unavailable"
+            overall = ""
+        elif not profile:
+            status = "species_weights_not_validated"
             overall = ""
         else:
             overall = sum(float(indicators[k]["score"]) * profile[k] for k in INDICATORS)
