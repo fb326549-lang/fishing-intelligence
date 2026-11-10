@@ -450,6 +450,7 @@ async function loadP2FishOutlook(){
   if(candidates.some(x=>x.id===previous))sel.value=previous;
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
+ renderDecisionFishOptions(selectedCwaRegion());
 }
 function renderForecastVerification(){
  const data=latest.forecastVerification;
