@@ -87,7 +87,7 @@ def load_rules(rows, candidates):
             raise ValueError(f"rule {rid}: unsupported operator")
         if row.get("region_scope") not in REGIONS:
             raise ValueError(f"rule {rid}: unsupported region_scope")
-        if not all(row.get(k, "").strip() for k in ("life_stage", "evidence_id", "source_url", "reviewed_by", "reviewed_at")):
+        if not all(row.get(k, "").strip() for k in ("response_group", "life_stage", "evidence_id", "source_url", "reviewed_by", "reviewed_at")):
             raise ValueError(f"rule {rid}: missing provenance/review fields")
         if not row["source_url"].startswith(("https://", "http://")):
             raise ValueError(f"rule {rid}: invalid source URL")
