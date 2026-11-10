@@ -608,6 +608,7 @@ function renderDecisionFishOptions(regionId){
  const unique=[...new Map(records.map(r=>[r.candidate_id,{id:r.candidate_id,...names.get(r.candidate_id)}])).values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
  select.innerHTML='<option value="">請選擇目標魚種</option>'+unique.map(x=>'<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+(x.scientific?'（'+escapeP2Text(x.scientific)+'）':'')+'</option>').join('');
  if(unique.some(x=>x.id===previous))select.value=previous;
+ const p2Select=$('p2FishCandidate');if(p2Select)p2Select.value=select.value||'all';
  scope.textContent=unique.length?regionNames[regionId]+'｜僅列本區歷史 eDNA 物種級精確陽性紀錄（'+unique.length+' 種）；不代表目前有魚或即時魚群。':'本區目前沒有可確認到物種的歷史 eDNA 陽性紀錄，因此不提供魚種選項；不代表本區沒有這些魚。';
 }
 function renderDecisionHome(){
