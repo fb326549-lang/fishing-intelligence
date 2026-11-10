@@ -62,6 +62,19 @@ def derived_features(record):
         values["daylight"] = 1.0 if rise <= valid < set_ else 0.0
     return values
 
+def unique_candidates(rows):
+    result = {}
+    for row in rows:
+        cid = row.get("candidate_id", "").strip()
+        if not cid:
+            raise ValueError("candidate register contains blank candidate_id")
+        previous = result.get(cid)
+        if previous and previous.get("eligibility_gate", "") != row.get("eligibility_gate", ""):
+            raise ValueError(f"candidate {cid} has conflicting eligibility_gate values")
+        if not previous:
+            result[cid] = row
+    return [result[cid] for cid in sorted(result)]
+
 def load_rules(rows, candidates):
     gates = {r["candidate_id"]: r.get("eligibility_gate", "") for r in candidates}
     result, seen = [], set()
@@ -299,7 +312,7 @@ def main():
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
     records = [json.loads(x) for x in a.environment_jsonl.read_text(encoding="utf-8").splitlines() if x.strip()]
-    candidates = read_csv(a.candidates_csv)
+    candidates = unique_candidates(read_csv(a.candidates_csv))
     rules = load_rules(read_csv(a.rules_csv), candidates)
     weights = load_weights(read_csv(a.weights_csv), candidates)
     rows = []
