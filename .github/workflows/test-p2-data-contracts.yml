@@ -23,8 +23,6 @@ jobs:
           python-version: "3.12"
       - name: Run P2 data contract tests
         run: python -m unittest discover -s P2 -p 'test_*.py' -v
-      - name: Run P2 species-engine regression tests
-        run: python -m unittest discover -s P2/species -p 'test_*.py' -v
       - name: Rebuild evidence-linked P2 species register
         run: |
           python P2/species/migrate_p1_ecology_parameters.py --ecology-csv P1/species/species_ecology_parameters.csv --evidence-csv P1/species/species_evidence_register.csv --out "$RUNNER_TEMP/species_response_parameters.csv"
