@@ -802,8 +802,8 @@ function renderDecisionHome(){
  const h=latest.hourlyWeather||{},mh=latest.hourlyMarine||{},times=h.time||[],now=Date.now(),lines=[];
  [6,12,24].forEach(n=>{let valid=0;for(let i=0;i<times.length;i++){const t=new Date(times[i]).getTime();if(t>=now&&t<now+n*3600000&&[h.wind_speed_10m?.[i],h.wind_gusts_10m?.[i],mh.wave_height?.[i]].some(v=>v!==null&&v!==undefined&&v!==''))valid++}lines.push('未來 '+n+' 小時：'+valid+'/'+n+' 小時有風浪資料')});
  $('decisionHorizon').textContent=lines.join('｜')+'。魚種活動最佳時段尚未經證據驗證。';
-}
  renderRadarDashboard();
+}
 function detectCwaRegion(){
  const lat=Number(point.lat),lon=Number(point.lon);
  if(!Number.isFinite(lat)||!Number.isFinite(lon)||lon<120.8||lon>122.5)return null;
