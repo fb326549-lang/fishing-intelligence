@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),30)
+        self.assertEqual(len(rows),35)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -91,6 +91,23 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(selected["AE030"]["source_literature_id"],"L045")
         self.assertIn("春冬",selected["AE030"]["reported_pattern"])
         self.assertTrue(all(r["model_use_status"]=="context_only_taiwan_fishery_reference" for r in selected.values()))
+
+
+    def test_rabbitfish_field_diet_and_captive_activity_sources_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        selected={r["activity_evidence_id"]:r for r in rows if r["activity_evidence_id"] in {"AE031","AE032","AE033","AE034","AE035"}}
+        self.assertEqual(set(selected),{"AE031","AE032","AE033","AE034","AE035"})
+        self.assertEqual(selected["AE031"]["source_literature_id"],"L046")
+        self.assertIn("低於濕重2%",selected["AE031"]["reported_pattern"])
+        self.assertEqual(selected["AE032"]["source_literature_id"],"L047")
+        self.assertIn("夏季45%",selected["AE032"]["reported_pattern"])
+        self.assertEqual(selected["AE033"]["source_literature_id"],"L048")
+        self.assertIn("15及30株",selected["AE033"]["reported_pattern"])
+        self.assertEqual(selected["AE034"]["source_literature_id"],"L049")
+        self.assertEqual(selected["AE035"]["source_literature_id"],"L050")
+        self.assertEqual(selected["AE035"]["evidence_kind"],"captive_activity_observation")
+        self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in selected.values()))
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
