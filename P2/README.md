@@ -805,6 +805,7 @@ python P2/species/audit_environment_response_rules.py \\
 - 新增 southern_drummer_response_model_spec.md，明確建立南方舵魚藻種×海溫、日照相位及晨昏／夜間候選反應架構；缺台灣東部自然藻源及野外驗證前，維持context-only，不輸出分數。
 - 新增 southern_drummer_response_curve_observations.csv，保存10筆有來源可追溯的水槽溫度／日週期觀測點；所有列均為context-only，不會自動成為計分規則。
 - 新增 fishery_effort_validation_methodology.md：納入iOcean官方「垂釣時數非必填」說明、墾丁2017年人時CPUE抽樣法及北部港區CPUE研究，修正原先對iOcean努力量欄位的過度簡化；仍須先稽核原始CSV/JSON實際欄位及完整率。
+- 新增 fishery_effort_study_register.csv：結構化登錄iOcean官方操作說明、墾丁現場努力量調查、北部港區CPUE研究及海保署2025年成果報告資料集；所有外地資料均標記為方法參考，不當作東部物種權重。
 - L046–L047 / AE031–AE032 / SE013–SE014：臭肚日本野生成魚胃含物研究顯示春秋食物組成不同；大型褐藻在夏、秋季胃含物重量比例分別約45%及74%，動物性成分亦有季節差異。
 - L048–L049 / AE033–AE034：臭肚水槽研究顯示褐藻密度影響取食，且飼育條件下也會取食動物性餌料；人工水槽餌料接受度不可視為野外釣餌偏好。
 - L050 / AE035 / SE015：DIDSON水槽活動觀察顯示臭肚日夜活動會隨月份改變（7月夜間活動較多，8月及12月白天較多），不能將臭肚全年簡化成固定白天活動。
