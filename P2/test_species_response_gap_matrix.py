@@ -61,7 +61,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c023,E002,https://www.tfrin.gov.tw/theme_data.php?id=1382&theme=research\n",encoding="utf-8")
             literature=root/"literature.csv"
             literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n"
-                "L6,c023,seasonal_activity,https://example.org/l6,context_only_east_taiwan_commercial_fishery\n",encoding="utf-8")
+                "L6,c023,seasonal_activity,https://example.org/l6,context_only_east_taiwan_commercial_fishery\n"
+                "L034,c036,activity_period,https://doi.org/10.1111/jfb.70024,context_only_external_region\n"
+                "L035,c036,activity_period,https://doi.org/10.2331/suisan.23-00035,context_only_external_region\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),147)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -106,10 +108,10 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(context[0]["model_use_status"],"context_only_east_taiwan_commercial_fishery")
             self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
             southern_activity=next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="activity_period")
-            self.assertEqual(southern_activity["literature_record_ids"],"L016;L034;L035")
+            self.assertEqual(southern_activity["literature_record_ids"],"L034;L035")
             self.assertEqual(southern_activity["literature_use_status"],"context_only_external_region;context_only_taxonomic_database")
             southern_context=__import__("json").loads(southern_activity["literature_context_json"])
-            self.assertEqual([x["literature_record_id"] for x in southern_context],["L016","L034","L035"])
+            self.assertEqual([x["literature_record_id"] for x in southern_context],["L034","L035"])
             self.assertTrue(all(x["model_use_status"] != "eligible_for_activity_scoring" for x in southern_context))
 
 if __name__ == "__main__":
