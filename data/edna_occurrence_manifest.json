@@ -2,7 +2,7 @@
   "schema_version": 1,
   "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
   "dataset_page": "https://data.gov.tw/dataset/172487",
-  "generated_at_utc": "2026-11-09T12:54:32.079486+00:00",
+  "generated_at_utc": "2026-11-10T03:35:19.422264+00:00",
   "detection_record_count": 19731,
   "exact_candidate_record_count": 618,
   "ambiguous_taxon_record_count": 238,
@@ -10,6 +10,28 @@
   "nearest_region_context_record_count": 6350,
   "candidate_month_region_summary_count": 293,
   "candidate_region_context_count": 51,
+  "regional_reference_coverage": {
+    "region_ids": [
+      "chenggong_donghe",
+      "fengbin_shitiping",
+      "hualien_north",
+      "hualien_south",
+      "taitung_south",
+      "yilan_suao"
+    ],
+    "active_reference_regions": [
+      "chenggong_donghe",
+      "fengbin_shitiping",
+      "hualien_north",
+      "taitung_south",
+      "yilan_suao"
+    ],
+    "regions_without_active_reference_stations": [
+      "hualien_south"
+    ],
+    "assignment_method": "nearest_active_reference_station_within_35km",
+    "interpretation": "Nearest-station region is geographic context only; it is not proof that the sample belongs to a fishing spot or that every region has equal reference coverage."
+  },
   "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
   "source_datasets": [
     {
