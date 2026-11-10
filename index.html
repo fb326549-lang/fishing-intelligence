@@ -17,6 +17,40 @@ main{max-width:1000px;margin:auto;padding:14px;display:grid;gap:12px}.panel{back
 button,input,select{background:#19465e;color:var(--text);border:1px solid #39718d;border-radius:10px;padding:11px;font-size:14px}button{cursor:pointer}button:active{opacity:.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#163b51;border-radius:10px;padding:12px;min-width:0}.label{font-size:11px;color:var(--muted)}.value{font-size:21px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#map{height:330px;border-radius:12px;z-index:1}.wide{grid-column:1/-1}#settings{display:none}#settings.show{display:block}label{display:block;font-size:12px;color:var(--muted);margin-top:9px}input,select{width:100%;margin-top:5px}.notice{font-size:11px;line-height:1.5;color:var(--muted);background:#0a2333;padding:10px;border-radius:9px;margin-top:10px}.tag{display:inline-block;border:1px solid #39718d;border-radius:99px;padding:4px 8px;font-size:11px;color:#b9eafa}
 .favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}.evidence-details{margin-top:7px;border-top:1px solid #28516a;padding-top:6px}.evidence-details summary{cursor:pointer;color:#b9eafa;font-size:12px}.evidence-item{margin-top:8px;padding:8px;background:#0e2b3e;border-radius:8px;overflow-wrap:anywhere}.evidence-item .small{margin-top:4px;line-height:1.45}.evidence-item a{color:#75d7f2}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
+
+/* Ocean-world palette: color-only presentation override */
+:root{
+ color-scheme:dark;
+ --bg:#062b3a;--panel:#0b5262;--line:#2a9aab;
+ --text:#f2fcff;--muted:#b5dce2;--accent:#52e0d0;
+}
+body{
+ background:
+  radial-gradient(ellipse at 12% 0%,rgba(39,190,194,.28),transparent 38%),
+  radial-gradient(ellipse at 88% 18%,rgba(27,139,190,.24),transparent 42%),
+  linear-gradient(180deg,#063c50 0%,#052c40 48%,#031f31 100%);
+ color:var(--text);
+}
+header{background:rgba(4,48,65,.96);border-bottom-color:rgba(92,218,220,.38)}
+.panel{
+ background:linear-gradient(145deg,rgba(12,91,105,.97),rgba(8,65,84,.98));
+ border-color:rgba(86,202,204,.48);
+ box-shadow:0 8px 24px rgba(0,20,34,.16);
+}
+.metric{background:linear-gradient(145deg,#126477,#0e5065)}
+button,input,select{
+ background:linear-gradient(145deg,#16788a,#10566e);
+ color:#f3fdff;border-color:#45b9c4;
+}
+button:active{background:#218b98}
+.tag{border-color:#52bdc6;color:#c7fbf3}
+.notice{background:linear-gradient(145deg,#07394d,#062d42);color:#c1e2e6}
+.favorite-item,.evidence-item{background:#084255;border-color:#278b9b}
+.evidence-details{border-top-color:#278b9b}
+.evidence-details summary{color:#8ef0e0}
+.season-note{color:#a8f0d8}
+.sub,.small,.status,.label{color:#b5dce2}
+a{color:#8be8ef}
 </style></head>
 <body>
 <header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">漁獵AI助手・東海岸</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
