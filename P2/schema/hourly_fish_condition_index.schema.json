@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hourly Fish Condition Index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "generated_at",
+    "as_of",
+    "regions",
+    "horizons_hours",
+    "rows",
+    "model_note"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "source": {
+      "const": "fishing-intelligence-fci-1.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "yilan_suao",
+          "hualien_north",
+          "hualien_south",
+          "fengbin_shitiping",
+          "chenggong_donghe",
+          "taitung_south"
+        ]
+      },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "horizons_hours": {
+      "const": [
+        6,
+        12,
+        24
+      ]
+    },
+    "model_note": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id",
+          "common_name_zh",
+          "scientific_name",
+          "region_id",
+          "valid_time",
+          "data_type",
+          "model_status",
+          "feeding_condition_score",
+          "feeding_condition_status",
+          "feeding_condition_coverage",
+          "environment_suitability_score",
+          "environment_suitability_status",
+          "environment_suitability_coverage",
+          "fish_activity_score",
+          "fish_activity_status",
+          "fish_activity_coverage",
+          "overall_fish_condition_index",
+          "species_weights",
+          "best_hour_status_6h",
+          "best_hour_rank_6h",
+          "best_hour_status_12h",
+          "best_hour_rank_12h",
+          "best_hour_status_24h",
+          "best_hour_rank_24h",
+          "indicator_trace",
+          "interpretation"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "common_name_zh": {
+            "type": "string"
+          },
+          "scientific_name": {
+            "type": "string"
+          },
+          "region_id": {
+            "type": "string",
+            "enum": [
+              "yilan_suao",
+              "hualien_north",
+              "hualien_south",
+              "fengbin_shitiping",
+              "chenggong_donghe",
+              "taitung_south"
+            ]
+          },
+          "valid_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data_type": {
+            "const": "forecast"
+          },
+          "model_status": {
+            "type": "string"
+          },
+          "feeding_condition_score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "feeding_condition_status": {
+            "type": "string"
+          },
+          "feeding_condition_coverage": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "environment_suitability_score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "environment_suitability_status": {
+            "type": "string"
+          },
+          "environment_suitability_coverage": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "fish_activity_score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "fish_activity_status": {
+            "type": "string"
+          },
+          "fish_activity_coverage": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "overall_fish_condition_index": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "species_weights": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "best_hour_status_6h": {
+            "type": "string"
+          },
+          "best_hour_rank_6h": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "best_hour_status_12h": {
+            "type": "string"
+          },
+          "best_hour_rank_12h": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "best_hour_status_24h": {
+            "type": "string"
+          },
+          "best_hour_rank_24h": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "indicator_trace": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "interpretation": {
+            "const": "species_specific_relative_fish_condition_index_not_catch_probability"
+          }
+        }
+      }
+    }
+  }
+}
