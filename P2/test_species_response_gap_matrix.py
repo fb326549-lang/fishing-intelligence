@@ -71,9 +71,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L040,c001,feeding_condition,https://zoolstud.sinica.edu.tw/Journals/20.1/17.pdf,context_only_northern_taiwan_field_study\n"
                 "L041,c001,seasonal_activity,https://doi.org/10.1007/s12562-018-1206-5,context_only_external_region\n"
                 "L042,c001,feeding_condition,https://doi.org/10.1016/j.aqrep.2024.102349,context_only_captive_feeding\n"
-                "L043,c036,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=586\&theme=fisheasy,context_only_taiwan_fishery_reference\n"
-                "L044,c003,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=624\&theme=fisheasy,context_only_taiwan_fishery_reference\n"
-                "L045,c004,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=536\&theme=fisheasy,context_only_taiwan_fishery_reference\n",encoding="utf-8")
+                "L043,c036,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=586&theme=fisheasy,context_only_taiwan_fishery_reference\n"
+                "L044,c003,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=624&theme=fisheasy,context_only_taiwan_fishery_reference\n"
+                "L045,c004,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=536&theme=fisheasy,context_only_taiwan_fishery_reference\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
