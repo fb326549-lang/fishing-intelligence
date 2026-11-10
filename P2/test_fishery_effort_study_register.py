@@ -11,7 +11,7 @@ class FisheryEffortStudyRegisterTests(unittest.TestCase):
         self.assertEqual(len(rows),4)
         by_id={r["effort_source_id"]:r for r in rows}
         self.assertEqual(set(by_id),{"EV001","EV002","EV003","EV004"})
-        self.assertIn("非必填",by_id["EV001"]["effort_measure"])
+        self.assertIn("非必填",by_id["EV001"]["sampling_design"])
         self.assertIn("3–4小時",by_id["EV002"]["sampling_design"])
         self.assertIn("Kyphosus spp.",by_id["EV002"]["target_taxon_scope"])
         self.assertIn("1.37±2.99",by_id["EV003"]["reported_result"])
