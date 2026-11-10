@@ -774,7 +774,7 @@ python P2/species/audit_environment_response_rules.py \\
 - 水族箱夜間攝食比例、12°C試驗結果及日本場域移動季節性，都不能直接轉成台灣東部夜釣加分、溫度反應門檻、季節分數、最佳作釣時段或中魚率。
 - 以上資料只適用已鑑定的 Kyphosus bigibbus，不得轉用到未鑑種的「白毛」俗名群、Kyphosus cinerascens 或其他舵魚。
 
-本次只補齊魚種專屬研究上下文與測試；不建立或啟用未經東部直接證據核准的魚情分數，不更動安全判斷，不修改首頁其他區塊。
+本節只補齊南方舵魚研究上下文與測試；不更動安全判斷，不修改首頁其他區塊。
 
 
 ## P2.4.19 三項核心指標計算引擎與四魚種研究補充
@@ -812,4 +812,18 @@ python P2/species/audit_environment_response_rules.py \\
 完整規格：`P2/species/fish_condition_index_model_spec.md`。
 
 本次未修改安全判斷、海域選擇、天氣/海洋資料蒐集、潮汐、P1、首頁其他區塊或釣魚紀錄功能。
+
+
+## P2.4.20 三指標引擎接入逐時預報與漁獵雷達面板
+
+- 新增 indicator_score_engine.py：以每個魚種獨立的 response_group 及不重疊反應區間計算覓食條件、環境適合度、魚類活動力三項0–100指標。
+- 同一 response_group 多個反應區間只取唯一符合區間，避免把同一環境變數的低／中／高區間重複加權；區域專屬規則優先於 all_east_taiwan fallback。
+- 任一必要輸入缺值時該指標不輸出分數；三項指標未全部有效或魚種權重未通過東部努力量驗證時，FCI保持空值。
+- 逐時排名分別計算未來6、12、24小時；只排名完整FCI的 forecast 小時，未計分時段不混入排名。
+- 新增 export_hourly_fish_condition_index_json.py 及 schema，Open-Meteo P2工作流程每次建立逐時環境後產生CSV/JSON並發佈至 p2-history；首頁既有漁獵雷達面板讀取這份資料顯示三項指標、FCI及6小時最佳小時。
+- 新增測試涵蓋三指標加權、缺值閘門、species weight驗證、反應區間不重疊、區域規則優先、預報版本去重、6/12/24小時排名及JSON輸出。
+
+目前 indicator_scoring_rules_template.csv 與 species_indicator_weights_template.csv 都沒有核准規則／權重列，因此工作流程會輸出明確的證據不足狀態與空分數，不會假造魚情指數。雷達面板不再把一般環境摘要分數當成魚種環境適合度，也不會顯示虛構最佳時段。
+
+本次只改漁獵雷達模型及其資料輸出；沒有新增安全判斷面板或安全規則，沒有修改原有安全模組、海域選擇、氣象海洋蒐集、潮汐或其他首頁功能。
 
