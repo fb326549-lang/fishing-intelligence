@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),16)
+        self.assertEqual(len(rows),18)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -39,6 +39,25 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
         self.assertIn("護卵雄魚",row["limitations"])
         self.assertIn("沒有測量",row["limitations"])
+
+
+    def test_southern_drummer_new_feeding_and_movement_studies_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        feeding=next(r for r in rows if r["activity_evidence_id"]=="AE017")
+        movement=next(r for r in rows if r["activity_evidence_id"]=="AE018")
+        self.assertEqual(feeding["candidate_id"],"c036")
+        self.assertEqual(feeding["source_literature_id"],"L034")
+        self.assertEqual(feeding["activity_dimension"],"feeding_activity")
+        self.assertEqual(feeding["model_use_status"],"context_only_external_region")
+        self.assertIn("日落至日出",feeding["reported_pattern"])
+        self.assertIn("不可直接作為東部夜釣",feeding["limitations"])
+        self.assertEqual(movement["candidate_id"],"c036")
+        self.assertEqual(movement["source_literature_id"],"L035")
+        self.assertEqual(movement["activity_dimension"],"movement_activity")
+        self.assertEqual(movement["model_use_status"],"context_only_external_region")
+        self.assertIn("1至5月",movement["reported_pattern"])
+        self.assertIn("不是魚群豐度",movement["limitations"])
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
