@@ -18,7 +18,7 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),12)
+        self.assertEqual(len(rows),15)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_dolphinfish_commercial_seasonality_remains_context_only(self):
@@ -83,6 +83,19 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertIn("全年皆產",rabbit["reported_season"])
         self.assertIn("春、冬",seabream["reported_season"])
         self.assertIn("不是東部岸釣",seabream["limitations"])
+
+
+    def test_rabbitfish_seasonal_diet_and_monthly_activity_are_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        spring_autumn=next(r for r in rows if r["seasonal_evidence_id"]=="SE013")
+        summer_autumn=next(r for r in rows if r["seasonal_evidence_id"]=="SE014")
+        diel=next(r for r in rows if r["seasonal_evidence_id"]=="SE015")
+        self.assertEqual(spring_autumn["source_literature_id"],"L046")
+        self.assertEqual(summer_autumn["source_literature_id"],"L047")
+        self.assertEqual(diel["source_literature_id"],"L050")
+        self.assertEqual(diel["evidence_kind"],"captive_activity_observation")
+        self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in (spring_autumn,summer_autumn,diel)))
 
     def test_seasonal_score_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
