@@ -747,10 +747,10 @@ function renderRadarDashboard(){
   level='danger';safetyText='不建議出竿';safetyNote='官方安全決策或海象暴露資料顯示高風險。即使魚情條件有利，也必須停止出釣判斷。';
  }else if(safety?.state==='warning'||risk?.exposure_level==='high'||risk?.exposure_level==='moderate'){
   level='warning';safetyText='注意風險';safetyNote='本區有官方警示或海象暴露風險，請優先重新評估行程與現場狀況。';
+ }else if(safety?.state==='insufficient_data'||risk?.state==='partial_data'||(safety&&risk&&risk.state!=='assessed')){
+  level='unknown';safetyText='安全資料不完整';safetyNote='部分官方來源或測站資料缺漏，無法可靠判斷安全；請勿把資料不足視為可出釣。';
  }else if(safety?.state==='no_active_alerts_reported'&&risk?.state==='assessed'&&risk?.exposure_level==='low'){
   level='normal';safetyText='未回報有效警特報';safetyNote='已查核來源目前未回報有效警特報且暴露篩檢為低；這不是安全許可，仍須確認現場浪況、岸際公告與裝備。';
- }else if(safety?.state==='insufficient_data'||risk?.state==='partial_data'){
-  level='unknown';safetyText='安全資料不完整';safetyNote='部分官方來源或測站資料缺漏，無法可靠判斷安全；請勿把資料不足視為可出釣。';
  }
  $('radarSafetyPanel').dataset.level=level;
  $('radarSafetyState').textContent=safetyText;
