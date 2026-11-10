@@ -723,35 +723,51 @@ function renderDecisionFishOptions(regionId){
 }
 
 function renderRadarDashboard(){
- const regionId=selectedCwaRegion(),candidateId=$('decisionFishSelect')?.value||'',data=latest.p2FishOutlook;
+ const regionId=selectedCwaRegion(),candidateId=$('decisionFishSelect')?.value||'',outlook=latest.p2FishOutlook,index=latest.fishConditionIndex;
  const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
- const aliases={c001:'瓜子鱲（黑毛俗名候選）',c002:'白毛（舵魚屬未鑑種）',c036:'南方舵魚',c037:'天竺舵魚'};
- const row=data?.rows?.find(r=>r.region_id===regionId&&r.candidate_id===candidateId&&String(r.horizon_hours)==='6');
- const name=row?(aliases[row.candidate_id]||row.common_name_zh||row.candidate_id):'尚未選擇';
+ const aliases={c001:'瓜子鱲（須確認物種）',c002:'白毛（舵魚屬未鑑種）',c036:'南方舵魚',c037:'天竺舵魚'};
+ const outlookRow=outlook?.rows?.find(r=>r.region_id===regionId&&r.candidate_id===candidateId&&String(r.horizon_hours)==='6');
+ const name=outlookRow?(aliases[outlookRow.candidate_id]||outlookRow.common_name_zh||outlookRow.candidate_id):(aliases[candidateId]||'尚未選擇');
  $('radarTarget').textContent=name;
- $('radarIndex').textContent='—';
- $('radarGauge')?.setAttribute('data-state','unavailable');
- $('radarGrade').textContent=candidateId?'證據不足・暫不評分':'請先選擇目標魚種';
- $('radarScoreNote').textContent='目前 P2 沒有任何經審查的東部數值環境反應規則，活動分數與最佳時段也明確維持未建立；因此不產生虛構的 0–100 分。';
- $('radarForage').textContent='尚未建立';
- $('radarActivity').textContent='無活動模型';
- $('radarBestWindow').textContent='尚未建立';
- $('radarBestNote').textContent='現有逐時展望只彙整環境與潮勢，不代表魚類覓食活動；最佳時段尚未經驗證。';
- let env='無核准規則';
- if(row){
-  const labels={taxon_or_distribution_gate:'物種資格未通過',insufficient_evidence:'缺少直接環境證據',insufficient_environment_data:'環境資料不足',no_forecast_records:'沒有預報資料',environment_match_unavailable:'環境匹配不可用',partial_environment_match_coverage:'資料覆蓋不完整',environment_match_summary_available:'環境摘要可用'};
-  env=labels[row.environment_match_status]||'證據不足';
-  if(row.environment_match_mean)env='僅環境摘要 '+row.environment_match_mean+'/100';
-  const activityLabels={taxon_or_distribution_gate:'物種資格未通過',context_only_evidence_available:'僅背景證據',direct_evidence_requires_activity_rule_review:'直接證據待審查',insufficient_east_taiwan_activity_evidence:'缺少東部活動證據',missing_activity_assessment:'尚無活動評估'};
-  $('radarActivity').textContent=activityLabels[row.activity_evidence_status]||'尚無模型';
+ const rows=(index?.rows||[]).filter(r=>r.region_id===regionId&&r.candidate_id===candidateId&&r.data_type==='forecast');
+ const best=rows.find(r=>r.best_hour_status_6h==='best_hour');
+ const display=best||rows.find(r=>r.overall_fish_condition_index!==null&&r.overall_fish_condition_index!==undefined)||rows[0]||null;
+ const scoreValue=display?.overall_fish_condition_index;
+ const hasScore=typeof scoreValue==='number'&&Number.isFinite(scoreValue);
+ const indicatorText=(value,status)=>{
+  if(typeof value==='number'&&Number.isFinite(value))return Math.round(value)+'/100';
+  const labels={insufficient_evidence:'缺少東部直接證據',incomplete_input:'環境資料缺值',taxon_or_distribution_gate:'物種資格未通過'};
+  return labels[status]||'尚未建立';
+ };
+ $('radarIndex').textContent=hasScore?Math.round(scoreValue):'—';
+ $('radarGauge')?.setAttribute('data-state',hasScore?'scored':'unavailable');
+ $('radarGauge')?.setAttribute('aria-label',hasScore?'綜合魚情指數 '+Math.round(scoreValue)+' 分':'綜合魚情指數尚無可驗證分數');
+ $('radarGrade').textContent=!candidateId?'請先選擇目標魚種':hasScore?'三項指標已完成計算':'證據不足・暫不評分';
+ $('radarForage').textContent=display?indicatorText(display.feeding_condition_score,display.feeding_condition_status):'尚未建立';
+ $('radarEnvironment').textContent=display?indicatorText(display.environment_suitability_score,display.environment_suitability_status):'無核准規則';
+ $('radarActivity').textContent=display?indicatorText(display.fish_activity_score,display.fish_activity_status):'尚無模型';
+ const modelNotes={
+  taxon_or_distribution_gate:'物種鑑定或分布資格尚未通過。',
+  one_or_more_indicators_unavailable:'覓食條件、環境適合度、魚類活動力至少一項缺少合格的台灣東部直接證據或必要輸入。',
+  species_weights_not_validated:'三項指標已有分數，但此魚種專屬權重尚未通過台灣東部努力量驗證。',
+  scored:'分數為該魚種專屬相對魚情指數，不是中魚機率。'
+ };
+ $('radarScoreNote').textContent=display?(modelNotes[display.model_status]||'模型狀態：'+display.model_status+'。不以缺值補分。'):'尚未取得本區、本魚種逐時魚情指數資料。';
+ if(hasScore)$('radarScoreNote').textContent='此分數對應所選海域未來最佳預報小時的相對魚情指數，不是中魚機率。';
+ if(best){
+  const t=new Date(best.valid_time);
+  $('radarBestWindow').textContent=t.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  $('radarBestNote').textContent='未來6小時內三項指標完整且綜合魚情指數最高的預報小時；僅為相對排序，不代表中魚機率。';
+ }else{
+  $('radarBestWindow').textContent='尚未建立';
+  $('radarBestNote').textContent='未來6小時尚無完整且通過驗證的三指標綜合分數；不會以環境較平穩代替魚類最佳時段。';
  }
- $('radarEnvironment').textContent=env;
- const generated=new Date(data?.generated_at||'');
+ const generated=new Date(index?.generated_at||outlook?.generated_at||'');
  const age=(Date.now()-generated.getTime())/3600000;
  const stale=!Number.isFinite(age)||age>8||age<-.25;
- $('radarForecastState').textContent=data?(stale?'逐時展望可能過期':'六區 6／12／24 小時展望已接入'):'逐時展望資料暫不可用';
- $('radarModelStatus').textContent=!candidateId?'等待目標魚種':!data?'資料暫不可用':stale?'資料可能過期':'模型證據不足';
- $('radarFreshness').textContent='海域：'+(names[regionId]||'未選擇')+'｜魚種：'+(candidateId?name:'未選擇')+'｜展望產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'無法取得')+'。eDNA／標本為歷史出現背景，不代表目前有魚。';
+ $('radarForecastState').textContent=outlook?(stale?'逐時展望可能過期':'六區6／12／24小時展望已接入'):'逐時展望資料暫不可用';
+ $('radarModelStatus').textContent=!candidateId?'等待目標魚種':!index?'魚情指數資料暫不可用':stale?'資料可能過期':hasScore?'魚情指數已計算':'模型證據不足';
+ $('radarFreshness').textContent='海域：'+(names[regionId]||'未選擇')+'｜魚種：'+(candidateId?name:'未選擇')+'｜指數產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'無法取得')+'。分數未通過完整證據與權重驗證時會保持空值。';
 }
 
 function renderDecisionHome(){
