@@ -80,7 +80,7 @@ def build_matrix(candidate_path: Path, ecology_path: Path, evidence_path: Path, 
                 "wind_sensitivity": {"wind_response"},
                 "feeding_conditions": {"feeding_condition"},
                 # Seasonal commercial distribution remains context only.
-                "activity_period": {"activity_period", "seasonal_activity"},
+                "activity_period": {"activity_period", "seasonal_activity", "diel_feeding"},
                 "salinity_preference": {"salinity_response"},
             }[domain]
             domain_literature = [
