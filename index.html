@@ -158,9 +158,10 @@ const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-in
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
 const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
+const FISH_CONDITION_INDEX_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_condition_index.json";
 const FORECAST_VERIFICATION_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/latest.json";
 const FORECAST_COVERAGE_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/environment_coverage.json";
-let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null,forecastVerification:null,forecastCoverage:null};
+let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null,fishConditionIndex:null,forecastVerification:null,forecastCoverage:null};
 
 const map=L.map('map').setView([23.72,121.62],8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
