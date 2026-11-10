@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),35)
+        self.assertEqual(len(rows),37)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -108,6 +108,22 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(selected["AE035"]["source_literature_id"],"L050")
         self.assertEqual(selected["AE035"]["evidence_kind"],"captive_activity_observation")
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in selected.values()))
+
+
+    def test_southern_drummer_2016_and_2021_diel_trials_remain_captive_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        early=next(r for r in rows if r["activity_evidence_id"]=="AE036")
+        later=next(r for r in rows if r["activity_evidence_id"]=="AE037")
+        self.assertEqual(early["source_literature_id"],"L051")
+        self.assertEqual(early["evidence_kind"],"captive_feeding_trial")
+        self.assertIn("21:00–24:00",early["reported_pattern"])
+        self.assertEqual(early["model_use_status"],"context_only_captive_feeding")
+        self.assertEqual(later["source_literature_id"],"L053")
+        self.assertEqual(later["evidence_kind"],"captive_activity_observation")
+        self.assertIn("45.6%",later["reported_pattern"])
+        self.assertEqual(later["model_use_status"],"context_only_captive_activity")
+        self.assertTrue(all("台灣東部" in r["limitations"] for r in (early,later)))
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
