@@ -7,6 +7,8 @@ on:
       - p1-foundation
     paths:
       - "P1/collector/**"
+      - "P1/species/**"
+      - "P2/species/**"
       - "index.html"
       - ".github/workflows/test-marine-pipeline.yml"
   pull_request:
@@ -14,6 +16,8 @@ on:
       - main
     paths:
       - "P1/collector/**"
+      - "P1/species/**"
+      - "P2/species/**"
       - "index.html"
       - ".github/workflows/test-marine-pipeline.yml"
   workflow_dispatch:
