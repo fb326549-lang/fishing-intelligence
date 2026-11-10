@@ -25,7 +25,7 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 <section class="panel wide" id="decisionHome">
 <div class="row"><h2>🧭 今日智慧釣魚決策</h2><span class="tag">決策首頁・建置中</span></div>
 <p class="small">先確認安全，再分析海況與目標魚種。環境條件不等於中魚機率。</p>
-<div class="grid"><div class="metric"><div class="label">分析海域</div><div class="value" id="decisionRegion">尚未選擇</div></div><div class="metric"><div class="label">目標魚種</div><div class="value" id="decisionFish">綜合魚種</div></div></div>
+<div class="grid"><div class="metric"><div class="label">分析海域</div><div class="value" id="decisionRegion">尚未選擇</div></div><div class="metric"><div class="label">目標魚種</div><select id="decisionFishSelect" aria-label="依所選海域選擇目標魚種" style="width:100%;margin-top:8px"><option value="">請先選擇海域</option></select><div class="small" id="decisionFishScope" style="margin-top:7px">只顯示本區有物種級歷史陽性紀錄的魚種。</div></div></div>
 <div class="metric" style="margin-top:9px"><div class="row"><strong>🛟 出釣安全確認</strong><span class="tag" id="decisionSafetyTag">未驗證安全</span></div><div id="decisionSafety" class="small" style="margin-top:7px">正在取得中央氣象署官方警報與海象風險資料…</div><div id="decisionSafetyTime" class="small" style="margin-top:5px;color:#9fb4ae">官方資料更新時間：等待資料</div></div>
 <div class="grid" style="margin-top:9px"><div class="metric"><div class="label">海浪</div><div class="value" id="decisionWave">等待資料</div></div><div class="metric"><div class="label">風速／陣風</div><div class="value" id="decisionWind">等待資料</div></div><div class="metric"><div class="label">海表溫度</div><div class="value" id="decisionSst">等待資料</div></div><div class="metric"><div class="label">海流</div><div class="value" id="decisionCurrent">等待資料</div></div></div>
 <div class="metric" style="margin-top:9px"><div class="row"><strong>🌊 六區海象暴露分析</strong><span class="tag" id="decisionMarineRiskTag">等待分析</span></div><div id="decisionMarineRiskText" class="small" style="margin-top:7px">等待中央氣象署最新測站觀測與分析。</div><div id="decisionMarineRiskTime" class="small" style="margin-top:5px;color:#9fb4ae">分析時間：等待資料</div><div class="notice">浪高、風速分級為本專案內部環境暴露篩檢，不是官方警戒門檻或安全許可；不推斷潮汐漲退、岸線迎浪或中魚率。</div></div>
@@ -108,7 +108,7 @@ function renderFavorites(){
   row.append(name,coord,load,rename,del);box.append(row);
  });
 }
-function choose(lat,lon){point={lat,lon};if(pin)pin.setLatLng([lat,lon]);else pin=L.marker([lat,lon]).addTo(map);$('coords').textContent=lat.toFixed(4)+', '+lon.toFixed(4);$('pointStatus').textContent='已選定座標，正在更新環境資料…';renderFishOptions();calculateFishing();loadData()}
+function choose(lat,lon){point={lat,lon};if(pin)pin.setLatLng([lat,lon]);else pin=L.marker([lat,lon]).addTo(map);$('coords').textContent=lat.toFixed(4)+', '+lon.toFixed(4);$('pointStatus').textContent='已選定座標，正在更新環境資料…';renderFishOptions();calculateFishing();renderDecisionHome();loadData()}
 map.on('click',e=>choose(e.latlng.lat,e.latlng.lng));
 $('gps').onclick=()=>{if(!navigator.geolocation){alert('此瀏覽器不支援定位');return}navigator.geolocation.getCurrentPosition(pos=>{map.setView([pos.coords.latitude,pos.coords.longitude],12);choose(pos.coords.latitude,pos.coords.longitude)},()=>alert('定位失敗，請確認 Safari 已允許定位，並使用 HTTPS。'))};
 $('taiwan').onclick=()=>map.setView([23.7,121],7);$('refresh').onclick=loadData;
@@ -450,6 +450,7 @@ async function loadP2FishOutlook(){
   if(candidates.some(x=>x.id===previous))sel.value=previous;
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
+ renderDecisionFishOptions(selectedCwaRegion());
 }
 function renderForecastVerification(){
  const data=latest.forecastVerification;
@@ -594,11 +595,27 @@ function renderP2FishOutlook(){
  }).join(''):'<div class="small">此區域／時段沒有對應候選資料。請確認最新展望是否已涵蓋此區。</div>';
  $('p2FishFreshness').textContent='分析基準：'+(data.as_of||'未知')+'｜資料產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜來源：P2 六區逐時展望';
 }
+function renderDecisionFishOptions(regionId){
+ const select=$('decisionFishSelect'),scope=$('decisionFishScope'),data=latest.p2FishOutlook;
+ if(!select)return;
+ const previous=select.value;
+ const regionNames={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ if(!regionId||!data?.edna_occurrence_context?.records){
+  select.innerHTML='<option value="">請先選擇有效海域</option>';scope.textContent='請先在地圖選擇東部海域。';return;
+ }
+ const names=new Map(data.rows.map(r=>[r.candidate_id,{name:r.common_name_zh||r.candidate_id,scientific:r.scientific_name||''}]));
+ const records=data.edna_occurrence_context.records.filter(r=>r.region_id===regionId&&Number(r.exact_positive_detection_record_count)>0&&names.has(r.candidate_id)&&r.candidate_id!=='c035');
+ const unique=[...new Map(records.map(r=>[r.candidate_id,{id:r.candidate_id,...names.get(r.candidate_id)}])).values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
+ select.innerHTML='<option value="">請選擇目標魚種</option>'+unique.map(x=>'<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+(x.scientific?'（'+escapeP2Text(x.scientific)+'）':'')+'</option>').join('');
+ if(unique.some(x=>x.id===previous))select.value=previous;
+ const p2Select=$('p2FishCandidate');if(p2Select)p2Select.value=select.value||'all';
+ scope.textContent=unique.length?regionNames[regionId]+'｜僅列本區歷史 eDNA 物種級精確陽性紀錄（'+unique.length+' 種）；不代表目前有魚或即時魚群。':'本區目前沒有可確認到物種的歷史 eDNA 陽性紀錄，因此不提供魚種選項；不代表本區沒有這些魚。';
+}
 function renderDecisionHome(){
  const regionId=selectedCwaRegion(),names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  $('decisionRegion').textContent=names[regionId]||'請選擇分析區域';
  const fi=$('targetFish').value,fr=FISH_DB[detectFishRegion()]||[],fish=fi==='all'?null:fr[Number(fi)];
- $('decisionFish').textContent=fish?fish[0]:'綜合魚種';
+ renderDecisionFishOptions(regionId);
  const m=latest.marine||{},w=latest.weather||{},fmt=(v,u,d=1)=>v===null||v===undefined||v===''?'無資料':Number.isFinite(Number(v))?Number(v).toFixed(d)+' '+u:'無資料';
  $('decisionWave').textContent=fmt(m.wave_height,'m')+' / '+fmt(m.wave_period,'秒',0);
  $('decisionWind').textContent=fmt(w.wind_speed_10m,'km/h',0)+' / '+fmt(w.wind_gusts_10m,'km/h',0);
@@ -709,6 +726,7 @@ async function loadCwaSnapshot(){
 
 $('cwaRegion').addEventListener('change',()=>{renderCwaObserved();renderDecisionHome();renderP2FishOutlook()});
 $('p2FishCandidate').addEventListener('change',renderP2FishOutlook);
+$('decisionFishSelect').addEventListener('change',()=>{const id=$('decisionFishSelect').value;if(id)$('p2FishCandidate').value=id;else $('p2FishCandidate').value='all';renderP2FishOutlook();});
 $('p2FishHorizon').addEventListener('change',renderP2FishOutlook);
 $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFishing();renderDecisionHome()});
 $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
