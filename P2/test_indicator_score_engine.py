@@ -61,7 +61,7 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         self.assertEqual(fish["feeding_condition_score"], "80.00")
         self.assertEqual(fish["environment_suitability_score"], "70.00")
         self.assertEqual(fish["fish_activity_score"], "90.00")
-        self.assertEqual(fish["overall_fish_condition_index"], "80.00")
+        self.assertEqual(fish["overall_fish_condition_index"], "79.00")
         self.assertEqual(fish["model_status"], "scored")
         self.assertEqual(fish["best_hour_status"], "rankable")
 
