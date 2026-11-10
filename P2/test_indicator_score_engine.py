@@ -104,7 +104,7 @@ class IndicatorScoreEngineTests(unittest.TestCase):
 
     def test_best_hour_ranking_only_uses_fully_scored_hours(self):
         base = {
-            "candidate_id": "c036", "region_id": "taitung_south",
+            "candidate_id": "c036", "region_id": "taitung_south", "data_type": "forecast",
             "overall_fish_condition_index": "75.00", "valid_time": "2026-11-10T10:00:00+08:00",
         }
         other = dict(base, overall_fish_condition_index="88.00", valid_time="2026-11-10T11:00:00+08:00")
