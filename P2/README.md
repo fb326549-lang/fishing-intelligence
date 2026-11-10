@@ -126,7 +126,7 @@ python P2/collector/build_hourly_history_catalog.py \
 
 ## P2.2.1 優先魚種環境反應證據缺口矩陣
 
-`P2/species/species_response_evidence_gaps.csv` 是研究排程與證據缺口登錄，不是模型參數表。初版包含 8 個優先候選：瓜子鱲（黑毛）、白毛（舵魚屬）、臭肚、黑鯛、條紋豆娘魚、孟加拉豆娘魚、瑪拉巴石斑及點帶石斑；每種檢視 7 個反應面向：水溫、浪況、一般海流、潮汐、風、活動時段、鹽度。P2.2.4 已另增南方舵魚與天竺舵魚兩個獨立物種候選，目前共 10 個候選、70 列。
+`P2/species/species_response_evidence_gaps.csv` 是研究排程與證據缺口登錄，不是模型參數表。初版包含 8 個優先候選：瓜子鱲（黑毛）、白毛（舵魚屬）、臭肚、黑鯛、條紋豆娘魚、孟加拉豆娘魚、瑪拉巴石斑及點帶石斑；每種檢視 7 個反應面向：水溫、浪況、一般海流、潮汐、風、活動時段、鹽度。P2.2.4 已另增南方舵魚與天竺舵魚兩個獨立物種候選，目前共 21 個優先候選、147 列；除原有物種外，已納入花身雞魚、紅槽、白帶魚、日本竹筴魚、鬼頭刀、紅甘及四種東部有分布紀錄的鸚哥魚。正鰹與鬼頭刀亦有東部季節研究背景。
 
 矩陣會顯示既有生態參數代碼、證據編號及來源 URL，但不把棲地、報告深度、食性等背景描述冒充為環境反應曲線。白毛維持舵魚屬集合，必須有物種級鑑定才可建立單一物種模型；點帶石斑維持東部本島分布證據衝突的審查狀態。所有列目前均不得直接作為模型反應門檻。
 
@@ -478,17 +478,282 @@ PWA 從下列 raw JSON 讀取最新展望：
 - 展望以 workflow 最新成功執行產出為準；前端若資料超過 8 小時會顯示可能過期。
 
 
+## P2.5.1 真實釣況 Ground Truth 資料契約
 
-## P2.5 六區逐時智慧魚情 PWA 介接
+P2.5 先建立可稽核的實際釣況資料，不急著訓練或輸出中魚率。
 
-PWA 決策首頁已讀取 `p2-history/data/latest_hourly_fish_outlook.json`，提供：
-- 依目前選定的六區海域，顯示該區候選魚種的 6/12/24 小時展望。
-- 可依研究候選魚種篩選，並呈現預報時數完整度、環境證據狀態、活動證據狀態。
-- 顯示資料基準時間及產生時間；超過 8 小時或時間異常時標示資料可能過期。
-- 缺資料、物種鑑定/分布資格未通過、只有背景文獻、缺乏東部直接活動證據等狀態均明確呈現。
-- 目前活動分數、中魚機率及最佳作釣時段維持未估算；不把環境匹配分數當成魚活性或中魚機率。
+### 兩張表分離
+- `P2/field_data/fishing_session_template.csv`：一筆代表一次完整出勤/釣況時段，包含開始/結束時間、六區代碼、釣法、實際有效作釣分鐘及總漁獲數。
+- `P2/field_data/catch_event_template.csv`：一筆代表同一時段內某一魚種的一次漁獲批次，保留俗名、候選物種 ID、鑑定信心、數量、尺寸、重量、放流狀態及照片參照。
+- JSON Schema 分別位於 `P2/schema/fishing_session.schema.json` 與 `P2/schema/catch_event.schema.json`。
 
-PWA 資料端點：
-`https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json`
+### 關鍵資料規則
+1. **零漁獲也必須記錄**：只要確實作釣且 effort_minutes > 0，就必須建立 session，catch_count 可為 0，catch event 可為空。這是避免模型只看成功案例而高估魚況的必要條件。
+2. 有漁獲時，session.catch_count 必須等於其 catch events 的 count 加總。
+3. 每個 catch event 必須連回有效 session，時間需落在該次 session 之內。
+4. 時間必須包含時區；台灣資料建議使用 ISO 8601 +08:00。
+5. 不確定魚種時保留俗名及 low/unconfirmed，不可猜測學名或 candidate_id。
+6. 不要求上傳精確私人座標；location_label 記錄到可分析但不暴露私人進出資訊的程度。
+7. 不從記憶補寫海溫、浪高、潮位等量測值。環境條件應由系統依區域與時間，從 P2 歷史資料配對；缺值維持缺值。
+8. effort_minutes 是實際有效作釣時間，不是單純停留時間。
 
-此介接完成資料管線至手機首頁的可見性，不代表已完成東部物種級活動預測模型。模型只有在直接證據、資料完整度、物種資格及驗證條件均通過後才能逐步啟用。
+### 驗證
+```bash
+python P2/field_data/validate_fishing_logs.py \
+  --sessions P2/field_data/fishing_session_template.csv \
+  --catches P2/field_data/catch_event_template.csv
+python -m unittest P2.test_fishing_logs -v
+```
+
+目前資料契約只驗證紀錄完整性與 session/catch 關聯，不會推論魚種活動分數、環境偏好或中魚率。下一步才建立環境快照配對器，並以「每次出勤」為樣本單位，避免把同一次出勤的多尾魚當成多次獨立成功樣本。
+
+
+## P2.4.7 CWA 高低潮事件推導逐時潮汐階段
+
+Open-Meteo 工作流程新增 CWA F-A0021-001 高低潮預報事件蒐集，使用明確審查的 `P1/stations/cwa_tide_region_mapping.csv` 將預報地點對應到六區，再由 `build_hourly_environment_records.py --cwa-tide-forecast-csv` 為逐時 forecast record 建立 `tide_phase` 與 `tide_turning`。
+
+推導規則：
+- 只使用同一 CWA 地點前後相鄰的官方滿潮/乾潮預報事件；乾潮→滿潮為 rising，滿潮→乾潮為 falling。
+- 距離最近高/低潮事件 30 分鐘內，標記 high_slack / low_slack 及 `tide_turning=true`，表示預報轉折時間窗，不代表實測潮流已停流。
+- 同一區域所有已映射預報地點必須得到相同階段；若地點間相位不同、缺少前後事件或事件資料不完整，整區階段保持 null，不以平均或最近點代替。
+- 只在 forecast records 加入預報潮勢；不回填歷史 observation，避免以事後取得的預報版本造成時間洩漏。
+- 不插值潮位高度、不推算潮流速度；`tide_height_m`、`tidal_current_velocity_ms` 仍保持各自獨立欄位與缺值。
+- `source_records` 保留 CWA F-A0021-001 來源與擷取時間；品質旗標明示潮勢是由預報高低潮事件推導，並非實測潮流或流速。
+
+執行：
+```bash
+python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
+python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
+python P2/collector/build_hourly_environment_records.py \
+  --forecast-csv output/open_meteo/RUN_ID/environmental_forecast.csv \
+  --forecast-dir output/open_meteo/RUN_ID \
+  --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl \
+  --cwa-tide-forecast-csv output/cwa_tides/regional_tide_forecast.csv \
+  --out output/p2/hourly_environment.jsonl
+```
+
+測試涵蓋漲/退潮方向、高潮/低潮轉折時間窗、事件未涵蓋時段、不同地點相位不一致、來源可追溯，以及潮位/潮流不被虛構。潮汐階段只是水文上下文，不是任何魚種的偏好或中魚率。
+
+
+## P2.4.8 六區 6/12/24 小時潮勢摘要
+
+`build_hourly_fish_outlook.py` 會從每個區域的逐時 forecast record 彙整：
+- 漲潮小時數、退潮小時數、高潮轉折窗小時數、低潮轉折窗小時數。
+- 已判定潮勢時數、潮勢未判定時數、缺少預報時數及潮勢覆蓋率。
+- 轉折窗小時數只統計上游 `tide_turning=true` 的預報小時，不表示實測潮流停流。
+
+潮勢摘要是所有候選魚種共用的區域水文上下文，不參與魚種排序、環境匹配分數、活動分數、中魚機率或最佳時段。若沒有有效潮勢資料，維持零/未判定並揭露覆蓋率，不以其他區域或鄰近時段補值。PWA 決策首頁將在 P2 智慧魚情面板顯示這組 6/12/24 小時摘要。
+
+
+## P2.4.9 台東物種出現標本證據（不等於活動證據）
+
+新增可追溯的台東標本出現紀錄：
+- 臭肚 `Siganus fuscescens`：ASIZP0072322，台東成功，2010-03-30。
+- 條紋豆娘魚 `Abudefduf vaigiensis`：ASIZP0911844，台東基翬，2005-10-06，成魚，採集資料記載釣獲。
+- 條紋豆娘魚 `Abudefduf vaigiensis`：FRIP21009，台東成功，2005-04-02，一支釣，幼魚標本。
+
+這些資料用於補強東部物種出現證據與資料來源可追溯性；每筆只代表單一典藏標本/採集事件，不能推論當地族群密度、季節性、逐時活動、潮汐/海象反應或中魚率。活動證據維持 `context_only_east_taiwan_occurrence`，不進入環境規則、活動分數或最佳時段模型。P1 證據 ID 全域唯一，這三筆新增標本紀錄使用 E047–E049。P2 整合狀態可以顯示「已有東部出現背景資料」，但仍不視為已具備魚種活動預測證據。
+
+
+## P2.4.10 核心目標魚種的東部出現紀錄
+
+新增三筆核心候選魚種的東部紀錄：
+- 瓜子鱲／黑毛俗名候選 `Girella punctata`：水產試驗所典藏 FRIP22025，2007-06-28 花蓮東堤釣魚比賽竿釣釣獲，300mm、485g。這是單次釣獲紀錄，但不提供釣獲時段或環境條件。
+- 南方舵魚 `Kyphosus bigibbus`：ASIZP0805860，2012-04-30 台東三仙台尾柄肌肉組織標本。
+- 天竺舵魚 `Kyphosus cinerascens`：ASIZP0802636，2006-01-02 台東成功尾柄肌肉組織標本。
+
+三筆均為 `context_only_east_taiwan_occurrence`，只證明物種/單次釣獲曾在東部出現。不得推論季節性、逐時活動、潮汐/海象反應或中魚率。黑毛俗名群仍須個體鑑種；白毛舵魚屬群仍須鑑定到種。組織標本不代表可釣獲或常態族群。
+
+
+## P2.6 海保署魚類 eDNA 出現背景（非魚群數量／非釣況預測）
+
+資料來源：海洋保育署「110–113年臺灣鄰近海域魚類 eDNA 調查分析」政府資料開放資料集（資料集 172487），包含潛水調查、船舶調查及海洋保護區站點三組資料。欄位包含站點、座標、深度、採樣時間、學名、中文學名、科別及計畫類別。
+
+新增：
+- `collector/fetch_oca_edna_occurrence.py`：下載三組官方資料，支援 CSV、JSON 及 ZIP 包裝，統一欄位與採樣年月。
+- `schema/edna_occurrence_context.schema.json`：單筆 eDNA 陽性偵測資料契約。
+- `test_oca_edna_occurrence.py`：測試資料格式解析、民國年月、六區最近參考站距離、物種候選對應及出現資料限制。
+- `.github/workflows/oca-edna-occurrence-context.yml`：每月蒐集一次，並支援手動執行；原始標準化輸出以 Actions artifact 保存，待資料品質審查後才考慮接入 P2 展望。
+
+執行：
+```bash
+python P2/collector/fetch_oca_edna_occurrence.py \\
+  --mapping P1/stations/east_region_station_mapping.csv \\
+  --candidates P1/species/species_candidate_register.csv \\
+  --out-dir output/oca_edna_context
+python -m unittest P2.test_oca_edna_occurrence -v
+```
+
+資料解讀與防誤用規則：
+1. eDNA 陽性偵測只代表該次採樣在該站點檢出物種 DNA，不代表個體數、族群密度、生物量、釣獲率或即時活動強度。
+2. 沒有檢出不代表魚不存在；不得把未檢出紀錄當作負樣本，因採樣努力量、季節、檢測靈敏度及環境 DNA 傳輸/降解可能不同。
+3. 依最近東部參考站的區域對應僅供地理上下文，並保留距離；超出 35 公里不強行分配六區，也不把參考站當成實際採樣站或釣點。
+4. 只對已能以學名精確對應的候選物種填入 candidate_id；斜線合併的多物種名稱（例如 Abudefduf sexfasciatus/vaigiensis、Siganus canaliculatus/fuscescens）保留 possible_candidate_ids 並標記 ambiguous_multi_species_taxon，不會強制歸到其中一種。俗名群組、屬級候選及未確認物種不做模糊配對。
+5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。manifest 另分開報告精確候選、模糊多物種與未匹配資料筆數。
+6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
+
+第一次官方資料抓取已成功取得 19,731 筆陽性 eDNA 資料列、258 筆候選物種/月/區域摘要。這是資料列數而非魚隻數；約 13,381 筆因距六區參考站超過 35 公里而保留為未分區背景資料，避免硬塞進六區。資料中也存在多物種合併學名，必須保持 ambiguous，不能當成 c003 臭肚或 c027 條紋豆娘魚的確證。
+
+只有在成功取得三組來源、資料解析通過且輸出筆數大於零時才產生 artifact。此階段先建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
+
+## P2.6 海保署魚類 eDNA 出現背景（非魚群數量／非釣況預測）
+
+資料來源：海洋保育署「110–113年臺灣鄰近海域魚類 eDNA 調查分析」政府資料開放資料集（資料集 172487），包含潛水調查、船舶調查及海洋保護區站點三組資料。欄位包含站點、座標、深度、採樣時間、學名、中文學名、科別及計畫類別。
+
+新增：
+- `collector/fetch_oca_edna_occurrence.py`：下載三組官方資料，支援 CSV、JSON 及 ZIP 包裝，統一欄位與採樣年月。
+- `schema/edna_occurrence_context.schema.json`：單筆 eDNA 陽性偵測資料契約。
+- `test_oca_edna_occurrence.py`：測試資料格式解析、民國年月、六區最近參考站距離、物種候選精確/模糊對應及出現資料限制。
+- `.github/workflows/oca-edna-occurrence-context.yml`：每月蒐集一次，並支援手動執行；標準化輸出以 Actions artifact 保存，待資料品質審查後才考慮接入 P2 展望。
+
+資料解讀與防誤用規則：
+1. eDNA 陽性偵測只代表該次採樣在該站點檢出物種 DNA，不代表個體數、族群密度、生物量、釣獲率或即時活動強度。
+2. 沒有檢出不代表魚不存在；不得把未檢出紀錄當作負樣本，因採樣努力量、季節、檢測靈敏度及環境 DNA 傳輸/降解可能不同。
+3. 依最近東部參考站的區域對應僅供地理上下文，並保留距離；超出 35 公里不強行分配六區，也不把參考站當成實際採樣站或釣點。
+4. 只對已能以學名精確對應的候選物種填入 candidate_id；多物種合併學名、俗名群組、屬級候選及未確認物種不做模糊配對。
+5. 月摘要的 `positive_detection_record_count` 是陽性資料列數，不是魚隻數或標準化盛度；不同計畫/方法/採樣努力量不可直接比較。
+6. 所有資料固定為 `context_only_edna_occurrence`，不輸出 activity_score、catch_probability、最佳作釣時段，也不作為環境規則的數值權重。
+
+資料流程會先通過三組來源蒐集、欄位正規化、逐筆 JSON Schema 驗證及 occurrence-only 語意檢查。此階段只建立可追溯的物種出現背景資料，尚未把 eDNA 偵測轉成魚情分數或即時魚群判斷。
+
+
+### P2.6 → PWA 歷史出現背景介接
+
+eDNA 蒐集器另輸出精簡的 `edna_candidate_region_context.json`，按候選物種 × 六區分開計算：
+- 精確學名陽性檢出資料列數、採樣月份數、站點數、採樣年月範圍及樣本深度範圍。
+- 可能涉及該候選的多物種合併標籤筆數與原始合併學名，獨立標示為 ambiguous，不加到精確檢出數。
+- 每筆均固定 `context_only_edna_occurrence`，不輸出活動分數或中魚機率。
+
+每月 OCA workflow 將精簡 JSON 與資料 manifest 發布至 `p2-history/data/`；Open-Meteo/P2 四小時流程讀取該檔，將它嵌入 `latest_hourly_fish_outlook.json` 的 `edna_occurrence_context` 區塊。PWA 可依目前區域及候選魚種顯示歷史採樣背景。若尚未發布或沒有該候選/區域資料，前端必須明確說明「未找到精確檢出紀錄不代表魚不存在」，不能顯示為物種不存在。
+
+
+## P2.4.10 東部出現紀錄與活動研究證據分流
+
+活動證據登錄表中的 `activity_dimension=occurrence_record` 代表博物館標本、單次採集或單次釣獲等「曾在當地出現」紀錄，不是魚類活動研究。整合器現在將其獨立分流：
+- `activity_evidence_count/ids`：只計入活動、攝食、季節、遙測等活動研究資料；不含單次出現紀錄。
+- `occurrence_evidence_count/ids`：只列出經鑑種且具來源的地區出現紀錄。
+- 只有出現紀錄時，活動狀態仍為 context-only；活動分數、中魚機率與最佳時段保持空白/未建立。
+- 逐時展望將同一候選的出現紀錄去重後彙整，不因 6/12/24 小時內多筆 forecast row 而重複計數。
+
+PWA 分開顯示「活動研究」與「東部出現紀錄」，避免使用者將單筆標本或單次釣獲誤讀成活動證據或即時魚群訊號。
+
+
+## P2.4.11 東部鬼頭刀商業漁業季節分布研究
+
+新增 L030 / SE005，來源為農業部農業知識入口網研究報告「臺灣東部新港海域鬼頭刀延繩釣漁業漁獲組成及作業漁場分布」：
+- 2003–2018 年台東新港魚市場量測 88,902 尾鬼頭刀；另使用 2012–2018 年延繩釣樣本船作業資料。
+- 報告主要商業盛漁期為 4–6 月及 10–12 月。
+- 1–3 月約 75% 作業航次集中於新港外海；4–6 月漁場往東南移動；10–12 月往北偏移至花蓮海域。
+- 此資料具有台灣東部在地季節性商業漁業資訊，但漁法是離岸延繩釣，不是岸際磯釣。只能作為鬼頭刀季節分布與商業漁場移動背景，不能轉成岸釣最佳月份、逐時活動或中魚率。
+- 模型用途維持 `context_only_east_taiwan_commercial_fishery`，不參與即時活動分數及最佳時段推估。
+
+
+## P2.4.12 東部正鰹物種候選與生殖季節證據
+
+新增正鰹（`Katsuwonus pelamis`，俗名煙仔／卓鯤／煙仔虎）為獨立候選 c039。依據水產試驗所東部海洋生物研究中心 2020 年按月於台東新港魚市場採集的 358 尾東部海域正鰹樣本，建立 L031 / SE006：
+- 組織學觀察之雌魚產卵階段為 3–8 月，產卵比例最高為 4–7 月。
+- 雌魚 GSI 於 4–6 月達峰，雄魚於 5–7 月達峰。
+- 研究為單一年度商業漁獲樣本的生殖生物學研究；可支持東部正鰹生殖時序背景，不代表近岸魚群出現、逐時活動、岸釣最佳月份或中魚率。
+- 所有季節資料維持 `context_only_east_taiwan_reproductive_biology`，不進入活動分數或最佳時段模型。
+
+
+## P2.4.13 顯示可追溯的歷史季節研究摘要
+
+P2 整合器現在保留每個候選魚種的季節研究 ID、報告季節、研究地理範圍、用途狀態及限制說明；逐時展望會依唯一季節證據 ID 去重，將摘要放入 `seasonal_evidence_context_json`。PWA 以繁體中文顯示研究期間與地理範圍，並標示「歷史季節研究背景（非即時作釣預測）」。
+
+季節研究可能來自外縣市、外國、商業延繩釣、養殖或生殖生物學研究；這些資料不會轉成即時活動分數、中魚率或最佳作釣時段。報告季節必須與研究場景一併呈現，不可脫離地理與漁法脈絡。
+
+
+## P2.4.14 可追溯物種生態背景目錄
+
+新增 `build_species_context_catalog.py`，從 P1 物種候選、物種生態參數與證據登錄表產生 `species_ecology_context.json`，並嵌入即時 P2 JSON。每筆資料保留候選 ID、學名、參數值、地理範圍、證據 ID、來源名稱/網址、信心等級、用途狀態及限制。
+
+資料分類包含棲地、記載水深、活動水層/日夜活動、食性、繁殖、漁業季節等。此目錄只呈現物種自然史背景：
+- 記載水深不是建議作釣深度。
+- 棲地類型不是指定釣點存在證據。
+- 日行性或食性描述不是即時活性或咬餌機率。
+- 季節與繁殖資料必須連同研究地區、漁法及限制一起解讀。
+- 任何物種背景資料都不會自動變成環境反應分數、中魚率或最佳作釣時段。
+
+
+## P2.4.16 擴充至 21 種優先東部魚種候選
+
+優先魚種反應缺口矩陣擴充為 21 個候選、147 列（每種七個環境反應領域）。新增花身雞魚、紅槽、白帶魚、日本竹筴魚、紅甘，以及雜紋、史氏、藍頭綠、雙色鯨四種鸚哥魚。所有物種均沿用各自的分類及東部分布資格閘門。
+
+保留必要限制：
+- 白毛仍為舵魚屬俗名群；瓜子鱲的黑毛俗名也需鑑種，不因加入矩陣就解除資格閘門。
+- 點帶石斑魚仍保留東部本島分布衝突審查狀態。
+- 隆頭鸚哥魚（c035）因屬海洋保育類、禁止垂釣，不納入可釣目標候選。
+- 所有新增物種在缺乏直接物種反應研究前，七項環境反應仍標示 evidence gap；棲地、深度、食性及季節背景不會轉成魚情分數。
+
+
+## P2.4.17 條紋豆娘魚繁殖與攝食行為研究
+
+新增 L032 / AE016 與 L033 / SE007：
+- 1984 年北台灣研究觀察到護卵雄魚在水流帶來浮游生物時出現跳躍攝食；此為特定繁殖情境的行為觀察，不是一般活動率或流速偏好。
+- 1986 年北台灣研究調查 169 天、記錄 966 個巢，產卵活動約在 5–10 月，5 月及 7 月各有高峰；研究未發現產卵強度與水溫、月相或近岸流速的顯著關聯。
+- 兩項研究均為北台灣歷史研究，維持 `context_only_northern_taiwan_field_study`。不得外推成台灣東部逐時活動、中魚率或最佳作釣月份。
+
+## P2.2.5 東部海岸歷史物種出現基線
+
+新增 `P2/species/species_regional_occurrence_register.csv`，將交通部觀光局東部海岸國家風景區管理處 2016 年海域生態調查的物種表，整理為可追溯的物種／測站／調查次數出現紀錄。
+
+目前納入的目標魚種：
+- 南方舵魚（`Kyphosus bigibbus`）：杉原北側第 2 次調查有記錄。
+- 條紋豆娘魚（`Abudefduf vaigiensis`）：杉原北側第 2、3 次及基翬北側第 1 次調查有記錄。
+- 七帶豆娘魚（`Abudefduf septemfasciatus`）：杉原北側第 2 次調查有記錄；此為豆娘魚俗名群中的單一物種紀錄，不代表整個俗名群。
+- 藍頭綠鸚哥魚（`Chlorurus sordidus`）：基翬南側第 1 次、石梯坪第 1、2 次調查有記錄。
+
+這些資料只代表該次水下生態調查曾觀察到物種，不代表數量、族群豐度、岸釣漁獲、即時存在或最佳作釣時段。表格空白也不解讀為未出現。研究範圍為東部海岸小野柳至花蓮鹽寮、潮間帶至水深 20 公尺以淺，只有單年度調查，不能作為逐時魚情模型訓練標籤。
+
+`build_species_context_catalog.py` 會將這些紀錄一併輸出至 `species_ecology_context.json` 的 `regional_occurrence_records`，PWA 可依魚種及區域顯示歷史出現證據與原始報告連結；此層仍標記為 `context_only_east_coast_biodiversity_survey`，不參與活動分數或中魚機率。
+
+## P2.4.5 活動／出現／季節證據可追溯上下文
+
+`P2/species/integrate_environment_and_activity.py` now exports source-level evidence context alongside evidence IDs and counts:
+- `activity_evidence_context_json`: activity dimension, evidence kind, reported pattern, geographic scope, study period, sample size, life stage, method, literature ID, source URL, confidence, transferability, model-use status, and limitations.
+- `occurrence_evidence_context_json`: the same provenance fields for occurrence-only records, kept separate from activity evidence.
+- `seasonal_evidence_context_json`: expanded with study period, life stage, method, literature ID, source URL, confidence, transferability, model-use status, and limitations.
+
+This lets downstream PWA/API consumers explain why a record is context-only (for example, northern Taiwan, western Taiwan fishery, captive feeding, juvenile-only behaviour, external-region telemetry, or a single East Taiwan occurrence). Occurrence records remain a separate evidence class and are never counted as activity observations. This change does not create activity scores, environmental-response scores, catch probabilities, or best-fishing windows. The existing blank score fields and taxonomy gates remain unchanged.
+
+Validation is covered by `P2/test_integrated_activity.py`: source URL/literature traceability, transferability and limitations are preserved, and occurrence-only evidence remains separate from activity evidence.
+
+### Evidence context propagation to the published 6/12/24-hour PWA outlook
+
+The evidence provenance fields produced by the hourly integration are carried through `build_hourly_fish_outlook.py` into each candidate/region/horizon summary, then published unchanged by `export_hourly_fish_outlook_json.py` in `latest_hourly_fish_outlook.json`:
+- `activity_evidence_context_json`: traceable activity-study metadata and limitations.
+- `occurrence_evidence_context_json`: separate occurrence-only provenance; never merged into activity counts.
+- `seasonal_evidence_context_json`: seasonal-study provenance and transferability limits.
+
+The window builder deduplicates repeated evidence IDs across forecast hours. If the same evidence ID carries conflicting metadata within one summary window, it fails rather than silently selecting one version. Empty context remains an empty JSON array. No activity score, catch probability, or best-fishing-window claim is created by exposing the metadata. Regression tests cover propagation, deduplication, conflicting metadata rejection, and publication.
+
+
+## P2.4.6 PWA evidence-source inspection
+
+The P2 outlook cards now expose expandable, source-traceable evidence sections for activity/ecology studies, East Taiwan occurrence/specimen records, and seasonal research. Each entry shows its geography, study period, life stage, method/sample context, confidence, transferability, model-use status and limitations when present, with an HTTPS source link when available. The UI keeps these evidence classes separate and explicitly labels occurrence as historical presence only; none of these sections creates an activity score, catch probability, or best-fishing-time claim. The hourly outlook schema now explicitly includes the seasonal evidence context field.
+
+## P2.7.1 季節漁業證據與逐時活動證據分層
+
+The priority species response-gap matrix now carries a JSON provenance bundle for each matched literature domain (study design, geography, study period, reported observation/value, source, confidence, use status and limitations). East Taiwan commercial seasonal-distribution records (seasonal_activity) are visible under the seasonal/activity research domain as context-only literature, without becoming approved nearshore activity rules or hourly catch predictions. The matrix preserves the not_model_eligible_until_direct_response_evidence_reviewed policy. This prevents offshore commercial longline seasonality from being misrepresented as shore-angling activity.
+
+
+## P2.7.2 環境比對分數的逐條證據追溯
+
+The environmental match engine now emits `rule_evidence_trace_json` for every candidate/region/hour. Each evaluated rule records its rule ID, environmental field, observed value, operator/range, match outcome, score/weight, evidence ID, source URL and confidence. Missing/non-numeric inputs are explicitly represented rather than silently disappearing. The trace is carried through the integrated assessment and aggregated into the published 6/12/24-hour outlook by rule and forecast hour; conflicting duplicate metadata is rejected. This is provenance for the environmental-match calculation only, not a fish-activity score or catch probability.
+
+
+## P2.8 環境反應規則審核報告
+
+新增 `P2/species/audit_environment_response_rules.py`，逐條檢查環境反應規則是否符合計分資格，並輸出可稽核 CSV。未核准、外地研究、低信心、未完成審查、魚種分類/分布資格未通過、環境欄位/區域/運算子錯誤、數值範圍或權重錯誤，都會列出明確排除原因，而不是只在引擎載入時被略過。
+
+執行：
+
+```bash
+python P2/species/audit_environment_response_rules.py \\
+  --rules-csv P2/species/environment_response_rules_template.csv \\
+  --candidates-csv P2/species/species_response_evidence_gaps.csv \\
+  --out output/p2/environment_response_rule_audit.csv
+```
+
+`approved_for_scoring` 代表通過規則欄位與證據門檻審核；實際計分仍由 environment_match_engine 執行。此稽核不會替任何魚種創造研究數值、門檻或分數。CI 以單元測試涵蓋合格規則、外地/背景證據排除、魚種資格閘門、來源缺漏、數值錯誤及重複規則 ID。

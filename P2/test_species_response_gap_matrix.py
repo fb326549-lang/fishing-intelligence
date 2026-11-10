@@ -36,24 +36,49 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c002,白毛,Kyphosus spp.\n"
                 "c003,臭肚,Siganus fuscescens\n"
                 "c004,黑鯛,Acanthopagrus schlegelii\n"
+                "c010,花身雞魚,Terapon jarbua\n"
+                "c012,紅槽,Lutjanus bohar\n"
+                "c018,白帶魚,Trichiurus lepturus\n"
+                "c019,日本竹筴魚,Trachurus japonicus\n"
+                "c023,鬼頭刀,Coryphaena hippurus\n"
+                "c024,紅甘,Seriola dumerili\n"
                 "c027,條紋豆娘魚,Abudefduf vaigiensis\n"
                 "c028,孟加拉豆娘魚,Abudefduf bengalensis\n"
                 "c029,瑪拉巴石斑魚,Epinephelus malabaricus\n"
                 "c030,點帶石斑魚,Epinephelus coioides\n"
+                "c031,雜紋鸚哥魚,Scarus rivulatus\n"
+                "c032,史氏鸚哥魚,Scarus schlegeli\n"
+                "c033,藍頭綠鸚哥魚,Chlorurus sordidus\n"
+                "c034,雙色鯨鸚哥魚,Cetoscarus bicolor\n"
                 "c036,南方舵魚,Kyphosus bigibbus\n"
-                "c037,天竺舵魚,Kyphosus cinerascens\n",encoding="utf-8")
+                "c037,天竺舵魚,Kyphosus cinerascens\n"
+                "c039,正鰹,Katsuwonus pelamis\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
-            evidence.write_text("candidate_id,evidence_id,source_url\nc001,E1,https://example.org/e1\n",encoding="utf-8")
+            evidence.write_text(
+                "candidate_id,evidence_id,source_url\n"
+                "c001,E1,https://example.org/e1\n"
+                "c023,E001,https://fishdb.sinica.edu.tw/taxon/381638-fishdb\n"
+                "c023,E002,https://www.tfrin.gov.tw/theme_data.php?id=1382&theme=research\n",encoding="utf-8")
             literature=root/"literature.csv"
-            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n",encoding="utf-8")
+            literature.write_text("literature_record_id,candidate_id,parameter_code,source_url,model_use_status\nL1,c003,temperature_response,https://example.org/l1,context_only_external_region\nL2,c001,activity_period,https://example.org/l2,context_only_northern_taiwan_field_study\nL3,c004,temperature_response,https://example.org/l3,context_only_western_taiwan_fishery_model\nL4,c004,ocean_current_response,https://example.org/l4,context_only_western_taiwan_fishery_model\nL5,c036,temperature_response,https://example.org/l5,context_only_external_region\n"
+                "L6,c023,seasonal_activity,https://example.org/l6,context_only_east_taiwan_commercial_fishery\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),70)
+            self.assertEqual(len(rows),147)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
+            skipjack=next(r for r in rows if r["candidate_id"]=="c039" and r["response_domain"]=="temperature_range")
+            dolphinfish=next(r for r in rows if r["candidate_id"]=="c023" and r["response_domain"]=="temperature_range")
+            amberjack=next(r for r in rows if r["candidate_id"]=="c024" and r["response_domain"]=="temperature_range")
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(grouper["evidence_status"],"regional_evidence_gate")
             self.assertEqual(black["evidence_status"],"evidence_gap")
+            self.assertEqual(skipjack["eligibility_gate"],"verified_taxon")
+            self.assertEqual(skipjack["evidence_status"],"evidence_gap")
+            self.assertEqual(dolphinfish["eligibility_gate"],"verified_taxon")
+            self.assertEqual(dolphinfish["evidence_status"],"evidence_gap")
+            self.assertIn("E001;E002",dolphinfish["evidence_ids"])
+            self.assertEqual(amberjack["eligibility_gate"],"verified_taxon")
             self.assertIn("habitat",black["existing_parameter_codes"])
             rabbit=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="temperature_range")
             self.assertEqual(rabbit["evidence_status"],"external_literature_found_context_only")
@@ -73,6 +98,13 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(white_alias["evidence_status"],"species_identification_required")
             self.assertEqual(white_alias["literature_record_ids"],"")
             self.assertEqual(len([r for r in rows if r["candidate_id"] in {"c036","c037"}]),14)
+            seasonal_fishery=next(r for r in rows if r["candidate_id"]=="c023" and r["response_domain"]=="activity_period")
+            self.assertEqual(seasonal_fishery["evidence_status"],"external_literature_found_context_only")
+            self.assertEqual(seasonal_fishery["literature_record_ids"],"L6")
+            self.assertEqual(seasonal_fishery["literature_use_status"],"context_only_east_taiwan_commercial_fishery")
+            context=__import__("json").loads(seasonal_fishery["literature_context_json"])
+            self.assertEqual(context[0]["model_use_status"],"context_only_east_taiwan_commercial_fishery")
+            self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
 
 if __name__ == "__main__":
     unittest.main()

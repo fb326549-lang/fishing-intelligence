@@ -1,4 +1,5 @@
 import csv
+import json
 import sys
 import tempfile
 import unittest
@@ -64,6 +65,12 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
             self.assertEqual(rabbit["rule_coverage"], "1.0000")
             self.assertEqual(rabbit["rules_matched"], "1")
             self.assertEqual(rabbit["rules_evaluated"], "1")
+            trace = json.loads(rabbit["rule_evidence_trace_json"])
+            self.assertEqual(len(trace), 1)
+            self.assertEqual(trace[0]["rule_id"], "R1")
+            self.assertEqual(trace[0]["evidence_id"], "E1")
+            self.assertEqual(trace[0]["observed_value"], 24)
+            self.assertTrue(trace[0]["match"])
             self.assertEqual(rabbit["interpretation"], "environment_match_only_not_fish_activity_or_catch_probability")
 
     def test_non_matching_environment_value_contributes_zero(self):
@@ -104,6 +111,11 @@ class EnvironmentMatchEngineTests(unittest.TestCase):
         self.assertEqual(rows[0]["status"], "insufficient_environment_data")
         self.assertEqual(rows[0]["rule_coverage"], "0.0000")
         self.assertEqual(rows[0]["rules_evaluated"], "0")
+        trace = json.loads(rows[0]["rule_evidence_trace_json"])
+        self.assertEqual(len(trace), 1)
+        self.assertEqual(trace[0]["rule_id"], "R1")
+        self.assertEqual(trace[0]["evaluation_status"], "missing")
+        self.assertIsNone(trace[0]["observed_value"])
 
     def test_approved_rule_requires_review_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:

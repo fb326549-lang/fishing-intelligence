@@ -16,7 +16,8 @@ def build_context(record):
     tide_phase=present["tide_phase"]
     if tide_phase not in {"rising","falling","high_slack","low_slack","unknown"}:
         tide_phase="unknown"
-    # Do not infer tide phase from tide height or turning points from sparse samples.
+    # Upstream may pass through a phase derived from bracketing CWA high/low
+    # forecast events. Never infer it from tide height or sparse regional samples.
     # Do not infer tidal current from ocean current, or vice versa.
     tide_height=present["tide_height_m"]
     tidal_speed=present["tidal_current_velocity_ms"]
@@ -41,12 +42,13 @@ def build_context(record):
             "tidal_current":"available" if tidal_speed is not None else "missing",
             "ocean_current":"available" if ocean_speed is not None else "missing",
         },
-        "derivation":"direct_field_passthrough_no_interpolation",
+        "derivation":"direct_fields_with_upstream_cwa_event_derived_phase_no_height_interpolation",
         "interpretation":"neutral_hydrodynamic_context_not_fish_activity_or_catch_probability",
         "limitations":[
             "tide_height_is_not_tidal_current_velocity",
             "ocean_current_is_not_tidal_current",
             "missing_tide_phase_is_not_inferred_from_tide_height",
+            "forecast_tide_phase_from_high_low_events_is_not_measured_tidal_current_or_current_slack",
             "no_species_response_or_best_fishing_time_is_inferred",
         ],
     }

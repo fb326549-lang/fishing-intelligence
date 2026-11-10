@@ -16,7 +16,7 @@ header{position:sticky;top:0;background:#08283df2;padding:14px 16px;border-botto
 main{max-width:1000px;margin:auto;padding:14px;display:grid;gap:12px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;min-width:0}.panel h2{font-size:16px;margin:0 0 12px}
 button,input,select{background:#19465e;color:var(--text);border:1px solid #39718d;border-radius:10px;padding:11px;font-size:14px}button{cursor:pointer}button:active{opacity:.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#163b51;border-radius:10px;padding:12px;min-width:0}.label{font-size:11px;color:var(--muted)}.value{font-size:21px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
 .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}#map{height:330px;border-radius:12px;z-index:1}.wide{grid-column:1/-1}#settings{display:none}#settings.show{display:block}label{display:block;font-size:12px;color:var(--muted);margin-top:9px}input,select{width:100%;margin-top:5px}.notice{font-size:11px;line-height:1.5;color:var(--muted);background:#0a2333;padding:10px;border-radius:9px;margin-top:10px}.tag{display:inline-block;border:1px solid #39718d;border-radius:99px;padding:4px 8px;font-size:11px;color:#b9eafa}
-.favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
+.favorite-list{display:grid;gap:7px;margin-top:9px}.favorite-item{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#0e2b3e;border:1px solid #28516a;border-radius:9px;padding:8px}.favorite-name{flex:1;min-width:120px;font-weight:650}.favorite-item button{padding:7px 9px;font-size:12px}.season-note{color:#b8e8d9;font-size:11px;margin-top:5px}.evidence-details{margin-top:7px;border-top:1px solid #28516a;padding-top:6px}.evidence-details summary{cursor:pointer;color:#b9eafa;font-size:12px}.evidence-item{margin-top:8px;padding:8px;background:#0e2b3e;border-radius:8px;overflow-wrap:anywhere}.evidence-item .small{margin-top:4px;line-height:1.45}.evidence-item a{color:#75d7f2}@media(min-width:760px){main{grid-template-columns:1fr 1fr}#map{height:420px}}
 </style></head>
 <body>
 <header><div class="row"><div><div class="brand">〰 FISHING INTELLIGENCE <span style="color:#5bd5a0">測試版</span></div><div class="sub">台灣海域優先・智慧海釣助手</div></div><button id="settingsBtn">⚙ API 設定</button></div></header>
@@ -47,11 +47,12 @@ button,input,select{background:#19465e;color:var(--text);border:1px solid #39718
 <section class="panel wide"><div class="row"><h2>📍 選擇釣點</h2><span id="coords" class="small">尚未選點</span></div><div id="map"></div><div class="tools"><button id="gps">◎ 目前位置</button><button id="taiwan">回到台灣</button><button id="refresh">重新查詢</button><button id="saveFavorite">☆ 收藏目前釣點</button></div><div class="metric" style="margin-top:10px"><div class="row"><strong>⭐ 我的最愛釣點</strong><span class="small" id="favoriteCount">0 個收藏</span></div><div id="favoriteList" class="favorite-list"><div class="small">尚未收藏釣點。先點選地圖，再按「收藏目前釣點」。</div></div></div><div id="pointStatus" class="status">點擊地圖選擇海域，或使用目前位置。</div></section>
 <section class="panel"><h2>🌊 海洋預報（Open-Meteo）</h2><div class="grid"><div class="metric"><div class="label">海表溫度</div><div class="value" id="sst">—</div></div><div class="metric"><div class="label">海流速度</div><div class="value" id="current">—</div></div><div class="metric"><div class="label">浪高</div><div class="value" id="wave">—</div></div><div class="metric"><div class="label">浪週期</div><div class="value" id="period">—</div></div></div><div id="marineStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel wide" id="cwaObservedPanel"><div class="row"><h2>📡 中央氣象署實測海象</h2><span class="tag">測站觀測</span></div><div class="grid"><div><label>東部規劃區域</label><select id="cwaRegion"><option value="auto">依釣點座標自動選區</option><option value="yilan_suao">宜蘭、蘇澳</option><option value="hualien_north">花蓮北段</option><option value="hualien_south">花蓮南段</option><option value="fengbin_shitiping">豐濱、石梯坪</option><option value="chenggong_donghe">成功、東河</option><option value="taitung_south">台東南段</option></select></div><div class="metric"><div class="label">48小時最新觀測時間</div><div class="value" id="cwaObservedTime">等待資料</div></div></div><div class="grid" style="margin-top:8px"><div class="metric"><div class="label">實測浪高</div><div class="value" id="cwaWave">—</div></div><div class="metric"><div class="label">實測浪週期</div><div class="value" id="cwaPeriod">—</div></div><div class="metric"><div class="label">實測海溫</div><div class="value" id="cwaSst">—</div></div><div class="metric"><div class="label">實測海流速度</div><div class="value" id="cwaCurrent">—</div></div><div class="metric"><div class="label">實測風速</div><div class="value" id="cwaWind">—</div></div><div class="metric"><div class="label">實測潮位</div><div class="value" id="cwaTide">—</div></div></div><div class="small" id="cwaObservedMeta">等待中央氣象署區域實測摘要。</div><div class="metric" style="margin-top:9px"><div class="row"><strong>30天資料最新觀測（歷史窗）</strong><span class="small" id="cwa30dTime">—</span></div><div class="grid" style="margin-top:8px"><div><div class="label">浪高</div><div class="value" id="cwa30dWave">—</div></div><div><div class="label">海溫</div><div class="value" id="cwa30dSst">—</div></div><div><div class="label">海流速度</div><div class="value" id="cwa30dCurrent">—</div></div></div></div><div id="cwaStatus" class="status">取得中央氣象署實測摘要中…</div><div class="notice">CWA 數值為規劃區域內測站觀測彙整，不是地圖選點的現場實測；自動選區依 P1 規劃區域中心緯度估算，並非官方海域邊界，可手動改選。缺測欄位保持無資料。30天資料顯示歷史窗內最新觀測，不是30日平均或預報。這些實測值目前獨立顯示，尚未直接混入魚情分數。</div></section>
+<section class="panel wide" id="forecastVerificationPanel"><div class="row"><h2>📊 海象預報可信度驗證</h2><span class="tag" id="forecastVerificationStatus">等待資料</span></div><div class="grid"><div class="metric"><div class="label">同區域／同有效小時配對</div><div class="value" id="forecastPairCount">—</div></div><div class="metric"><div class="label">預報版本配對</div><div class="value" id="forecastVintageCount">—</div></div><div class="metric"><div class="label">達探索樣本門檻變數</div><div class="value" id="forecastMetricCount">—</div></div></div><div id="forecastVerificationMetrics" class="small" style="margin-top:10px;line-height:1.7">等待歷史預報與中央氣象署實測資料完成時間配對。</div><div class="metric" style="margin-top:9px"><strong>六區資料覆蓋</strong><div id="forecastCoverageStatus" class="small" style="margin-top:6px">等待區域資料覆蓋報告。</div><div id="forecastCoverageRegions" class="small" style="margin-top:7px;line-height:1.7"></div></div><div id="forecastVerificationNote" class="notice">資料完整度不等於預報準確度。只有同區域、同有效小時的預報與實測配對才會計算誤差；樣本不足時不會顯示準確度結論。</div><div id="forecastVerificationFreshness" class="small" style="margin-top:8px;color:#9fb4ae">驗證更新時間：等待資料</div></section>
 <section class="panel"><h2>🌬️ 天氣與風況</h2><div class="grid"><div class="metric"><div class="label">風速</div><div class="value" id="wind">—</div></div><div class="metric"><div class="label">陣風</div><div class="value" id="gust">—</div></div><div class="metric"><div class="label">氣壓</div><div class="value" id="pressure">—</div></div><div class="metric"><div class="label">降雨機率</div><div class="value" id="rain">—</div></div><div class="metric"><div class="label">相對濕度</div><div class="value" id="humidity">—</div></div><div class="metric"><div class="label">雲量</div><div class="value" id="cloud">—</div></div><div class="metric"><div class="label">能見度</div><div class="value" id="visibility">—</div></div><div class="metric"><div class="label">風向</div><div class="value" id="windDirection">—</div></div></div><div id="weatherStatus" class="status">選擇釣點後查詢</div></section>
 <section class="panel wide"><h2>🐟 台灣常見魚種・智慧魚情</h2><div class="grid"><div><label>海域區域</label><select id="fishRegion"><option value="auto">依釣點自動判斷</option><option value="north">北部／東北角</option><option value="east">東部</option><option value="west">西部／中部</option><option value="south">南部</option></select></div><div><label>目標魚種</label><select id="targetFish"><option value="all">不限魚種（綜合環境）</option></select></div></div><div class="row" style="margin-top:12px"><div><div class="label">舊版通用環境分數（已停用）</div><div class="value" id="activity" style="font-size:34px">已停用</div></div><span class="tag" id="activityGrade">不作魚情判斷</span></div><p class="small" id="activityNote">舊版通用權重缺少台灣東部物種級直接反應證據，已停止計分，避免產生誤導性分數。</p><div id="activityBreakdown" class="small" style="line-height:1.8;margin-top:8px">請以「P2 智慧魚情展望」中的物種資格、環境證據與活動證據狀態為準。</div><div class="notice">指數是依海流、潮汐、風浪、氣壓及魚種習性建立的環境參考值，不代表魚群即時偵測或保證漁獲。魚種名單依台灣沿岸棲地與常見垂釣對象整理；各地季節、禁漁規定及實際出現情況仍須確認。</div></section>
 <section class="panel wide" id="recommendations"><h2>🎯 魚種推薦與最佳時段</h2><p class="small">舊版通用環境排序已停用。只有具備足夠的東部物種級直接證據、通過模型驗證後，才會提供魚種排名與最佳作釣時段。</p><div id="topFish" class="grid"><div class="metric">尚未建立可驗證的魚種排名；請查看 P2 智慧魚情展望中的證據狀態。</div></div><div class="metric" style="margin-top:10px"><div class="label">最佳作釣時段</div><div class="value" id="bestWindow">尚未建立</div><div class="small" id="bestWindowNote">不以風浪較平穩的時段直接推論魚類活性或中魚機率。</div></div></section><section class="panel"><h2>🌙 潮汐資訊</h2><div class="grid"><div class="metric"><div class="label">下一個滿潮／乾潮</div><div class="value" id="tideLevel">待串接</div></div><div class="metric"><div class="label">目前潮勢</div><div class="value" id="tidePhase">待串接</div></div></div><div style="margin-top:10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="small">今日潮差 <strong id="tideRangeToday">計算中</strong></span><strong id="tideRangeGrade" style="font-size:24px;line-height:1.2;color:#35c7a0;letter-spacing:1px">判定中</strong></div><div class="metric" style="margin-top:8px"><div class="row"><span class="label">目前潮汐進度</span><strong id="tideProgressText">等待資料</strong></div><div style="height:10px;background:#0a2333;border-radius:99px;overflow:hidden;margin-top:8px"><div id="tideProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#2aa8d8,#5bd5a0);border-radius:99px"></div></div><div class="row small" style="margin-top:5px"><span>轉折點（滿潮／乾潮）</span><span id="tideRangeText">—</span></div></div><p class="small" id="tideDetail">依選定座標自動比對最近的中央氣象署潮汐預報地點。</p></section>
 <section class="panel"><h2>📡 資料來源與更新</h2><div class="small">海洋預報：Open-Meteo Marine；CWA實測：O-B0075-001（48小時）及 O-B0075-002（30天區域彙整）；天氣預報：Open-Meteo Forecast；潮汐轉折：CWA F-A0021-001。海底水深、底質及更細緻的魚種分布資料仍待補足。</div><div id="updated" class="status">尚未查詢</div><div class="notice">海洋模式在近岸、港灣及複雜地形可能有誤差。出海前請另確認中央氣象署海象、海上警報及航安資訊，不可將本工具作為唯一安全依據。</div></section>
-<section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>中央氣象署潮汐 API 網址<input id="tideUrl" autocomplete="url"></label><label>中央氣象署 OpenData 授權碼<input id="tideKey" type="password" autocomplete="off" placeholder="貼上你的 CWA API 授權碼"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">潮汐資料使用中央氣象署 F-A0021-001。授權碼只存於目前裝置的瀏覽器，不會寫入 GitHub 程式碼；但瀏覽器發出的 API 請求仍會帶出授權碼，請勿在公用裝置使用。</div></section>
+<section class="panel wide" id="settings"><h2>⚙ API／資料來源管理</h2><label>海洋 API 網址<input id="marineUrl" autocomplete="url"></label><label>天氣 API 網址<input id="weatherUrl" autocomplete="url"></label><label>中央氣象署潮汐 API 網址<input id="tideUrl" autocomplete="url"></label><label>中央氣象署 OpenData 授權碼（備援，可留空）<input id="tideKey" type="password" autocomplete="off" placeholder="只有後端潮汐快取失效時才需要"></label><div class="tools"><button id="save">儲存設定</button><button id="test">測試海洋 API</button><button id="restore">還原預設</button></div><div id="configStatus" class="status">設定儲存在目前裝置的瀏覽器。</div><div class="notice">潮汐資料優先使用系統自動更新的中央氣象署 F-A0021-001 後端快取，不需要自行輸入授權碼；授權碼僅作直接 API 備援，存於目前裝置瀏覽器，不會寫入 GitHub 程式碼。</div></section>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -60,10 +61,13 @@ const $=id=>document.getElementById(id),defaults={marineUrl:'https://marine-api.
 const CWA_SNAPSHOT_URL='https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_regional_marine_conditions.json';
 const CWA_SAFETY_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_safety_decisions.json";
 const CWA_MARINE_RISK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/tide-history/data/latest_marine_risk_assessment.json";
+const CWA_TIDE_SNAPSHOT_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_cwa_tide_forecast.json";
 const P2_FISH_OUTLOOK_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/latest_hourly_fish_outlook.json";
-let point={lat:23.7,lon:121},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null};
+const FORECAST_VERIFICATION_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/latest.json";
+const FORECAST_COVERAGE_URL="https://raw.githubusercontent.com/fb326549-lang/fishing-intelligence/p2-history/data/forecast_verification/environment_coverage.json";
+let point={lat:23.72,lon:121.62},pin=null,latest={marine:null,weather:null,tide:null,hourlyMarine:null,hourlyWeather:null,cwaSnapshot:null,safety:null,marineRisk:null,p2FishOutlook:null,forecastVerification:null,forecastCoverage:null};
 
-const map=L.map('map').setView([23.7,121],7);
+const map=L.map('map').setView([23.72,121.62],8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
 function config(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return {...defaults}}}
 function fillSettings(){const c=config();Object.keys(c).forEach(k=>$(k).value=c[k]||'')}
@@ -111,94 +115,165 @@ $('settingsBtn').onclick=()=>{$('settings').classList.toggle('show');if($('setti
 $('save').onclick=saveSettings;$('restore').onclick=()=>{localStorage.removeItem(KEY);fillSettings();$('configStatus').textContent='已還原預設 API 設定。'};
 $('test').onclick=async()=>{if(!saveSettings())return;const c=config(),u=new URL(c.marineUrl);u.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature',forecast_days:'1'});try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);await r.json();$('configStatus').textContent='海洋 API 連線成功。'}catch(e){$('configStatus').textContent='連線失敗：'+e.message+'。可能是網路、CORS 或服務限制。'}};
 async function loadTide(){
-const c=config();
-$('tideLevel').textContent='查詢中…';$('tidePhase').textContent='—';$('tideDetail').textContent='正在取得中央氣象署潮汐預報…';
-if(!c.tideKey){$('tideLevel').textContent='尚未設定授權碼';$('tidePhase').textContent='—';$('tideDetail').textContent='請開啟「API 設定」，貼上中央氣象署 OpenData 授權碼並儲存。';return}
-try{
-const u=new URL(c.tideUrl||defaults.tideUrl);
-u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
-const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);
-const j=await r.json();
-const norm=k=>String(k).replace(/[^a-z0-9]/gi,'').toLowerCase();
-const prop=(o,...keys)=>{if(!o||typeof o!=='object')return undefined;const wanted=keys.map(norm);const k=Object.keys(o).find(x=>wanted.includes(norm(x)));return k===undefined?undefined:o[k]};
-const arr=v=>v==null?[]:Array.isArray(v)?v:[v];
-if(String(prop(j,'success')||'').toLowerCase()==='false'||String(prop(j,'status')||'').toUpperCase()==='ERROR')throw Error(prop(j,'message')||'中央氣象署回應錯誤');
-const candidates=[];
-const scanEvents=(node,out,depth=0)=>{
- if(!node||typeof node!=='object'||depth>16)return;
- if(Array.isArray(node)){node.forEach(x=>scanEvents(x,out,depth+1));return}
- const dt=prop(node,'DateTime','dateTime','datetime'),tide=prop(node,'Tide');
- if(dt&&tide){const heights=prop(node,'TideHeights','tideHeights')||{};out.push({date:dt,tide:String(tide),height:prop(heights,'AboveLocalMSL','AboveChartDatum')??prop(node,'AboveLocalMSL','AboveChartDatum')});}
- Object.values(node).forEach(x=>scanEvents(x,out,depth+1));
-};
-const walk=(node,depth=0)=>{
- if(!node||typeof node!=='object'||depth>16)return;
- if(Array.isArray(node)){node.forEach(x=>walk(x,depth+1));return}
- const lat=prop(node,'Latitude'),lon=prop(node,'Longitude');
- if(lat!==undefined&&lon!==undefined){
-  const events=[];scanEvents(node,events);
-  if(events.length)candidates.push({node,lat:Number(lat),lon:Number(lon),events});
+ const c=config();
+ $('tideLevel').textContent='查詢中…';
+ $('tidePhase').textContent='—';
+ $('tideDetail').textContent='正在取得中央氣象署潮汐預報…';
+ try{
+  let valid=[];
+  let tideSource='CWA 快取';
+  try{
+   const snapshotResponse=await fetch(CWA_TIDE_SNAPSHOT_URL);
+   if(snapshotResponse.ok){
+    const snapshot=await snapshotResponse.json();
+    const generatedAt=new Date(snapshot.generated_at_utc||'');
+    const ageHours=(Date.now()-generatedAt.getTime())/3600000;
+    if(snapshot.schema_version===1&&Array.isArray(snapshot.locations)&&Number.isFinite(ageHours)&&ageHours>=-0.25&&ageHours<=12){
+     valid=snapshot.locations.map(location=>({
+      node:{LocationName:location.location_name||location.location_id},
+      lat:Number(location.latitude),
+      lon:Number(location.longitude),
+      events:(Array.isArray(location.events)?location.events:[]).map(event=>({
+       date:event.valid_time,
+       tide:event.tide,
+       height:event.height_above_local_msl_cm
+      }))
+     })).filter(location=>Number.isFinite(location.lat)&&Number.isFinite(location.lon)&&location.events.length);
+     if(valid.length)tideSource='CWA 官方潮汐預報快取（'+generatedAt.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})+'）';
+    }
+   }
+  }catch(snapshotError){
+   /* Snapshot is optional; use direct CWA API fallback when configured. */
+  }
+  if(!valid.length&&c.tideKey){
+   tideSource='CWA OpenData 直接查詢';
+   const u=new URL(c.tideUrl||defaults.tideUrl);
+   u.search=new URLSearchParams({Authorization:c.tideKey,format:'JSON'});
+   const response=await fetch(u);
+   if(!response.ok)throw Error('HTTP '+response.status);
+   const payload=await response.json();
+   const norm=k=>String(k).replace(/[^a-z0-9]/gi,'').toLowerCase();
+   const prop=(o,...keys)=>{
+    if(!o||typeof o!=='object')return undefined;
+    const wanted=keys.map(norm);
+    const key=Object.keys(o).find(x=>wanted.includes(norm(x)));
+    return key===undefined?undefined:o[key];
+   };
+   const candidates=[];
+   const scanEvents=(node,out,depth=0)=>{
+    if(!node||typeof node!=='object'||depth>16)return;
+    if(Array.isArray(node)){node.forEach(x=>scanEvents(x,out,depth+1));return;}
+    const date=prop(node,'DateTime','dateTime','datetime');
+    const tide=prop(node,'Tide');
+    if(date&&tide){
+     const heights=prop(node,'TideHeights','tideHeights')||{};
+     out.push({date,tide:String(tide),height:prop(heights,'AboveLocalMSL')});
+    }
+    Object.values(node).forEach(x=>scanEvents(x,out,depth+1));
+   };
+   const walk=(node,depth=0)=>{
+    if(!node||typeof node!=='object'||depth>16)return;
+    if(Array.isArray(node)){node.forEach(x=>walk(x,depth+1));return;}
+    const latitude=prop(node,'Latitude');
+    const longitude=prop(node,'Longitude');
+    if(latitude!==undefined&&longitude!==undefined){
+     const events=[];
+     scanEvents(node,events);
+     if(events.length)candidates.push({node,lat:Number(latitude),lon:Number(longitude),events});
+    }
+    Object.values(node).forEach(x=>walk(x,depth+1));
+   };
+   walk(payload);
+   valid=candidates.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.events.length);
+  }
+  if(!valid.length)throw Error('後端潮汐快取暫不可用；如需直接連線備援，請在 API 設定中填入 CWA 授權碼。');
+  const rad=x=>x*Math.PI/180;
+  const distance=x=>{
+   const a=rad(x.lat-point.lat),b=rad(x.lon-point.lon);
+   const h=Math.sin(a/2)**2+Math.cos(rad(point.lat))*Math.cos(rad(x.lat))*Math.sin(b/2)**2;
+   return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
+  };
+  valid.sort((a,b)=>distance(a)-distance(b));
+  const station=valid[0];
+  const events=station.events;
+  const now=Date.now();
+  const future=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const past=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()<now).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!future.length)throw Error('最近預報地點「'+(station.node.LocationName||'')+'」沒有未來潮汐資料');
+  const next=future[0];
+  const prev=past[0];
+  const label=next.tide;
+  const localDay=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(d));
+  const today=localDay(now);
+  const dailyMap=new Map();
+  events.forEach(e=>{
+   if(!e.date||e.height===undefined||e.height===null||e.height==='')return;
+   const day=localDay(e.date);
+   const height=Number(String(e.height).replace(/[^0-9.+-]/g,''));
+   if(!Number.isFinite(height))return;
+   if(!dailyMap.has(day))dailyMap.set(day,{high:[],low:[]});
+   if(e.tide.includes('滿潮'))dailyMap.get(day).high.push(height);
+   if(e.tide.includes('乾潮'))dailyMap.get(day).low.push(height);
+  });
+  const ranges=[];
+  dailyMap.forEach((v,day)=>{
+   if(v.high.length&&v.low.length)ranges.push({day,range:Math.max(...v.high)-Math.min(...v.low)});
+  });
+  const todayRange=ranges.find(x=>x.day===today);
+  if(todayRange){
+   const sorted=ranges.map(x=>x.range).sort((a,b)=>a-b);
+   const rank=sorted.filter(x=>x<=todayRange.range).length/Math.max(1,sorted.length);
+   const grade=rank>=.67?'大潮':rank>=.34?'中潮':'小潮';
+   $('tideRangeToday').textContent=todayRange.range.toFixed(1)+' cm';
+   $('tideRangeGrade').textContent=grade;
+   $('tideRangeGrade').title='依本測站本期預報潮差相對排名；潮差不等同實際流速。';
+  }else{
+   $('tideRangeToday').textContent='資料不足';
+   $('tideRangeGrade').textContent='資料不足';
+   $('tideRangeGrade').title='此測站今日缺少完整滿潮、乾潮潮高，請稍後重新查詢。';
+  }
+  $('tideLevel').textContent=label+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm（當地平均海面基準）':'');
+  let tideState=null;
+  if(prev){
+   const rising=prev.tide.includes('乾潮')&&next.tide.includes('滿潮');
+   const falling=prev.tide.includes('滿潮')&&next.tide.includes('乾潮');
+   if(rising||falling){
+    const t0=new Date(prev.date).getTime();
+    const t1=new Date(next.date).getTime();
+    const fraction=Math.max(0,Math.min(1,(now-t0)/(t1-t0)));
+    const progress=Math.round(fraction*100)/10;
+    const phase=rising?'漲潮':'退潮';
+    tideState={phase,progress,prev,next,fraction};
+    $('tidePhase').textContent=phase+'中';
+    $('tideProgressText').textContent=phase+' '+progress.toFixed(1)+' 分'+(rising?'滿':'退');
+    $('tideProgressText').style.fontSize='18px';
+    $('tideProgressBar').style.width=(progress*10)+'%';
+    $('tideRangeText').textContent=new Date(prev.date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})+' → '+new Date(next.date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+   }else{
+    $('tidePhase').textContent='潮汐轉折資料待確認';
+    $('tideProgressText').textContent='無法判定潮向';
+    $('tideProgressBar').style.width='0%';
+    $('tideRangeText').textContent='—';
+   }
+  }else{
+   $('tidePhase').textContent='等待前一筆潮汐資料';
+   $('tideProgressText').textContent='資料不足';
+   $('tideProgressBar').style.width='0%';
+   $('tideRangeText').textContent='—';
+  }
+  latest.tide=tideState;
+  $('tideDetail').textContent='配對地點：'+(station.node.LocationName||'最近預報地點')+'；距離約 '+distance(station).toFixed(1)+' 公里。來源：'+tideSource+'。潮汐轉折進度不是實測潮高比例或海流流速。';
+  calculateFishing();
+ }catch(e){
+  latest.tide=null;
+  $('tideLevel').textContent='取得失敗';
+  $('tidePhase').textContent='—';
+  $('tideProgressText').textContent='無法計算';
+  $('tideProgressBar').style.width='0%';
+  $('tideRangeText').textContent='—';
+  $('tideDetail').textContent='潮汐資料錯誤：'+e.message+'。請確認授權碼、API 網址及網路連線。';
+  calculateFishing();
  }
- Object.values(node).forEach(x=>walk(x,depth+1));
-};
-walk(j);
-const valid=candidates.filter(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon)&&x.events.length);
-if(!valid.length)throw Error('官方 API 已連線，但回傳內容沒有可辨識的測站座標與潮汐事件。頂層欄位：'+Object.keys(j||{}).join(', '));
-const rad=x=>x*Math.PI/180;
-const distance=x=>{const a=rad(x.lat-point.lat),b=rad(x.lon-point.lon),h=Math.sin(a/2)**2+Math.cos(rad(point.lat))*Math.cos(rad(x.lat))*Math.sin(b/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))};
-valid.sort((a,b)=>distance(a)-distance(b));
-const station=valid[0],events=station.events;
-const now=Date.now(),future=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
-const past=events.filter(e=>e.date&&Number.isFinite(new Date(e.date).getTime())&&new Date(e.date).getTime()<now).sort((a,b)=>new Date(b.date)-new Date(a.date));
-if(!future.length)throw Error('最近測站「'+(prop(station.node,'LocationName')||'')+'」沒有未來潮汐資料');
-const next=future[0],prev=past[0],label=next.tide;
-// 今日潮差：同一測站當日最高滿潮與最低乾潮的預報潮高差。
-const localDay=d=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(d));
-const today=localDay(now),dailyMap=new Map();
-events.forEach(e=>{
- if(!e.date||e.height===undefined||e.height===null||e.height==='')return;
- const day=localDay(e.date),h=Number(String(e.height).replace(/[^0-9.+-]/g,''));
- if(!Number.isFinite(h))return;
- if(!dailyMap.has(day))dailyMap.set(day,{high:[],low:[]});
- if(e.tide.includes('滿潮'))dailyMap.get(day).high.push(h);
- if(e.tide.includes('乾潮'))dailyMap.get(day).low.push(h);
-});
-const ranges=[];
-dailyMap.forEach((v,day)=>{
- if(v.high.length&&v.low.length)ranges.push({day,range:Math.max(...v.high)-Math.min(...v.low)});
-});
-const todayRange=ranges.find(x=>x.day===today);
-if(todayRange){
- const sorted=ranges.map(x=>x.range).sort((a,b)=>a-b);
- const rank=sorted.filter(x=>x<=todayRange.range).length/Math.max(1,sorted.length);
- const grade=rank>=.67?'大潮':rank>=.34?'中潮':'小潮';
- $('tideRangeToday').textContent=todayRange.range.toFixed(1)+' cm';
- $('tideRangeGrade').textContent=grade;
- $('tideRangeGrade').title='依本測站本期預報潮差相對排名；潮差不等同實際流速。';
-}else{
- $('tideRangeToday').textContent='資料不足';
- $('tideRangeGrade').textContent='資料不足';
- $('tideRangeGrade').title='此測站今日缺少完整滿潮、乾潮潮高，請稍後重新查詢。';
-}
-$('tideLevel').textContent=label+' '+new Date(next.date).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})+(next.height!=null?' · '+next.height+' cm':'');
-let tideState=null;
-if(prev){
- const rising=prev.tide.includes('乾潮')&&next.tide.includes('滿潮');
- const falling=prev.tide.includes('滿潮')&&next.tide.includes('乾潮');
- if(rising||falling){
-  const t0=new Date(prev.date).getTime(),t1=new Date(next.date).getTime(),fraction=Math.max(0,Math.min(1,(now-t0)/(t1-t0)));
-  const progress=Math.round(fraction*100)/10,phase=rising?'漲潮':'退潮';
-  tideState={phase,progress,prev,next,fraction};
-  $('tidePhase').textContent=phase+'中';
-  $('tideProgressText').textContent=phase+' '+progress.toFixed(1)+' 分'+(rising?'滿':'退');$('tideProgressText').style.fontSize='18px';
-  $('tideProgressBar').style.width=(progress*10)+'%';
-  $('tideRangeText').textContent=new Date(prev.date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})+' → '+new Date(next.date).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
- }else{$('tidePhase').textContent='潮汐轉折資料待確認';$('tideProgressText').textContent='無法判定潮向';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—'}
-}else{$('tidePhase').textContent='等待前一筆潮汐資料';$('tideProgressText').textContent='資料不足';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—'}
-latest.tide=tideState;
-$('tideDetail').textContent='配對地點：'+(prop(station.node,'LocationName')||'最近預報地點')+'；距離約 '+distance(station).toFixed(1)+' 公里。分數為兩個官方潮汐轉折時刻之間的時間進度，並非實測潮高比例。';
-calculateFishing();
-}catch(e){latest.tide=null;$('tideLevel').textContent='取得失敗';$('tidePhase').textContent='—';$('tideProgressText').textContent='無法計算';$('tideProgressBar').style.width='0%';$('tideRangeText').textContent='—';$('tideDetail').textContent='潮汐資料錯誤：'+e.message+'。請確認授權碼、API 網址及網路連線。';calculateFishing()}
 }
 const FISH_DB={
  north:[
@@ -364,7 +439,7 @@ async function loadP2FishOutlook(){
   const response=await fetch(P2_FISH_OUTLOOK_URL+'?t='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const data=await response.json();
-  if(data.schema_version!==1||data.source!=='fishing-intelligence-p2.4.6'||!Array.isArray(data.rows)||!data.rows.length)throw Error('P2 展望資料格式不符');
+  if(data.schema_version!==1||!['fishing-intelligence-p2.4.6','fishing-intelligence-p2.6'].includes(data.source)||!Array.isArray(data.rows)||!data.rows.length)throw Error('P2 展望資料格式不符');
   if(!Array.isArray(data.horizons_hours)||!data.horizons_hours.includes(6)||!data.horizons_hours.includes(12)||!data.horizons_hours.includes(24))throw Error('P2 預報時段不完整');
   latest.p2FishOutlook=data;
   const sel=$('p2FishCandidate'),previous=sel.value;
@@ -374,6 +449,87 @@ async function loadP2FishOutlook(){
   if(candidates.some(x=>x.id===previous))sel.value=previous;
  }catch(e){latest.p2FishOutlook=null;$('p2FishStatus').textContent='資料暫不可用';$('p2FishSummary').textContent='無法取得最新 P2 智慧魚情資料：'+e.message;$('p2FishCards').innerHTML='<div class="small">資料來源暫時無法讀取；不代表魚種不存在或環境不適合。</div>';$('p2FishFreshness').textContent='資料時間：無法取得';return;}
  renderP2FishOutlook();
+}
+function renderForecastVerification(){
+ const data=latest.forecastVerification;
+ if(!data)return;
+ const labels={awaiting_time_aligned_observations:'等待同時刻實測資料',matched_hours_without_comparable_variables:'已有時間配對，尚無可比較欄位',exploratory_metrics_available:'已有初步誤差指標',exploratory_pairs_below_minimum_sample:'已有配對，樣本仍不足'};
+ $('forecastVerificationStatus').textContent=labels[data.status]||'驗證狀態未知';
+ $('forecastPairCount').textContent=String(data.forecast_observation_hour_pairs??0);
+ $('forecastVintageCount').textContent=String(data.forecast_vintages_with_any_comparable_variable??0);
+ $('forecastMetricCount').textContent=String(data.variables_with_exploratory_metrics??0)+' / '+String(Object.keys(data.variables||{}).length);
+ const names={wave_height_m:['浪高','m'],wave_period_s:['浪週期','秒'],sea_surface_temperature_c:['海表溫度','°C'],wind_speed_ms:['風速','m/s'],wind_direction_deg:['風向','°'],current_speed_ms:['海流速度','m/s'],current_direction_deg:['海流方向','°']};
+ const rows=Object.entries(data.variables||{}).map(([key,v])=>{
+  const label=names[key]||[key,''];
+  if(v.status!=='exploratory_metrics'||v.mae==null)return '<div>'+escapeP2Text(label[0])+'：樣本不足（'+String(v.unique_region_valid_hours??0)+' 個有效時刻；至少 '+String(data.minimum_unique_region_valid_hours_for_exploratory_metrics??5)+' 個）</div>';
+  return '<div>'+escapeP2Text(label[0])+'：MAE '+Number(v.mae).toFixed(2)+' '+label[1]+'｜RMSE '+Number(v.rmse).toFixed(2)+' '+label[1]+'｜有效時刻 '+String(v.unique_region_valid_hours??0)+'</div>';
+ });
+ $('forecastVerificationMetrics').innerHTML=rows.length?rows.join(''):'目前尚無可用的誤差統計。';
+ const regionNames={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ const detailRows=Object.entries(data.variables||{}).map(([key,v])=>{
+  const regional=Object.entries(v.regional||{}).map(([id,r])=>'<div>'+escapeP2Text(regionNames[id]||id)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜RMSE '+Number(r.rmse).toFixed(2)+'｜有效時刻 '+String(r.unique_valid_hours??0):'樣本不足（'+String(r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');
+  const lead=Object.entries(v.lead_bands||{}).map(([band,r])=>'<div>'+escapeP2Text(band)+'：'+(r.status==='exploratory_metrics'&&r.mae!=null?'MAE '+Number(r.mae).toFixed(2)+'｜有效時刻 '+String(r.unique_region_valid_hours??r.unique_valid_hours??0):'樣本不足（'+String(r.unique_region_valid_hours??r.unique_valid_hours??0)+' 個有效時刻）')+'</div>').join('');
+  return regional||lead?'<details class="evidence-details"><summary>'+escapeP2Text(names[key]?.[0]||key)+'：分區及提前時間明細</summary>'+(regional?'<div class="small">各區域</div>'+regional:'')+(lead?'<div class="small" style="margin-top:6px">預報提前時間</div>'+lead:'')+'</details>':'';
+ }).filter(Boolean);
+ if(detailRows.length)$('forecastVerificationMetrics').innerHTML+=detailRows.join('');
+ if(data.status==='awaiting_time_aligned_observations'){
+  $('forecastVerificationNote').textContent='目前尚無同區域、同有效小時的預報／實測配對。系統不以最近時間替代、不插值，也不推估預報準確度；持續累積資料後才會開始計算。';
+ }else if(data.status==='exploratory_metrics_available'){
+  $('forecastVerificationNote').textContent='目前僅為探索性歷史誤差指標，不保證未來預報準確，也不代表近岸釣點的實際海況；各區樣本量與預報提前時間仍須分開檢視。';
+ }else{
+  $('forecastVerificationNote').textContent='目前資料尚未達到探索性指標的最低有效時刻數。配對筆數與獨立有效時刻數分開呈現，避免重複預報版本灌大樣本。';
+ }
+ const generated=new Date(data.generated_at_utc||'');
+ $('forecastVerificationFreshness').textContent='驗證更新時間：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜觀測有效時刻 '+String(data.observation_valid_hours_available??0)+'｜預報有效時刻 '+String(data.forecast_valid_hours_with_vintages??0);
+}
+function renderForecastCoverage(){
+ const data=latest.forecastCoverage;if(!data)return;
+ const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
+ const status={forecast_and_observation_present:'預報與實測均有資料',forecast_only_observation_unavailable_by_design:'僅預報；本區無 CWA 海象測站',forecast_only_observation_missing:'有預報；實測資料缺漏',observation_only_forecast_missing:'有實測；預報資料缺漏',no_data:'預報與實測均無資料'};
+ $('forecastCoverageStatus').textContent='涵蓋 '+String(data.expected_region_count??0)+' 區｜預報完整區域 '+String(data.all_expected_regions_have_forecasts?'全部':'未全部')+'｜應有實測區域 '+String(data.regions_with_forecast_and_observation??0)+' 區有資料';
+ $('forecastCoverageRegions').innerHTML=(data.regions||[]).map(r=>'<div><strong>'+escapeP2Text(names[r.region_id]||r.region_id)+'</strong>：'+escapeP2Text(status[r.status]||r.status)+'｜預報 '+String(r.forecast?.unique_valid_hours??0)+' 有效時刻／'+String(r.forecast?.record_count??0)+' 筆｜實測 '+String(r.observation?.unique_valid_hours??0)+' 有效時刻／'+String(r.observation?.record_count??0)+' 筆</div>').join('');
+}
+async function loadForecastCoverage(){
+ try{const response=await fetch(FORECAST_COVERAGE_URL+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(data.schema_version!=='1.0.0'||!Array.isArray(data.regions))throw Error('覆蓋資料格式不符');latest.forecastCoverage=data;renderForecastCoverage();}
+ catch(e){latest.forecastCoverage=null;$('forecastCoverageStatus').textContent='區域覆蓋報告尚未發布；不代表資料完整或海況正常。';$('forecastCoverageRegions').textContent='等待下一次正式資料管線發布區域覆蓋報告。';}
+}
+async function loadForecastVerification(){
+ try{
+  const response=await fetch(FORECAST_VERIFICATION_URL+'?t='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.schema_version!=='1.0.0'||!data.status||!data.variables)throw Error('驗證資料格式不符');
+  latest.forecastVerification=data;
+  renderForecastVerification();
+ }catch(e){
+  latest.forecastVerification=null;
+  $('forecastVerificationStatus').textContent='尚未發布';
+  $('forecastPairCount').textContent='—';
+  $('forecastVintageCount').textContent='—';
+  $('forecastMetricCount').textContent='—';
+  $('forecastVerificationMetrics').textContent='目前尚未取得已發布的歷史預報驗證報告；這不代表預報準確或不準確。';
+  $('forecastVerificationFreshness').textContent='驗證更新時間：無資料';
+ }
+}
+function renderP2EvidenceContext(title,raw,kind){
+ let items=[];
+ try{items=JSON.parse(raw||'[]');if(!Array.isArray(items))items=[];}catch{items=[];}
+ if(!items.length)return '';
+ const rows=items.slice(0,4).map(x=>{
+  const headline=kind==='seasonal'?(x.reported_season||x.reported_pattern||'季節研究紀錄'):(x.reported_pattern||x.activity_dimension||x.evidence_kind||'證據紀錄');
+  const fields=[
+   ['研究地區',x.geographic_scope],['研究期間',x.study_period],['生命階段',x.life_stage],
+   ['樣本／方法',x.sample_size],['方法',x.method],['證據信心',x.confidence],
+   ['可轉移性',x.transferability],['模型用途',x.model_use_status],['限制',x.limitations]
+  ].filter(([,v])=>v);
+  const source=typeof x.source_url==='string'&&x.source_url.startsWith('https://')
+   ?'<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener noreferrer">查看原始來源'+(x.source_literature_id?'（'+escapeP2Text(x.source_literature_id)+'）':'')+'</a>':'';
+  return '<div class="evidence-item"><strong>'+escapeP2Text(x.id||'未編號')+'｜'+escapeP2Text(headline)+'</strong>'+
+   fields.map(([k,v])=>'<div class="small">'+k+'：'+escapeP2Text(v)+'</div>').join('')+
+   (source?'<div class="small">'+source+'</div>':'')+'</div>';
+ }).join('');
+ const more=items.length>4?'<div class="small">另有 '+(items.length-4)+' 筆，資料已保留於完整 JSON。</div>':'';
+ return '<details class="evidence-details"><summary>'+escapeP2Text(title)+'（'+items.length+' 筆）</summary>'+rows+more+'</details>';
 }
 function renderP2FishOutlook(){
  const data=latest.p2FishOutlook;
@@ -408,16 +564,21 @@ function renderP2FishOutlook(){
   const occurrenceEvidence=Number(r.occurrence_evidence_count)||0;
   const occurrenceIds=(r.occurrence_evidence_ids||'').split(';').filter(Boolean);
   const seasonalEvidence=(r.seasonal_evidence_ids||'').split(';').filter(Boolean).length;
-  let seasonalContext=[];
-  try{seasonalContext=JSON.parse(r.seasonal_evidence_context_json||'[]');if(!Array.isArray(seasonalContext))seasonalContext=[];}catch{seasonalContext=[];}
-  const seasonalHtml=seasonalContext.length?'<div class="small">歷史季節研究背景（非即時作釣預測）：</div>'+seasonalContext.map(x=>'<div class="small">'+escapeP2Text(x.id)+'｜'+escapeP2Text(x.reported_season)+'｜'+escapeP2Text(x.geographic_scope)+'</div>').join(''):'';
+  const activityContextHtml=renderP2EvidenceContext('活動／生態研究來源（非即時咬況）',r.activity_evidence_context_json,'activity');
+  const occurrenceContextHtml=renderP2EvidenceContext('東部出現／標本紀錄（只證明曾出現）',r.occurrence_evidence_context_json,'occurrence');
+  const seasonalHtml=renderP2EvidenceContext('歷史季節研究背景（非即時作釣預測）',r.seasonal_evidence_context_json,'seasonal');
+  const regionalOccurrenceRows=data.species_ecology_context&&Array.isArray(data.species_ecology_context.regional_occurrence_records)?data.species_ecology_context.regional_occurrence_records:[];
+  const regionalOccurrences=regionalOccurrenceRows.filter(x=>x.candidate_id===r.candidate_id&&x.region_id===region&&x.recorded_presence==='present');
+  const regionalOccurrenceHtml=regionalOccurrences.length?'<div class="small">東部海岸歷史調查出現紀錄（非即時魚況）：</div>'+regionalOccurrences.map(x=>'<div class="small">'+escapeP2Text(x.study_year)+'年｜'+escapeP2Text(x.common_name_zh||x.scientific_name)+'｜'+escapeP2Text(x.site_name)+'｜第'+escapeP2Text(x.visit_number)+'次調查有記錄'+ '｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源報告</a></div>').join(''):'';
   const ecologyRecords=data.species_ecology_context&&Array.isArray(data.species_ecology_context.records)?data.species_ecology_context.records:[];
   const ecologyItems=ecologyRecords.filter(x=>x.candidate_id===r.candidate_id&&['habitat','depth','activity','feeding','reproduction','fishery'].includes(x.category)).slice(0,5);
   const ecologyLabels={habitat:'棲地背景',depth:'記載水深',activity:'活動描述',feeding:'食性',reproduction:'繁殖背景',fishery:'漁業季節'};
   const ecologyHtml=ecologyItems.length?'<div class="small">物種生態資料（非即時魚況／非作釣深度建議）：</div>'+ecologyItems.map(x=>'<div class="small">'+escapeP2Text(ecologyLabels[x.category]||x.category)+'：'+escapeP2Text(x.parameter_value)+(x.unit_or_format&& !['controlled_vocabulary','qualitative'].includes(x.unit_or_format)?' '+escapeP2Text(x.unit_or_format):'')+'｜'+escapeP2Text(x.geographic_scope)+'｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源：'+escapeP2Text(x.source_name)+'（'+escapeP2Text(x.evidence_id)+'）</a></div>').join(''):'';
   const ednaRows=data.edna_occurrence_context&&Array.isArray(data.edna_occurrence_context.records)?data.edna_occurrence_context.records:[];
   const edna=ednaRows.find(x=>x.candidate_id===r.candidate_id&&x.region_id===region);
-  let ednaHtml='<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
+  const ednaCoverage=data.edna_occurrence_context&&data.edna_occurrence_context.regional_reference_coverage;
+  const ednaCoverageMissing=!!(ednaCoverage&&Array.isArray(ednaCoverage.regions_without_active_reference_stations)&&ednaCoverage.regions_without_active_reference_stations.includes(region));
+  let ednaHtml=ednaCoverageMissing?'<div class="small">歷史環境 DNA：本區缺少有效參考站，暫無法可靠歸區；這是資料覆蓋缺口，不代表沒有魚。</div>':'<div class="small">歷史環境 DNA：此區未收錄可對應陽性紀錄（不代表無魚）</div>';
   if(edna){
    const exact=Number(edna.exact_positive_detection_record_count)||0,ambiguous=Number(edna.ambiguous_positive_detection_record_count)||0;
    const months=Number(edna.exact_sample_month_count)||0,stations=Number(edna.exact_distinct_station_count)||0;
@@ -428,7 +589,7 @@ function renderP2FishOutlook(){
   const aliasNames={c001:'瓜子鱲（黑毛俗名候選）',c002:'白毛（舵魚屬，未鑑種）',c036:'南方舵魚（白毛俗名群成員）',c037:'天竺舵魚（白毛俗名群成員）'};
   const displayName=aliasNames[r.candidate_id]||r.common_name_zh;
   const taxonNote=r.candidate_id==='c001'?'黑毛為地方俗名群，個體仍須形態鑑種；不可將所有黑毛都視為瓜子鱲。':r.candidate_id==='c002'?'白毛已對應舵魚屬俗名群，但可能包含多個物種；需鑑種後才可套用物種級規則.':'';
-  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ecologyHtml+seasonalHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
+  return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ecologyHtml+activityContextHtml+occurrenceContextHtml+seasonalHtml+regionalOccurrenceHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
  }).join(''):'<div class="small">此區域／時段沒有對應候選資料。請確認最新展望是否已涵蓋此區。</div>';
  $('p2FishFreshness').textContent='分析基準：'+(data.as_of||'未知')+'｜資料產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜來源：P2 六區逐時展望';
 }
@@ -552,9 +713,9 @@ $('fishRegion').addEventListener('change',()=>{renderFishOptions();calculateFish
 $('targetFish').addEventListener('change',()=>{calculateFishing();renderDecisionHome()});
 renderFishOptions();
 initFavorites();
-loadSafetyDecision();
-loadP2FishOutlook();
-async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();loadP2FishOutlook();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
+map.setView([point.lat,point.lon],8);
+choose(point.lat,point.lon);
+async function loadData(){loadCwaSnapshot();loadTide();loadSafetyDecision();loadMarineRisk();loadP2FishOutlook();loadForecastVerification();loadForecastCoverage();const c=config();$('marineStatus').textContent='查詢中…';$('weatherStatus').textContent='查詢中…';try{
 const mu=new URL(c.marineUrl);mu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height,wave_period',hourly:'sea_surface_temperature,ocean_current_velocity,ocean_current_direction,wave_height',forecast_days:'2',timezone:'Asia/Taipei'});
 const wu=new URL(c.weatherUrl);wu.search=new URLSearchParams({latitude:point.lat,longitude:point.lon,current:'wind_speed_10m,wind_gusts_10m,pressure_msl,relative_humidity_2m,cloud_cover,visibility,wind_direction_10m',hourly:'precipitation_probability,wind_speed_10m,wind_gusts_10m,pressure_msl',forecast_days:'2',timezone:'Asia/Taipei'});
 const [mr,wr]=await Promise.all([fetch(mu),fetch(wu)]);if(!mr.ok)throw Error('Marine API HTTP '+mr.status);if(!wr.ok)throw Error('Weather API HTTP '+wr.status);

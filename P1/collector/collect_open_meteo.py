@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 MARINE_FIELDS = [
     "wave_height", "wave_direction", "wave_period",
@@ -39,6 +41,20 @@ def request_json(session: requests.Session, url: str, params: dict[str, Any]) ->
         raise ValueError("Provider response missing hourly.time array")
     return payload
 
+def resolve_source_location(location: dict[str, Any], source: str) -> dict[str, Any]:
+    """Keep marine grid coordinates independent from land weather coordinates."""
+    resolved = dict(location)
+    resolved["_requested_latitude"] = float(location["latitude"])
+    resolved["_requested_longitude"] = float(location["longitude"])
+    if source == "marine":
+        resolved["latitude"] = float(location.get("marine_latitude", location["latitude"]))
+        resolved["longitude"] = float(location.get("marine_longitude", location["longitude"]))
+    else:
+        resolved["latitude"] = float(location["latitude"])
+        resolved["longitude"] = float(location["longitude"])
+    return resolved
+
+
 def normalize_hourly(location: dict[str, Any], payload: dict[str, Any], fetched_at: str,
                      source: str, kind: str) -> list[dict[str, Any]]:
     hourly = payload["hourly"]
@@ -53,7 +69,7 @@ def normalize_hourly(location: dict[str, Any], payload: dict[str, Any], fetched_
         for valid_time, value in zip(times, values):
             rows.append({
                 "location_id": location["id"], "location_name": location["name"],
-                "requested_latitude": location["latitude"], "requested_longitude": location["longitude"],
+                "requested_latitude": location.get("_requested_latitude", location["latitude"]), "requested_longitude": location.get("_requested_longitude", location["longitude"]),
                 "grid_latitude": payload.get("latitude"), "grid_longitude": payload.get("longitude"),
                 "variable_code": variable, "value": value, "unit": units.get(variable),
                 "valid_time": valid_time, "fetched_at": fetched_at,
@@ -83,6 +99,20 @@ def main() -> int:
     folder = Path(args.out) / run_id
     folder.mkdir(parents=True, exist_ok=True)
     session = requests.Session()
+    retry_policy = Retry(
+        total=4,
+        connect=4,
+        read=3,
+        status=3,
+        backoff_factor=1.0,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset({"GET"}),
+        respect_retry_after_header=True,
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry_policy, pool_connections=8, pool_maxsize=8)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
     session.headers.update(HEADERS)
     rows: list[dict[str, Any]] = []
     manifest = {
@@ -93,7 +123,9 @@ def main() -> int:
     }
 
     for location in locations:
-        lat, lon = float(location["latitude"]), float(location["longitude"])
+        weather_location = resolve_source_location(location, "weather")
+        marine_location = resolve_source_location(location, "marine")
+        lat, lon = weather_location["latitude"], weather_location["longitude"]
         common = {
             "latitude": lat, "longitude": lon,
             "timezone": config.get("timezone", "Asia/Taipei"),
@@ -109,13 +141,16 @@ def main() -> int:
         # Marine forecast is independent from atmospheric forecast.
         try:
             marine_params = {
-                **common, "hourly": ",".join(MARINE_FIELDS),
+                **common,
+                "latitude": marine_location["latitude"],
+                "longitude": marine_location["longitude"],
+                "hourly": ",".join(MARINE_FIELDS),
                 "cell_selection": "sea",
             }
             marine = request_json(session, config["marine_base_url"], marine_params)
             save_json(folder / f"{location['id']}_marine_raw.json", marine)
             rows.extend(normalize_hourly(
-                location, marine, fetched_at, "open-meteo-marine", "modelled"
+                marine_location, marine, fetched_at, "open-meteo-marine", "modelled"
             ))
             marine_hourly = marine["hourly"]
             marine_counts = {
@@ -127,6 +162,7 @@ def main() -> int:
             entry["marine"] = {
                 "status": "partial" if marine_partial else "success",
                 "request_status": "success",
+                "requested_location": {"latitude": marine_location["latitude"], "longitude": marine_location["longitude"]},
                 "grid": {"latitude": marine.get("latitude"), "longitude": marine.get("longitude")},
                 "variables": list(marine_hourly.keys()),
                 "units": marine.get("hourly_units", {}),
@@ -156,6 +192,7 @@ def main() -> int:
             entry["weather"] = {
                 "status": "partial" if weather_partial else "success",
                 "request_status": "success",
+                "requested_location": {"latitude": weather_location["latitude"], "longitude": weather_location["longitude"]},
                 "grid": {"latitude": weather.get("latitude"), "longitude": weather.get("longitude")},
                 "variables": list(weather_hourly.keys()),
                 "units": weather.get("hourly_units", {}),

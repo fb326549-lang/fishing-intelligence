@@ -141,3 +141,26 @@ The panel shows O-B0075-001 48-hour observations and O-B0075-002 rolling 30-day 
 The PWA can estimate a P1 planning region from the selected coordinate or allow manual region selection. This automatic mapping is approximate and is not an official CWA marine boundary. Hualien South is explicitly marked as having no CWA station coverage; the UI does not substitute another region's values.
 
 CWA observed values are currently displayed as a separate evidence layer. They are not blended into the existing heuristic fish score. The existing score is not a calibrated catch probability or a trained local fish-activity model.
+
+## Forecast horizon coverage
+
+The collector requests three forecast days even though the current decision snapshots are +6h, +12h, and +24h. This buffer is intentional: the horizon selector chooses the first hourly model timestamp at or after the exact target and never backfills from an earlier hour. A two-day response can end before a +24h target when collection occurs late in the local hour (for example, target 23:17 while the feed ends at 23:00), producing a missing horizon despite a healthy API response. The extra forecast day prevents this avoidable end-of-range gap; the selected valid timestamp remains visible and may be slightly later than the nominal target.
+
+## Archived marine forecast verification against CWA observations
+
+The scheduled Open-Meteo workflow now appends each normalized hourly forecast/observation batch to the P2 history branch before rebuilding the history catalog. Exact duplicate records are skipped; forecast vintages and observation revisions are retained.
+
+The workflow also runs:
+```bash
+python P1/collector/evaluate_forecast_skill.py \
+  --archive-root p2-history-data/data \
+  --out p2-history-data/data/forecast_verification/latest.json
+```
+
+Verification joins only the same region and exact valid hour. It uses the latest archived CWA observation revision and every eligible forecast vintage issued before that valid time. It never substitutes a nearby hour. Wind/current direction errors use circular angular distance. Per-variable MAE, RMSE, bias, and lead-time bands retain all eligible forecast-vintage pairs for descriptive error analysis. However, the minimum-sample gate uses the count of unique `(region_id, valid_time_UTC)` pairs, not the raw forecast-vintage pair count, so repeated forecasts for one target hour cannot by themselves satisfy the threshold. Each metric reports both `forecast_vintage_pair_count` and `unique_region_valid_hours`; lead-time bands report the same distinction. Metrics are also broken out by `region_id`, with a separate unique-valid-hour threshold and MAE/RMSE/bias for each region; one region's error cannot be hidden by another region's aggregate. The default threshold is five unique region/valid-hour pairs (`--minimum-unique-hours`, with `--minimum-pairs` retained as an alias). Unique region/valid-hour pairs are not guaranteed statistically independent across nearby regions or serially correlated hours.
+
+If no time-aligned observation exists yet, the report status is `awaiting_time_aligned_observations`; this is a waiting state, not a zero-error or zero-skill result. CWA regional station aggregates are not point measurements at a fishing spot, and these verification metrics do not validate fish activity or catch probability.
+
+## Hourly marine archive coverage audit
+
+The four-hour Open-Meteo/P2 workflow runs `P1/collector/audit_environment_coverage.py` against the append-only P2 hourly history catalog and writes `data/forecast_verification/environment_coverage.json`. The report separately counts forecast records, observed records, unique valid hours, and collection vintages for all six planning regions. It does not interpolate missing hours or substitute another region. Hualien South is explicitly marked as having no CWA marine station coverage; its missing observation feed is a known coverage limitation, not a zero-valued observation. The report is also copied into the run artifact for review.

@@ -6,7 +6,16 @@ on:
     - cron: '0 */4 * * *'
   push:
     branches:
+      - main
       - p1-foundation
+    paths:
+      - 'P1/collector/**'
+      - 'P1/species/**'
+      - 'P2/**'
+      - '.github/workflows/open-meteo-marine-forecast.yml'
+  pull_request:
+    branches:
+      - main
     paths:
       - 'P1/collector/**'
       - 'P1/species/**'
@@ -28,7 +37,7 @@ jobs:
       - name: Check out P1 branch
         uses: actions/checkout@v4
         with:
-          ref: p1-foundation
+          ref: ${{ github.ref }}
 
       - name: Check out CWA append-only observation history
         uses: actions/checkout@v4
@@ -50,6 +59,15 @@ jobs:
       - name: Install collector dependencies
         run: python -m pip install --disable-pip-version-check -r P1/collector/requirements.txt
 
+      - name: Fetch and map CWA high/low tide forecast events
+        env:
+          CWA_AUTHORIZATION: ${{ secrets.CWA_AUTHORIZATION }}
+        run: |
+          python P1/collector/fetch_cwa_tide_forecast.py --out output/cwa_tides
+          python P1/collector/build_cwa_regional_tide_forecast.py --input output/cwa_tides/F-A0021-001.csv --mapping P1/stations/cwa_tide_region_mapping.csv --out output/cwa_tides/regional_tide_forecast.csv
+          python P1/collector/export_cwa_tide_forecast_json.py --input output/cwa_tides/regional_tide_forecast.csv --out p2-history-data/data/latest_cwa_tide_forecast.json
+          cp p2-history-data/data/latest_cwa_tide_forecast.json output/cwa_tides/latest_cwa_tide_forecast.json
+
       - name: Fetch Open-Meteo forecasts for six East Taiwan regions
         run: |
           python P1/collector/collect_open_meteo.py --config P1/collector/config.example.json --out output/open_meteo --delay 1
@@ -59,28 +77,95 @@ jobs:
           python P1/collector/build_regional_forecast_conditions.py --input "$latest_dir/forecast_horizons_6_12_24.csv" --out "$latest_dir/regional_forecast_conditions_6_12_24.csv"
           python P1/collector/validate_forecast_output.py --directory "$latest_dir" --out "$latest_dir/forecast_validation.json"
           python P1/species/build_species_environment_context.py --species-dir P1/species --regional-forecast "$latest_dir/regional_forecast_conditions_6_12_24.csv" --out "$latest_dir/species_environment_context.csv"
-          python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --out "$latest_dir/hourly_environment_p2.jsonl"
+          python P2/collector/build_hourly_environment_records.py --forecast-csv "$latest_dir/environmental_forecast.csv" --forecast-dir "$latest_dir" --cwa-observations-jsonl tide-history-data/data/regional_marine_observations_48h.jsonl --cwa-tide-forecast-csv output/cwa_tides/regional_tide_forecast.csv --out "$latest_dir/hourly_environment_p2.jsonl"
           python P2/validate_p2_data.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl"
  
-      - name: Build P2.4.6 live six-region fish outlook
+      - name: Build P2.6 live six-region fish outlook
         run: |
           latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
           test -n "$latest_dir"
           python P2/species/validate_activity_evidence.py --activity-csv P2/species/species_activity_evidence_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
           python P2/species/validate_seasonal_activity.py --seasonal-csv P2/species/species_seasonal_activity_register.csv --candidates-csv P1/species/species_candidate_register.csv --literature-csv P2/species/species_response_literature_register.csv
+          python P2/species/build_species_context_catalog.py --candidates P1/species/species_candidate_register.csv --ecology P1/species/species_ecology_parameters.csv --evidence P1/species/species_evidence_register.csv --out "$latest_dir/species_ecology_context.json"
           python P2/species/environment_match_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/environment_response_rules_template.csv --out "$latest_dir/environment_match.csv"
           python P2/species/integrate_environment_and_activity.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --environment-match-csv "$latest_dir/environment_match.csv" --activity-csv P2/species/species_activity_evidence_register.csv --seasonal-csv P2/species/species_seasonal_activity_register.csv --out "$latest_dir/integrated_hourly_fish_assessment.csv"
           as_of=$(python -c 'from datetime import datetime,timedelta; from zoneinfo import ZoneInfo; n=datetime.now(ZoneInfo("Asia/Taipei")); h=n.replace(minute=0,second=0,microsecond=0); print((h+timedelta(hours=1) if n!=h else h).isoformat())')
           python P2/species/build_hourly_fish_outlook.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --integrated-csv "$latest_dir/integrated_hourly_fish_assessment.csv" --as-of "$as_of" --out "$latest_dir/hourly_fish_outlook.csv"
-          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json
+          edna_args=()
+          if [ -f p2-history-data/data/edna_candidate_region_context.json ]; then
+            edna_args+=(--edna-context-json p2-history-data/data/edna_candidate_region_context.json)
+          fi
+          ecology_args=()
+          if [ -f "$latest_dir/species_ecology_context.json" ]; then
+            ecology_args+=(--species-context-json "$latest_dir/species_ecology_context.json")
+          fi
+          python P2/collector/export_hourly_fish_outlook_json.py --input "$latest_dir/hourly_fish_outlook.csv" --out p2-history-data/data/latest_hourly_fish_outlook.json "${edna_args[@]}" "${ecology_args[@]}"
 
-      - name: Validate history and commit P2 history plus live outlook
+      - name: Archive hourly forecasts and build retrospective forecast verification
+        run: |
+          latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          test -n "$latest_dir"
+          python P2/collector/archive_hourly_environment.py --input "$latest_dir/hourly_environment_p2.jsonl" --archive-root p2-history-data/data
+          python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
+          python P1/collector/audit_environment_coverage.py --catalog p2-history-data/data/hourly_environment/catalog.json --out p2-history-data/data/forecast_verification/environment_coverage.json
+          python P1/collector/evaluate_forecast_skill.py --archive-root p2-history-data/data --out p2-history-data/data/forecast_verification/latest.json
+          cp p2-history-data/data/forecast_verification/latest.json "$latest_dir/forecast_verification.json"
+          cp p2-history-data/data/forecast_verification/environment_coverage.json "$latest_dir/environment_coverage.json"
+
+      - name: Validate archived P2 history
         run: |
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
+
+      - name: Validate PWA preview payload and include it in artifact
+        run: |
+          latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          payload=p2-history-data/data/latest_hourly_fish_outlook.json
+          test -s "$payload"
+          python - "$payload" <<'PY'
+          import json,sys,re
+          from datetime import datetime
+          from pathlib import Path
+          data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          schema=json.loads(Path("P2/schema/hourly_fish_outlook.schema.json").read_text(encoding="utf-8"))
+          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-p2.6"
+          assert len(data.get("regions",[]))==6
+          assert data.get("horizons_hours")==[6,12,24]
+          rows=data.get("rows",[])
+          assert len(rows)==378, f"expected 378 rows, got {len(rows)}"
+          assert len({r.get("candidate_id") for r in rows})==21
+          assert len({r.get("region_id") for r in rows})==6
+          assert {str(r.get("horizon_hours")) for r in rows}=={"6","12","24"}
+          required=set(schema["required"])
+          properties=schema["properties"]
+          for index,row in enumerate(rows):
+              missing=required-set(row)
+              extra=set(row)-set(properties) if schema.get("additionalProperties") is False else set()
+              assert not missing, f"row {index} missing schema fields: {sorted(missing)}"
+              assert not extra, f"row {index} has undeclared fields: {sorted(extra)}"
+              for key,rule in properties.items():
+                  if key not in row: continue
+                  if rule.get("type")=="string": assert isinstance(row[key],str), f"row {index} {key} is not string"
+                  if "const" in rule: assert row[key]==rule["const"], f"row {index} {key} violates const"
+                  if "enum" in rule: assert row[key] in rule["enum"], f"row {index} {key} violates enum"
+                  if "pattern" in rule: assert re.fullmatch(rule["pattern"],row[key]), f"row {index} {key} violates pattern"
+                  if rule.get("format")=="date-time": datetime.fromisoformat(row[key].replace("Z","+00:00"))
+          assert all(r.get("activity_score")=="" and r.get("catch_probability")=="" for r in rows)
+          assert all(r.get("best_fishing_window_status")=="not_established" for r in rows)
+          edna=data.get("edna_occurrence_context",{}).get("records",[])
+          assert edna and all(r.get("model_use_status")=="context_only_edna_occurrence" for r in edna)
+          ecology=data.get("species_ecology_context",{}).get("records",[])
+          assert ecology and all(r.get("source_url") for r in ecology)
+          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":21,"edna_context_records":len(edna),"ecology_records":len(ecology),"schema_rows_validated":len(rows),"scores_withheld":True})
+          PY
+          cp "$payload" "$latest_dir/latest_hourly_fish_outlook.json"
+
+      - name: Commit P2 history plus live outlook
+        if: github.event_name != 'pull_request'
+        run: |
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C p2-history-data add data/hourly_environment data/latest_hourly_fish_outlook.json
+          git -C p2-history-data add data/hourly_environment data/forecast_verification/latest.json data/forecast_verification/environment_coverage.json data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
           if git -C p2-history-data diff --cached --quiet; then
             echo "No new hourly records or outlook changes."
           else
@@ -93,6 +178,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: open-meteo-six-region-forecast
-          path: output/open_meteo/
+          path: |
+            output/open_meteo/
+            output/cwa_tides/
           if-no-files-found: warn
           retention-days: 3
