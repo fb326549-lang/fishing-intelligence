@@ -81,7 +81,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L050,c003,activity_period,https://doi.org/10.18903/fisheng.47.1_47,context_only_captive_activity\n"
                 "L051,c036,feeding_condition,https://doi.org/10.11233/aquaculturesci.64.209,context_only_captive_feeding\n"
                 "L052,c036,temperature_response,https://www2.fish-u.ac.jp/kenkyu/sangakukou/kenkyuhoukoku/64/04_1.pdf,context_only_captive_feeding\n"
-                "L053,c036,diel_feeding,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n",encoding="utf-8")
+                "L053,c036,diel_feeding,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n"
+                "L054,c004,feeding_condition,https://doi.org/10.5846/stxb201911022308,context_only_external_region\n"
+                "L055,c004,feeding_condition,https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001293552,context_only_external_region\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -115,6 +117,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(rabbit_activity["literature_record_ids"],"L044;L050")
             black_seabream_activity=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="activity_period")
             self.assertEqual(black_seabream_activity["literature_record_ids"],"L045")
+            black_seabream_feeding=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="feeding_conditions")
+            self.assertEqual(black_seabream_feeding["literature_record_ids"],"L054;L055")
+            self.assertEqual(black_seabream_feeding["literature_use_status"],"context_only_external_region")
             black_activity=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="activity_period")
             self.assertEqual(black_activity["evidence_status"],"external_literature_found_context_only")
             black_seabream_temp=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="temperature_range")
