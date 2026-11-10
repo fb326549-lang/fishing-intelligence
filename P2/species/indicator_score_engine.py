@@ -87,7 +87,7 @@ def select_latest_forecast_vintages(records):
         previous = latest.get(key)
         if previous is None or collected > previous[0]:
             latest[key] = (collected, record)
-    return passthrough + [item[1] for item in sorted(latest.items())]
+    return passthrough + [item[1][1] for item in sorted(latest.items())]
 
 
 def load_rules(rows, candidates):
