@@ -132,6 +132,51 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "conflicting eligibility_gate"):
             unique_candidates(conflict)
 
+
+    def test_multiple_nonoverlapping_bands_form_one_response_group(self):
+        low = dict(rule("F_LOW", "feeding_condition", "sea_surface_temperature_c", 0, 19.9, 10),
+                   response_group="sst_curve")
+        optimal = dict(rule("F_OPT", "feeding_condition", "sea_surface_temperature_c", 20, 28, 85),
+                       response_group="sst_curve")
+        high = dict(rule("F_HIGH", "feeding_condition", "sea_surface_temperature_c", 28.1, 40, 30),
+                    response_group="sst_curve")
+        rules = load_rules([low, optimal, high, *self.rule_rows[1:]], CANDIDATES)
+        weights = load_weights(self.weight_rows, CANDIDATES)
+        fish = assess_hour(self.record, CANDIDATES, rules, weights)[0]
+        self.assertEqual(fish["feeding_condition_score"], "85.00")
+        trace = __import__("json").loads(fish["indicator_trace_json"])
+        self.assertEqual(sum(1 for x in trace if x["indicator_code"]=="feeding_condition" and x["matched"]),1)
+
+    def test_region_specific_response_group_overrides_global_fallback(self):
+        global_rule = dict(rule("F_GLOBAL", "feeding_condition", "sea_surface_temperature_c", 20, 30, 40),
+                           response_group="sst_curve", region_scope="all_east_taiwan")
+        local_rule = dict(rule("F_LOCAL", "feeding_condition", "sea_surface_temperature_c", 20, 30, 90),
+                          response_group="sst_curve", region_scope="taitung_south")
+        rules = load_rules([global_rule, local_rule, *self.rule_rows[1:]], CANDIDATES)
+        weights = load_weights(self.weight_rows, CANDIDATES)
+        fish = assess_hour(self.record, CANDIDATES, rules, weights)[0]
+        self.assertEqual(fish["feeding_condition_score"], "90.00")
+
+    def test_overlapping_bands_are_rejected_instead_of_double_scored(self):
+        first = dict(rule("F1", "feeding_condition", "sea_surface_temperature_c", 20, 27, 80),
+                     response_group="sst_curve")
+        second = dict(rule("F2", "feeding_condition", "sea_surface_temperature_c", 25, 30, 90),
+                      response_group="sst_curve")
+        rules = load_rules([first, second, *self.rule_rows[1:]], CANDIDATES)
+        weights = load_weights(self.weight_rows, CANDIDATES)
+        with self.assertRaisesRegex(ValueError, "overlapping score bands"):
+            assess_hour(self.record, CANDIDATES, rules, weights)
+
+    def test_nonforecast_records_are_not_best_hour_candidates(self):
+        row = {
+            "candidate_id": "c036", "region_id": "taitung_south",
+            "valid_time": "2026-11-10T12:00:00+08:00", "data_type": "observation",
+            "overall_fish_condition_index": "99.00",
+        }
+        ranked = rank_best_hours([row])
+        self.assertEqual(ranked[0]["best_hour_status"], "not_rankable_data_type")
+        self.assertEqual(ranked[0]["best_hour_rank"], "")
+
     def test_rule_cannot_score_without_direct_east_taiwan_basis(self):
         bad = dict(self.rule_rows[0], evidence_basis="western_taiwan_fishery")
         with self.assertRaisesRegex(ValueError, "East Taiwan direct field"):
