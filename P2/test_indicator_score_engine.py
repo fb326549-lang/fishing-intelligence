@@ -47,7 +47,7 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         self.weight_rows = [{
             "candidate_id": "c036", "feeding_weight": "0.40",
             "environment_weight": "0.35", "activity_weight": "0.25",
-            "evidence_basis": "east_taiwan_catch_validation",
+            "evidence_basis": "east_taiwan_effort_validated_catch",
             "model_use_status": "eligible_for_composite_scoring",
             "source_ids": "LOCAL-CATCH-001", "reviewed_by": "test-reviewer",
             "reviewed_at": "2026-11-10", "notes": "Synthetic test fixture only",
