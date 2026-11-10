@@ -24,7 +24,7 @@ NUMERIC_FIELDS = {
     "tidal_current_velocity_ms", "tidal_current_direction_deg",
     "precipitation_mm_h", "showers_mm_h", "precipitation_probability_pct",
 }
-DERIVED_FIELDS = {"daylight", "month"}
+DERIVED_FIELDS = {"daylight", "month", "minutes_from_sunrise", "minutes_from_sunset"}
 RULE_FIELDS = {
     "rule_id", "candidate_id", "indicator_code", "response_group", "environment_field",
     "operator", "minimum", "maximum", "match_score", "weight",
@@ -60,6 +60,8 @@ def derived_features(record):
         rise = parse_dt(sunrise, "sunrise")
         set_ = parse_dt(sunset, "sunset")
         values["daylight"] = 1.0 if rise <= valid < set_ else 0.0
+        values["minutes_from_sunrise"] = (valid - rise).total_seconds() / 60.0
+        values["minutes_from_sunset"] = (valid - set_).total_seconds() / 60.0
     return values
 
 def unique_candidates(rows):
