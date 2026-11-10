@@ -124,7 +124,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             southern = next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="temperature_range")
             white_alias = next(r for r in rows if r["candidate_id"]=="c002" and r["response_domain"]=="temperature_range")
             self.assertEqual(southern["evidence_status"],"external_literature_found_context_only")
-            self.assertEqual(southern["literature_record_ids"],"L037;L052")
+            self.assertEqual(southern["literature_record_ids"],"L037;L052;L5")
             self.assertEqual(southern["literature_use_status"],"context_only_captive_feeding;context_only_external_region")
             self.assertEqual(white_alias["evidence_status"],"species_identification_required")
             self.assertEqual(white_alias["literature_record_ids"],"")
