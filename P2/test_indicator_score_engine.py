@@ -15,7 +15,7 @@ CANDIDATES = [{
 def rule(rid, indicator, field, minimum, maximum, score):
     return {
         "rule_id": rid, "candidate_id": "c036", "indicator_code": indicator,
-        "environment_field": field, "operator": "between",
+        "response_group": rid, "environment_field": field, "operator": "between",
         "minimum": str(minimum), "maximum": str(maximum),
         "match_score": str(score), "weight": "1",
         "region_scope": "all_east_taiwan", "life_stage": "adult",
