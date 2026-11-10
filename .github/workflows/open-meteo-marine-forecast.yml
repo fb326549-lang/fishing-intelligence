@@ -112,11 +112,14 @@ jobs:
           cp p2-history-data/data/forecast_verification/latest.json "$latest_dir/forecast_verification.json"
           cp p2-history-data/data/forecast_verification/environment_coverage.json "$latest_dir/environment_coverage.json"
 
-      - name: Validate history and commit P2 history plus live outlook
-        if: github.event_name != 'pull_request'
+      - name: Validate archived P2 history
         run: |
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
+
+      - name: Commit P2 history plus live outlook
+        if: github.event_name != 'pull_request'
+        run: |
           git -C p2-history-data config user.name "github-actions[bot]"
           git -C p2-history-data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C p2-history-data add data/hourly_environment data/forecast_verification/latest.json data/forecast_verification/environment_coverage.json data/latest_hourly_fish_outlook.json data/latest_cwa_tide_forecast.json
