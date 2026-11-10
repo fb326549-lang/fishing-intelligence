@@ -32,6 +32,7 @@ jobs:
       - name: Rebuild priority species response evidence-gap matrix
         run: |
           python P2/species/build_species_response_gap_matrix.py --candidates P1/species/species_candidate_register.csv --ecology P1/species/species_ecology_parameters.csv --evidence P1/species/species_evidence_register.csv --literature P2/species/species_response_literature_register.csv --out "$RUNNER_TEMP/species_response_evidence_gaps.csv"
+          diff -u P2/species/species_response_evidence_gaps.csv "$RUNNER_TEMP/species_response_evidence_gaps.csv" || true
           cmp P2/species/species_response_evidence_gaps.csv "$RUNNER_TEMP/species_response_evidence_gaps.csv"
       - name: Audit environment response rule eligibility
         run: |
