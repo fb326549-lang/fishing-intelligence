@@ -265,12 +265,13 @@ def assess_hour(record, candidates, rules, weights):
 
 def rank_best_hours(rows):
     groups = {}
+    non_forecast = []
     for row in rows:
         if row.get("data_type") != "forecast":
-            output_row = dict(row, best_hour_status="not_rankable_data_type", best_hour_rank="")
+            non_forecast.append(dict(row, best_hour_status="not_rankable_data_type", best_hour_rank=""))
             continue
         groups.setdefault((row["candidate_id"], row["region_id"]), []).append(row)
-    output = []
+    output = list(non_forecast)
     for key, group in groups.items():
         scored = [r for r in group if r.get("overall_fish_condition_index", "") != ""]
         if not scored:
