@@ -253,8 +253,14 @@ def rank_best_hours(rows):
         scored.sort(key=lambda r: (-float(r["overall_fish_condition_index"]), r["valid_time"]))
         best_time = scored[0]["valid_time"]
         ranks = {r["valid_time"]: i + 1 for i, r in enumerate(scored)}
-        output.extend(dict(r, best_hour_status="best_hour" if r["valid_time"] == best_time else "ranked_hour",
-                           best_hour_rank=str(ranks.get(r["valid_time"], ""))) for r in group)
+        output.extend(dict(
+            r,
+            best_hour_status=(
+                "unscored_hour" if r.get("overall_fish_condition_index", "") == ""
+                else "best_hour" if r["valid_time"] == best_time else "ranked_hour"
+            ),
+            best_hour_rank=str(ranks.get(r["valid_time"], "")),
+        ) for r in group)
     return output
 
 def main():
