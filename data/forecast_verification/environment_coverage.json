@@ -5,17 +5,109 @@
   "interpretation": "Coverage audit only. Record counts and unique valid hours are reported as stored; missing hours are not inferred, interpolated, or filled from another region. Presence does not imply sufficient sample size or measurement quality. Hualien South is explicitly excluded from expected CWA observation coverage because the verified regional mapping has no CWA marine station coverage there.",
   "partition_count": 6,
   "regions": [
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":3,"record_count":48,"unique_valid_hours":48},"observation_expected":true,"observation_policy":"expected_from_archived_cwa_region_feed","region_id":"yilan_suao","status":"forecast_and_observation_present"},
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":3,"record_count":48,"unique_valid_hours":48},"observation_expected":true,"observation_policy":"expected_from_archived_cwa_region_feed","region_id":"hualien_north","status":"forecast_and_observation_present"},
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":0,"record_count":0,"unique_valid_hours":0},"observation_expected":false,"observation_policy":"no_cwa_station_coverage","region_id":"hualien_south","status":"forecast_only_observation_unavailable_by_design"},
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":3,"record_count":48,"unique_valid_hours":48},"observation_expected":true,"observation_policy":"expected_from_archived_cwa_region_feed","region_id":"fengbin_shitiping","status":"forecast_and_observation_present"},
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":3,"record_count":48,"unique_valid_hours":48},"observation_expected":true,"observation_policy":"expected_from_archived_cwa_region_feed","region_id":"chenggong_donghe","status":"forecast_and_observation_present"},
-    {"forecast":{"collection_vintages":153,"record_count":3672,"unique_valid_hours":96},"observation":{"collection_vintages":3,"record_count":48,"unique_valid_hours":48},"observation_expected":true,"observation_policy":"expected_from_archived_cwa_region_feed","region_id":"taitung_south","status":"forecast_and_observation_present"}
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 5,
+        "record_count": 68,
+        "unique_valid_hours": 67
+      },
+      "observation_expected": true,
+      "observation_policy": "expected_from_archived_cwa_region_feed",
+      "region_id": "yilan_suao",
+      "status": "forecast_and_observation_present"
+    },
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 5,
+        "record_count": 68,
+        "unique_valid_hours": 67
+      },
+      "observation_expected": true,
+      "observation_policy": "expected_from_archived_cwa_region_feed",
+      "region_id": "hualien_north",
+      "status": "forecast_and_observation_present"
+    },
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 0,
+        "record_count": 0,
+        "unique_valid_hours": 0
+      },
+      "observation_expected": false,
+      "observation_policy": "no_cwa_station_coverage",
+      "region_id": "hualien_south",
+      "status": "forecast_only_observation_unavailable_by_design"
+    },
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 5,
+        "record_count": 67,
+        "unique_valid_hours": 67
+      },
+      "observation_expected": true,
+      "observation_policy": "expected_from_archived_cwa_region_feed",
+      "region_id": "fengbin_shitiping",
+      "status": "forecast_and_observation_present"
+    },
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 5,
+        "record_count": 68,
+        "unique_valid_hours": 67
+      },
+      "observation_expected": true,
+      "observation_policy": "expected_from_archived_cwa_region_feed",
+      "region_id": "chenggong_donghe",
+      "status": "forecast_and_observation_present"
+    },
+    {
+      "forecast": {
+        "collection_vintages": 153,
+        "record_count": 3672,
+        "unique_valid_hours": 96
+      },
+      "observation": {
+        "collection_vintages": 5,
+        "record_count": 68,
+        "unique_valid_hours": 67
+      },
+      "observation_expected": true,
+      "observation_policy": "expected_from_archived_cwa_region_feed",
+      "region_id": "taitung_south",
+      "status": "forecast_and_observation_present"
+    }
   ],
   "regions_missing_expected_observations": [],
   "regions_missing_forecasts": [],
   "regions_with_forecast_and_observation": 5,
-  "regions_without_observations_by_design": ["hualien_south"],
+  "regions_without_observations_by_design": [
+    "hualien_south"
+  ],
   "schema_version": "1.0.0",
   "source": "p2-history hourly_environment/catalog.json"
 }
