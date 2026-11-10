@@ -149,8 +149,8 @@ def load_weights(rows, candidates):
             continue
         if gates.get(cid) != "verified_taxon":
             raise ValueError(f"weights {cid}: candidate taxonomy gate is not cleared")
-        if row.get("evidence_basis") != "east_taiwan_catch_validation":
-            raise ValueError(f"weights {cid}: requires East Taiwan catch validation")
+        if row.get("evidence_basis") != "east_taiwan_effort_validated_catch":
+            raise ValueError(f"weights {cid}: requires East Taiwan effort-validated catch validation")
         if not all(row.get(k, "").strip() for k in ("source_ids", "reviewed_by", "reviewed_at")):
             raise ValueError(f"weights {cid}: missing validation provenance")
         try:
