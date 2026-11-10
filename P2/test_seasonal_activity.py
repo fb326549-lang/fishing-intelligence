@@ -18,7 +18,7 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),9)
+        self.assertEqual(len(rows),12)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_dolphinfish_commercial_seasonality_remains_context_only(self):
@@ -68,6 +68,21 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertIn("9月下旬",rabbit["reported_season"])
         self.assertEqual(rabbit["model_use_status"],"context_only_captive_feeding")
         self.assertIn("不是台灣東部",rabbit["limitations"])
+
+
+    def test_taiwan_wide_fishery_seasons_are_not_east_taiwan_hourly_scores(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        drummer=next(r for r in rows if r["seasonal_evidence_id"]=="SE010")
+        rabbit=next(r for r in rows if r["seasonal_evidence_id"]=="SE011")
+        seabream=next(r for r in rows if r["seasonal_evidence_id"]=="SE012")
+        self.assertEqual(drummer["model_use_status"],"context_only_taiwan_fishery_reference")
+        self.assertEqual(rabbit["model_use_status"],"context_only_taiwan_fishery_reference")
+        self.assertEqual(seabream["model_use_status"],"context_only_taiwan_fishery_reference")
+        self.assertIn("冬季盛產",drummer["reported_season"])
+        self.assertIn("全年皆產",rabbit["reported_season"])
+        self.assertIn("春、冬",seabream["reported_season"])
+        self.assertIn("不是東部岸釣",seabream["limitations"])
 
     def test_seasonal_score_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
