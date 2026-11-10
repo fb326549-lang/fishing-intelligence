@@ -88,7 +88,7 @@ class HourlyFishOutlookTests(unittest.TestCase):
     def test_taxonomic_gate_never_receives_environment_score(self):
         region = REGIONS[0]
         record = self.record(region, 0)
-        integrated = [self.integrated("c002", region, record["valid_time"], "99", "matched", "context_only_evidence_available")]
+        integrated = [self.integrated("c002", region, record["valid_time"], "99", "taxon_or_distribution_gate", "context_only_evidence_available")]
         rows = build_window_summaries([record], self.candidates[1:], integrated, self.as_of)
         six_hour = next(row for row in rows if row["horizon_hours"] == "6")
         self.assertEqual(six_hour["environment_match_status"], "taxon_or_distribution_gate")
