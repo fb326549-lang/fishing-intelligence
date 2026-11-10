@@ -75,6 +75,21 @@ def unique_candidates(rows):
             result[cid] = row
     return [result[cid] for cid in sorted(result)]
 
+def select_latest_forecast_vintages(records):
+    latest = {}
+    passthrough = []
+    for record in records:
+        if record.get("data_type") != "forecast":
+            passthrough.append(record)
+            continue
+        collected = parse_dt(record.get("collected_at"), "collected_at")
+        key = (record.get("region_id", ""), record.get("valid_time", ""))
+        previous = latest.get(key)
+        if previous is None or collected > previous[0]:
+            latest[key] = (collected, record)
+    return passthrough + [item[1] for item in sorted(latest.items())]
+
+
 def load_rules(rows, candidates):
     gates = {r["candidate_id"]: r.get("eligibility_gate", "") for r in candidates}
     result, seen = [], set()
@@ -311,7 +326,7 @@ def main():
     p.add_argument("--weights-csv", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
-    records = [json.loads(x) for x in a.environment_jsonl.read_text(encoding="utf-8").splitlines() if x.strip()]
+    records = select_latest_forecast_vintages([json.loads(x) for x in a.environment_jsonl.read_text(encoding="utf-8").splitlines() if x.strip()])
     candidates = unique_candidates(read_csv(a.candidates_csv))
     rules = load_rules(read_csv(a.rules_csv), candidates)
     weights = load_weights(read_csv(a.weights_csv), candidates)
