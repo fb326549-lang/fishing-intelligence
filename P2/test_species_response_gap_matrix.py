@@ -109,7 +109,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
             southern_activity=next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="activity_period")
             self.assertEqual(southern_activity["literature_record_ids"],"L034;L035")
-            self.assertEqual(southern_activity["literature_use_status"],"context_only_external_region;context_only_taxonomic_database")
+            self.assertEqual(southern_activity["literature_use_status"],"context_only_external_region")
             southern_context=__import__("json").loads(southern_activity["literature_context_json"])
             self.assertEqual([x["literature_record_id"] for x in southern_context],["L034","L035"])
             self.assertTrue(all(x["model_use_status"] != "eligible_for_activity_scoring" for x in southern_context))
