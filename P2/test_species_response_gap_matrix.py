@@ -78,7 +78,10 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L047,c003,feeding_condition,https://doi.org/10.2331/suisan.77.1008,context_only_external_region\n"
                 "L048,c003,feeding_condition,https://doi.org/10.11233/aquaculturesci.57.429,context_only_captive_feeding\n"
                 "L049,c003,feeding_condition,https://www.fish-u.ac.jp/public/files/68/02_2.pdf,context_only_captive_feeding\n"
-                "L050,c003,activity_period,https://doi.org/10.18903/fisheng.47.1_47,context_only_captive_activity\n",encoding="utf-8")
+                "L050,c003,activity_period,https://doi.org/10.18903/fisheng.47.1_47,context_only_captive_activity\n"
+                "L051,c036,feeding_condition,https://doi.org/10.11233/aquaculturesci.64.209,context_only_captive_feeding\n"
+                "L052,c036,temperature_response,https://www2.fish-u.ac.jp/kenkyu/sangakukou/kenkyuhoukoku/64/04_1.pdf,context_only_captive_feeding\n"
+                "L053,c036,activity_period,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -121,7 +124,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             southern = next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="temperature_range")
             white_alias = next(r for r in rows if r["candidate_id"]=="c002" and r["response_domain"]=="temperature_range")
             self.assertEqual(southern["evidence_status"],"external_literature_found_context_only")
-            self.assertEqual(southern["literature_record_ids"],"L037;L5")
+            self.assertEqual(southern["literature_record_ids"],"L037;L052")
             self.assertEqual(southern["literature_use_status"],"context_only_captive_feeding;context_only_external_region")
             self.assertEqual(white_alias["evidence_status"],"species_identification_required")
             self.assertEqual(white_alias["literature_record_ids"],"")
@@ -133,11 +136,14 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             context=__import__("json").loads(seasonal_fishery["literature_context_json"])
             self.assertEqual(context[0]["model_use_status"],"context_only_east_taiwan_commercial_fishery")
             self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
+            southern_feeding=next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="feeding_conditions")
+            self.assertEqual(southern_feeding["literature_record_ids"],"L034;L051")
+            self.assertEqual(southern_feeding["literature_use_status"],"context_only_captive_feeding;context_only_external_region")
             southern_activity=next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="activity_period")
-            self.assertEqual(southern_activity["literature_record_ids"],"L034;L035;L036;L043")
-            self.assertEqual(southern_activity["literature_use_status"],"context_only_captive_feeding;context_only_external_region;context_only_taiwan_fishery_reference")
+            self.assertEqual(southern_activity["literature_record_ids"],"L034;L035;L036;L043;L053")
+            self.assertEqual(southern_activity["literature_use_status"],"context_only_captive_activity;context_only_captive_feeding;context_only_external_region;context_only_taiwan_fishery_reference")
             southern_context=__import__("json").loads(southern_activity["literature_context_json"])
-            self.assertEqual([x["literature_record_id"] for x in southern_context],["L034","L035","L036","L043"])
+            self.assertEqual([x["literature_record_id"] for x in southern_context],["L034","L035","L036","L043","L053"])
             self.assertTrue(all(x["model_use_status"] != "eligible_for_activity_scoring" for x in southern_context))
 
 if __name__ == "__main__":
