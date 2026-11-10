@@ -65,9 +65,14 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L034,c036,activity_period,https://doi.org/10.1111/jfb.70024,context_only_external_region\n"
                 "L035,c036,activity_period,https://doi.org/10.2331/suisan.23-00035,context_only_external_region\n"
                 "L036,c036,activity_period,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_feeding\n"
-                "L037,c036,temperature_response,https://ypir.lib.yamaguchi-u.ac.jp/fu/335,context_only_captive_feeding\n",encoding="utf-8")
+                "L037,c036,temperature_response,https://ypir.lib.yamaguchi-u.ac.jp/fu/335,context_only_captive_feeding\n"
+                "L038,c003,feeding_condition,https://doi.org/10.18903/fisheng.43.1_65,context_only_captive_feeding\n"
+                "L039,c004,temperature_response,https://doi.org/10.3390/jmse9121442,context_only_western_taiwan_fishery_model\n"
+                "L040,c001,feeding_condition,https://zoolstud.sinica.edu.tw/Journals/20.1/17.pdf,context_only_northern_taiwan_field_study\n"
+                "L041,c001,seasonal_activity,https://doi.org/10.1007/s12562-018-1206-5,context_only_external_region\n"
+                "L042,c001,feeding_condition,https://doi.org/10.1016/j.aqrep.2024.102349,context_only_captive_feeding\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),147)
+            self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
@@ -89,6 +94,12 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(rabbit["literature_record_ids"],"L1")
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(black["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
+            rabbit_feeding=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="feeding_conditions")
+            self.assertEqual(rabbit_feeding["literature_record_ids"],"L038")
+            self.assertEqual(rabbit_feeding["evidence_status"],"external_literature_found_context_only")
+            black_feeding=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="feeding_conditions")
+            self.assertEqual(black_feeding["literature_record_ids"],"L040;L042")
+            self.assertEqual(black_feeding["evidence_status"],"external_literature_found_context_only")
             black_activity=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="activity_period")
             self.assertEqual(black_activity["evidence_status"],"external_literature_found_context_only")
             black_seabream_temp=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="temperature_range")
@@ -102,7 +113,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(southern["literature_use_status"],"context_only_captive_feeding;context_only_external_region")
             self.assertEqual(white_alias["evidence_status"],"species_identification_required")
             self.assertEqual(white_alias["literature_record_ids"],"")
-            self.assertEqual(len([r for r in rows if r["candidate_id"] in {"c036","c037"}]),14)
+            self.assertEqual(len([r for r in rows if r["candidate_id"] in {"c036","c037"}]),16)
             seasonal_fishery=next(r for r in rows if r["candidate_id"]=="c023" and r["response_domain"]=="activity_period")
             self.assertEqual(seasonal_fishery["evidence_status"],"external_literature_found_context_only")
             self.assertEqual(seasonal_fishery["literature_record_ids"],"L6")
