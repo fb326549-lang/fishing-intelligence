@@ -26,7 +26,7 @@ NUMERIC_FIELDS = {
 }
 DERIVED_FIELDS = {"daylight", "month"}
 RULE_FIELDS = {
-    "rule_id", "candidate_id", "indicator_code", "environment_field",
+    "rule_id", "candidate_id", "indicator_code", "response_group", "environment_field",
     "operator", "minimum", "maximum", "match_score", "weight",
     "region_scope", "life_stage", "evidence_id", "source_url",
     "confidence", "evidence_basis", "model_use_status",
@@ -158,32 +158,50 @@ def score_indicator(candidate_id, region_id, features, rules, indicator):
     ]
     if not applicable:
         return {"status": "insufficient_evidence", "score": "", "coverage": "0.0000", "trace": []}
-    evaluated, missing, trace = [], [], []
+    groups = {}
     for rule in applicable:
-        value = features.get(rule["environment_field"])
-        matched = rule_matches(rule, value)
-        if matched is None:
-            missing.append(rule["rule_id"])
-            trace.append({
-                "rule_id": rule["rule_id"], "environment_field": rule["environment_field"],
-                "observed_value": value, "status": "missing_or_non_numeric",
-                "evidence_id": rule["evidence_id"], "source_url": rule["source_url"],
-            })
+        groups.setdefault(rule["response_group"], []).append(rule)
+    evaluated, missing, trace = [], [], []
+    for group_id, bands in sorted(groups.items()):
+        fields = {r["environment_field"] for r in bands}
+        weights = {r["_weight"] for r in bands}
+        if len(fields) != 1 or len(weights) != 1:
+            raise ValueError(f"response group {group_id} must share one input field and one weight")
+        field = next(iter(fields))
+        group_weight = next(iter(weights))
+        value = features.get(field)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            missing.append(group_id)
+            for rule in bands:
+                trace.append({
+                    "response_group": group_id, "rule_id": rule["rule_id"],
+                    "environment_field": field, "observed_value": value,
+                    "status": "missing_or_non_numeric", "evidence_id": rule["evidence_id"],
+                    "source_url": rule["source_url"],
+                })
             continue
-        evaluated.append(rule)
-        trace.append({
-            "rule_id": rule["rule_id"], "environment_field": rule["environment_field"],
-            "observed_value": value, "status": "evaluated", "matched": matched,
-            "score": rule["_score"] if matched else 0.0, "weight": rule["_weight"],
-            "evidence_id": rule["evidence_id"], "source_url": rule["source_url"],
-        })
-    total_weight = sum(r["_weight"] for r in applicable)
-    observed_weight = sum(r["_weight"] for r in evaluated)
+        matched = [r for r in bands if rule_matches(r, value)]
+        if len(matched) > 1:
+            raise ValueError(f"response group {group_id} has overlapping score bands for value {value}")
+        chosen = matched[0] if matched else None
+        group_score = chosen["_score"] if chosen else 0.0
+        evaluated.append((group_score, group_weight))
+        for rule in bands:
+            trace.append({
+                "response_group": group_id, "rule_id": rule["rule_id"],
+                "environment_field": field, "observed_value": value,
+                "status": "matched_band" if rule is chosen else "non_matching_band",
+                "matched": rule is chosen, "score": group_score if rule is chosen else 0.0,
+                "weight": group_weight, "evidence_id": rule["evidence_id"],
+                "source_url": rule["source_url"],
+            })
+    total_weight = sum(next(iter({r["_weight"] for r in bands})) for bands in groups.values())
+    observed_weight = sum(weight for _, weight in evaluated)
     coverage = observed_weight / total_weight if total_weight else 0.0
     # Require complete coverage; missing input must not silently inflate the score.
     if missing or not evaluated:
         return {"status": "incomplete_input", "score": "", "coverage": f"{coverage:.4f}", "trace": trace}
-    score = sum((r["_score"] if rule_matches(r, features[r["environment_field"]]) else 0.0) * r["_weight"] for r in evaluated) / observed_weight
+    score = sum(value * weight for value, weight in evaluated) / observed_weight
     return {"status": "scored", "score": f"{score:.2f}", "coverage": f"{coverage:.4f}", "trace": trace}
 
 def assess_hour(record, candidates, rules, weights):
