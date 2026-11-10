@@ -126,6 +126,19 @@ class IndicatorScoreEngineTests(unittest.TestCase):
         self.assertIn(newer, selected)
         self.assertNotIn(older, selected)
 
+
+    def test_solar_relative_time_features_support_species_dawn_and_dusk_curves(self):
+        from indicator_score_engine import derived_features
+        features = derived_features(self.record)
+        self.assertAlmostEqual(features["minutes_from_sunrise"], 365.0)
+        self.assertAlmostEqual(features["minutes_from_sunset"], -305.0)
+        self.assertEqual(features["daylight"], 1.0)
+        before_sunrise = dict(self.record, valid_time="2026-11-10T05:25:00+08:00")
+        early = derived_features(before_sunrise)
+        self.assertAlmostEqual(early["minutes_from_sunrise"], -30.0)
+        self.assertAlmostEqual(early["minutes_from_sunset"], -700.0)
+        self.assertEqual(early["daylight"], 0.0)
+
     def test_candidate_matrix_rows_are_deduplicated_by_species(self):
         repeated = CANDIDATES + [dict(CANDIDATES[0], response_domain="activity_period")]
         self.assertEqual(len(unique_candidates(repeated)), 1)
