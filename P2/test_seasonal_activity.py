@@ -18,7 +18,7 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),7)
+        self.assertEqual(len(rows),9)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_dolphinfish_commercial_seasonality_remains_context_only(self):
@@ -53,6 +53,21 @@ class SeasonalActivityTests(unittest.TestCase):
         self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
         self.assertIn("北台灣",row["geographic_scope"])
         self.assertIn("不可外推",row["limitations"])
+
+
+    def test_girella_juvenile_settlement_and_rabbitfish_feeding_season_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        girella=next(r for r in rows if r["seasonal_evidence_id"]=="SE008")
+        rabbit=next(r for r in rows if r["seasonal_evidence_id"]=="SE009")
+        self.assertEqual(girella["candidate_id"],"c001")
+        self.assertIn("4–8月",girella["reported_season"])
+        self.assertEqual(girella["model_use_status"],"context_only_external_region")
+        self.assertIn("幼魚",girella["limitations"])
+        self.assertEqual(rabbit["candidate_id"],"c003")
+        self.assertIn("9月下旬",rabbit["reported_season"])
+        self.assertEqual(rabbit["model_use_status"],"context_only_captive_feeding")
+        self.assertIn("不是台灣東部",rabbit["limitations"])
 
     def test_seasonal_score_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
