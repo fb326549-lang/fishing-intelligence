@@ -2,8 +2,8 @@
   "archive_layout": "hourly_environment/YYYY/MM/YYYY-MM-DD.jsonl",
   "catalog_version": "1.0.0",
   "data_types": {
-    "forecast": 23760,
-    "observation": 454
+    "forecast": 24192,
+    "observation": 476
   },
   "notes": [
     "Counts distinguish stored records from unique valid hours; forecast vintages and observation revisions may create multiple records per valid hour.",
@@ -159,11 +159,11 @@
       "valid_time_min": "2026-11-09T00:00:00+08:00"
     },
     {
-      "collected_at_max": "2026-11-10T16:18:14+00:00",
+      "collected_at_max": "2026-11-10T17:17:06+00:00",
       "collected_at_min": "2026-11-09T05:52:43.262318+00:00",
       "collection_vintages_by_region_type": {
         "chenggong_donghe|forecast": 79,
-        "chenggong_donghe|observation": 13,
+        "chenggong_donghe|observation": 14,
         "fengbin_shitiping|forecast": 79,
         "fengbin_shitiping|observation": 13,
         "hualien_north|forecast": 79,
@@ -172,18 +172,18 @@
         "taitung_south|forecast": 79,
         "taitung_south|observation": 13,
         "yilan_suao|forecast": 79,
-        "yilan_suao|observation": 13
+        "yilan_suao|observation": 14
       },
       "data_types": {
         "forecast": 11376,
-        "observation": 139
+        "observation": 141
       },
       "date": "2026-11-10",
       "path": "hourly_environment/2026/11/2026-11-10.jsonl",
-      "record_count": 11515,
+      "record_count": 11517,
       "records_by_region_type": {
         "chenggong_donghe|forecast": 1896,
-        "chenggong_donghe|observation": 28,
+        "chenggong_donghe|observation": 29,
         "fengbin_shitiping|forecast": 1896,
         "fengbin_shitiping|observation": 24,
         "hualien_north|forecast": 1896,
@@ -192,7 +192,7 @@
         "taitung_south|forecast": 1896,
         "taitung_south|observation": 28,
         "yilan_suao|forecast": 1896,
-        "yilan_suao|observation": 31
+        "yilan_suao|observation": 32
       },
       "regions": [
         "chenggong_donghe",
@@ -202,8 +202,8 @@
         "taitung_south",
         "yilan_suao"
       ],
-      "sha256": "d3d6ac7de8458a2a78f6eb55a4524fd407d12a04f8419c49d3e1ba1ff51a56a6",
-      "size_bytes": 12893969,
+      "sha256": "954466f1c373ed1764376fae4806025eade8b9daa031543806b57f6c3e8c827b",
+      "size_bytes": 12895731,
       "unique_valid_hours_by_region_type": {
         "chenggong_donghe|forecast": 24,
         "chenggong_donghe|observation": 24,
@@ -221,29 +221,40 @@
       "valid_time_min": "2026-11-10T00:00:00+08:00"
     },
     {
-      "collected_at_max": "2026-11-10T16:36:58.623072+00:00",
+      "collected_at_max": "2026-11-10T20:31:41.452171+00:00",
       "collected_at_min": "2026-11-10T03:35:52.875214+00:00",
       "collection_vintages_by_region_type": {
-        "chenggong_donghe|forecast": 5,
-        "fengbin_shitiping|forecast": 5,
-        "hualien_north|forecast": 5,
-        "hualien_south|forecast": 5,
-        "taitung_south|forecast": 5,
-        "yilan_suao|forecast": 5
+        "chenggong_donghe|forecast": 6,
+        "chenggong_donghe|observation": 3,
+        "fengbin_shitiping|forecast": 6,
+        "fengbin_shitiping|observation": 4,
+        "hualien_north|forecast": 6,
+        "hualien_north|observation": 2,
+        "hualien_south|forecast": 6,
+        "taitung_south|forecast": 6,
+        "taitung_south|observation": 3,
+        "yilan_suao|forecast": 6,
+        "yilan_suao|observation": 3
       },
       "data_types": {
-        "forecast": 720
+        "forecast": 864,
+        "observation": 20
       },
       "date": "2026-11-11",
       "path": "hourly_environment/2026/11/2026-11-11.jsonl",
-      "record_count": 720,
+      "record_count": 884,
       "records_by_region_type": {
-        "chenggong_donghe|forecast": 120,
-        "fengbin_shitiping|forecast": 120,
-        "hualien_north|forecast": 120,
-        "hualien_south|forecast": 120,
-        "taitung_south|forecast": 120,
-        "yilan_suao|forecast": 120
+        "chenggong_donghe|forecast": 144,
+        "chenggong_donghe|observation": 4,
+        "fengbin_shitiping|forecast": 144,
+        "fengbin_shitiping|observation": 4,
+        "hualien_north|forecast": 144,
+        "hualien_north|observation": 4,
+        "hualien_south|forecast": 144,
+        "taitung_south|forecast": 144,
+        "taitung_south|observation": 4,
+        "yilan_suao|forecast": 144,
+        "yilan_suao|observation": 4
       },
       "regions": [
         "chenggong_donghe",
@@ -253,43 +264,48 @@
         "taitung_south",
         "yilan_suao"
       ],
-      "sha256": "0fc5b5b90e6948466b0f4ccc4a265b03e3ee55f36ba4939aad0fa85a259418c1",
-      "size_bytes": 1021734,
+      "sha256": "f323dfa380a5d59529144c38421c5cbb5d161f34eb4e668fe0f46702cb19e350",
+      "size_bytes": 1243705,
       "unique_valid_hours_by_region_type": {
         "chenggong_donghe|forecast": 24,
+        "chenggong_donghe|observation": 4,
         "fengbin_shitiping|forecast": 24,
+        "fengbin_shitiping|observation": 4,
         "hualien_north|forecast": 24,
+        "hualien_north|observation": 4,
         "hualien_south|forecast": 24,
         "taitung_south|forecast": 24,
-        "yilan_suao|forecast": 24
+        "taitung_south|observation": 4,
+        "yilan_suao|forecast": 24,
+        "yilan_suao|observation": 4
       },
       "valid_time_max": "2026-11-11T23:00:00+08:00",
       "valid_time_min": "2026-11-11T00:00:00+08:00"
     },
     {
-      "collected_at_max": "2026-11-10T16:36:58.623072+00:00",
+      "collected_at_max": "2026-11-10T20:31:41.452171+00:00",
       "collected_at_min": "2026-11-10T03:35:52.875214+00:00",
       "collection_vintages_by_region_type": {
-        "chenggong_donghe|forecast": 5,
-        "fengbin_shitiping|forecast": 5,
-        "hualien_north|forecast": 5,
-        "hualien_south|forecast": 5,
-        "taitung_south|forecast": 5,
-        "yilan_suao|forecast": 5
+        "chenggong_donghe|forecast": 6,
+        "fengbin_shitiping|forecast": 6,
+        "hualien_north|forecast": 6,
+        "hualien_south|forecast": 6,
+        "taitung_south|forecast": 6,
+        "yilan_suao|forecast": 6
       },
       "data_types": {
-        "forecast": 720
+        "forecast": 864
       },
       "date": "2026-11-12",
       "path": "hourly_environment/2026/11/2026-11-12.jsonl",
-      "record_count": 720,
+      "record_count": 864,
       "records_by_region_type": {
-        "chenggong_donghe|forecast": 120,
-        "fengbin_shitiping|forecast": 120,
-        "hualien_north|forecast": 120,
-        "hualien_south|forecast": 120,
-        "taitung_south|forecast": 120,
-        "yilan_suao|forecast": 120
+        "chenggong_donghe|forecast": 144,
+        "fengbin_shitiping|forecast": 144,
+        "hualien_north|forecast": 144,
+        "hualien_south|forecast": 144,
+        "taitung_south|forecast": 144,
+        "yilan_suao|forecast": 144
       },
       "regions": [
         "chenggong_donghe",
@@ -299,8 +315,8 @@
         "taitung_south",
         "yilan_suao"
       ],
-      "sha256": "2165eae819bc8782316db9f076801facc2a0692b8302bd5bcb2ab3d29cd5220d",
-      "size_bytes": 1021477,
+      "sha256": "5d37b5a2b423b8c4442f0839637ac4d6db854a525826f0055648387f9e3ec097",
+      "size_bytes": 1225755,
       "unique_valid_hours_by_region_type": {
         "chenggong_donghe|forecast": 24,
         "fengbin_shitiping|forecast": 24,
@@ -313,29 +329,29 @@
       "valid_time_min": "2026-11-12T00:00:00+08:00"
     },
     {
-      "collected_at_max": "2026-11-10T16:36:58.623072+00:00",
+      "collected_at_max": "2026-11-10T20:31:41.452171+00:00",
       "collected_at_min": "2026-11-10T16:36:58.623072+00:00",
       "collection_vintages_by_region_type": {
-        "chenggong_donghe|forecast": 1,
-        "fengbin_shitiping|forecast": 1,
-        "hualien_north|forecast": 1,
-        "hualien_south|forecast": 1,
-        "taitung_south|forecast": 1,
-        "yilan_suao|forecast": 1
+        "chenggong_donghe|forecast": 2,
+        "fengbin_shitiping|forecast": 2,
+        "hualien_north|forecast": 2,
+        "hualien_south|forecast": 2,
+        "taitung_south|forecast": 2,
+        "yilan_suao|forecast": 2
       },
       "data_types": {
-        "forecast": 144
+        "forecast": 288
       },
       "date": "2026-11-13",
       "path": "hourly_environment/2026/11/2026-11-13.jsonl",
-      "record_count": 144,
+      "record_count": 288,
       "records_by_region_type": {
-        "chenggong_donghe|forecast": 24,
-        "fengbin_shitiping|forecast": 24,
-        "hualien_north|forecast": 24,
-        "hualien_south|forecast": 24,
-        "taitung_south|forecast": 24,
-        "yilan_suao|forecast": 24
+        "chenggong_donghe|forecast": 48,
+        "fengbin_shitiping|forecast": 48,
+        "hualien_north|forecast": 48,
+        "hualien_south|forecast": 48,
+        "taitung_south|forecast": 48,
+        "yilan_suao|forecast": 48
       },
       "regions": [
         "chenggong_donghe",
@@ -345,8 +361,8 @@
         "taitung_south",
         "yilan_suao"
       ],
-      "sha256": "4eca7d5c344b7beaafda1978f61d5c037d1298203c0b6b9d293f771de5377219",
-      "size_bytes": 204473,
+      "sha256": "574a96c35cd429e5f6fec1defc55893a73d8cf05f7a8b90131c0a85f4498bea5",
+      "size_bytes": 408952,
       "unique_valid_hours_by_region_type": {
         "chenggong_donghe|forecast": 24,
         "fengbin_shitiping|forecast": 24,
@@ -359,7 +375,7 @@
       "valid_time_min": "2026-11-13T00:00:00+08:00"
     }
   ],
-  "record_count": 24214,
+  "record_count": 24668,
   "regions": [
     "chenggong_donghe",
     "fengbin_shitiping",
