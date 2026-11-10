@@ -54,7 +54,7 @@ F_{c036}(t)=g(\mathrm{SST}_t,\ \mathrm{macroalgae\ availability}_t,\ \mathrm{lig
 
 ## 4. 魚類活動力反應（fish_activity）
 
-候選時段特徵應以當地日出／日落為基準，而不是全年固定鐘點：
+引擎已新增 minutes_from_sunrise、minutes_from_sunset 及 daylight 衍生欄位，讓候選時段以當地日出／日落為基準，而不是全年固定鐘點：
 - 日出前後窗口；
 - 日落前後窗口；
 - 夜間；
