@@ -117,6 +117,33 @@ jobs:
           python P2/collector/build_hourly_history_catalog.py --archive-root p2-history-data/data
           python P2/collector/validate_hourly_history.py --archive-root p2-history-data/data
 
+      - name: Validate PWA preview payload and include it in artifact
+        run: |
+          latest_dir=$(find output/open_meteo -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)
+          payload=p2-history-data/data/latest_hourly_fish_outlook.json
+          test -s "$payload"
+          python - "$payload" <<'PY'
+          import json,sys
+          from pathlib import Path
+          data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-p2.6"
+          assert len(data.get("regions",[]))==6
+          assert data.get("horizons_hours")==[6,12,24]
+          rows=data.get("rows",[])
+          assert len(rows)==378, f"expected 378 rows, got {len(rows)}"
+          assert len({r.get("candidate_id") for r in rows})==21
+          assert len({r.get("region_id") for r in rows})==6
+          assert {str(r.get("horizon_hours")) for r in rows}=={"6","12","24"}
+          assert all(r.get("activity_score")=="" and r.get("catch_probability")=="" for r in rows)
+          assert all(r.get("best_fishing_window_status")=="not_established" for r in rows)
+          edna=data.get("edna_occurrence_context",{}).get("records",[])
+          assert edna and all(r.get("model_use_status")=="context_only_edna_occurrence" for r in edna)
+          ecology=data.get("species_ecology_context",{}).get("records",[])
+          assert ecology and all(r.get("source_url") for r in ecology)
+          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":21,"edna_context_records":len(edna),"ecology_records":len(ecology),"scores_withheld":True})
+          PY
+          cp "$payload" "$latest_dir/latest_hourly_fish_outlook.json"
+
       - name: Commit P2 history plus live outlook
         if: github.event_name != 'pull_request'
         run: |
