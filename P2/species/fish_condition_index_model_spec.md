@@ -63,7 +63,7 @@ indicator_scoring_rules_template.csv 是三指標共用規則格式。可計分�
 - 具備來源、生命階段、研究範圍、reviewer 與 review date；
 - model_use_status 明確核准為 eligible_for_indicator_scoring。
 
-species_indicator_weights_template.csv 只有在 east_taiwan_catch_validation 完成後，才可填入 eligible_for_composite_scoring 權重。日本研究、北台灣研究、西台灣漁業模型、養殖試驗、物種資料庫、單筆標本或俗名推定，一律不得直接通過台灣東部計分門檻。
+species_indicator_weights_template.csv 只有在 east_taiwan_effort_validated_catch 完成後，才可填入 eligible_for_composite_scoring 權重。日本研究、北台灣研究、西台灣漁業模型、養殖試驗、物種資料庫、單筆標本或俗名推定，一律不得直接通過台灣東部計分門檻。
 
 ## 四個指定魚種的模型研究設定
 
@@ -79,3 +79,8 @@ species_indicator_weights_template.csv 只有在 east_taiwan_catch_validation �
 目前已建立三指標的程式計算流程、證據門檻、規則模板、權重模板及測試；但核准的台灣東部直接反應規則與經本地漁獲資料驗證的魚種權重尚未具備。四個魚種的研究資料已整理為可追溯背景證據，仍不能合法／科學地產生正式 0–100 分數或最佳時段。
 
 這是明確的模型資料狀態，不是用假分數填滿儀表板。補足直接證據及本地驗證後，才會啟用分數。
+## 本地垂釣回報資料的可用性限制
+
+海洋保育署 iOcean 垂釣回報為免費政府開放資料，欄位包含 Fishing_Time、People_Count、經緯度、Species_Name、Name_Code、Fishing_Count 及 Fishing_Length（資料集： https://data.gov.tw/dataset/157622 ）。它可作為正向釣獲回報的時空分布參考，但目前公開欄位沒有完整垂釣時數／努力量，也沒有足夠的無漁獲回報作為負樣本。因此不能直接計算 CPUE、中魚機率，亦不能單憑回報筆數推導某一時段「魚比較多」。
+
+如日後取得可稽核的東部地區、物種級、時間與釣點資料，且有努力量或適當背景樣本，才可用於活動分布驗證及魚種權重校準。單純的正向回報只能作輔助上下文，不可標記為 effort-validated catch validation。
