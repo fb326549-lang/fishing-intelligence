@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),18)
+        self.assertEqual(len(rows),20)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -58,6 +58,25 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(movement["model_use_status"],"context_only_external_region")
         self.assertIn("1至5月",movement["reported_pattern"])
         self.assertIn("不是魚群豐度",movement["limitations"])
+
+
+    def test_southern_drummer_captive_feeding_trials_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        diel=next(r for r in rows if r["activity_evidence_id"]=="AE019")
+        temp=next(r for r in rows if r["activity_evidence_id"]=="AE020")
+        self.assertEqual(diel["candidate_id"],"c036")
+        self.assertEqual(diel["source_literature_id"],"L036")
+        self.assertEqual(diel["evidence_kind"],"captive_feeding_trial")
+        self.assertEqual(diel["model_use_status"],"context_only_captive_feeding")
+        self.assertIn("45.6%",diel["reported_pattern"])
+        self.assertIn("不是野外魚群活動",diel["limitations"])
+        self.assertEqual(temp["candidate_id"],"c036")
+        self.assertEqual(temp["source_literature_id"],"L037")
+        self.assertEqual(temp["evidence_kind"],"captive_feeding_trial")
+        self.assertEqual(temp["model_use_status"],"context_only_captive_feeding")
+        self.assertIn("12°C",temp["reported_pattern"])
+        self.assertIn("不得直接套用台灣東部",temp["limitations"])
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
