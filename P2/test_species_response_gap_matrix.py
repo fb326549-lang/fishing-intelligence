@@ -73,7 +73,12 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L042,c001,feeding_condition,https://doi.org/10.1016/j.aqrep.2024.102349,context_only_captive_feeding\n"
                 "L043,c036,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=586&theme=fisheasy,context_only_taiwan_fishery_reference\n"
                 "L044,c003,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=624&theme=fisheasy,context_only_taiwan_fishery_reference\n"
-                "L045,c004,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=536&theme=fisheasy,context_only_taiwan_fishery_reference\n",encoding="utf-8")
+                "L045,c004,activity_period,https://kmweb.moa.gov.tw/theme_data.php?id=536&theme=fisheasy,context_only_taiwan_fishery_reference\n"
+                "L046,c003,feeding_condition,https://doi.org/10.18903/fisheng.39.1_5,context_only_external_region\n"
+                "L047,c003,feeding_condition,https://doi.org/10.2331/suisan.77.1008,context_only_external_region\n"
+                "L048,c003,feeding_condition,https://doi.org/10.11233/aquaculturesci.57.429,context_only_captive_feeding\n"
+                "L049,c003,feeding_condition,https://www.fish-u.ac.jp/public/files/68/02_2.pdf,context_only_captive_feeding\n"
+                "L050,c003,activity_period,https://doi.org/10.18903/fisheng.47.1_47,context_only_captive_activity\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
@@ -98,13 +103,13 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(white["evidence_status"],"species_identification_required")
             self.assertEqual(black["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
             rabbit_feeding=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="feeding_conditions")
-            self.assertEqual(rabbit_feeding["literature_record_ids"],"L038")
+            self.assertEqual(rabbit_feeding["literature_record_ids"],"L038;L046;L047;L048;L049")
             self.assertEqual(rabbit_feeding["evidence_status"],"external_literature_found_context_only")
             black_feeding=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="feeding_conditions")
             self.assertEqual(black_feeding["literature_record_ids"],"L040;L042")
             self.assertEqual(black_feeding["evidence_status"],"external_literature_found_context_only")
             rabbit_activity=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="activity_period")
-            self.assertEqual(rabbit_activity["literature_record_ids"],"L044")
+            self.assertEqual(rabbit_activity["literature_record_ids"],"L044;L050")
             black_seabream_activity=next(r for r in rows if r["candidate_id"]=="c004" and r["response_domain"]=="activity_period")
             self.assertEqual(black_seabream_activity["literature_record_ids"],"L045")
             black_activity=next(r for r in rows if r["candidate_id"]=="c001" and r["response_domain"]=="activity_period")
