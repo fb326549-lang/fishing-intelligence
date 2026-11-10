@@ -47,7 +47,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script(?:\\s[^>]*)?>(.*?)</script>", html, flags=re.IGNORECASE | re.DOTALL)
+          scripts = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, flags=re.IGNORECASE | re.DOTALL)
           if not scripts or not scripts[-1].strip():
               raise SystemExit("No inline PWA JavaScript block found.")
           Path("/tmp/fishing-intelligence-pwa.js").write_text(scripts[-1], encoding="utf-8")
