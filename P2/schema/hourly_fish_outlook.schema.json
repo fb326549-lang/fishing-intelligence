@@ -15,6 +15,17 @@
     "forecast_hour_count",
     "expected_hour_count",
     "forecast_coverage",
+    "occurrence_evidence_ids",
+    "occurrence_evidence_count",
+    "tide_turning_hour_count",
+    "tide_phase_coverage",
+    "tide_phase_missing_forecast_hour_count",
+    "tide_phase_missing_hour_count",
+    "tide_phase_known_hour_count",
+    "tide_phase_low_slack_hours",
+    "tide_phase_high_slack_hours",
+    "tide_phase_falling_hours",
+    "tide_phase_rising_hours",
     "environment_match_hour_count",
     "environment_match_status",
     "environment_match_mean",
@@ -137,6 +148,49 @@
     "rule_evidence_trace_json": {
       "type": "string",
       "description": "JSON array of per-hour rule evaluations with evidence IDs, sources, observed values and match outcomes."
+    },
+    "tide_phase_rising_hours": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_falling_hours": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_high_slack_hours": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_low_slack_hours": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_known_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_missing_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_missing_forecast_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tide_phase_coverage": {
+      "type": "string",
+      "pattern": "^(0(\\.[0-9]{4})?|1\\.0000)$"
+    },
+    "tide_turning_hour_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "occurrence_evidence_count": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "occurrence_evidence_ids": {
+      "type": "string"
     }
   }
 }
