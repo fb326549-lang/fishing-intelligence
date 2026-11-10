@@ -7,7 +7,7 @@ An environmental match alone is never interpreted as fish activity or catch prob
 """
 from __future__ import annotations
 import argparse, csv, json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 INDICATORS = ("feeding_condition", "environment_suitability", "fish_activity")
@@ -291,31 +291,56 @@ def assess_hour(record, candidates, rules, weights):
         })
     return output
 
-def rank_best_hours(rows):
+def rank_best_hours(rows, as_of):
+    if as_of.minute or as_of.second or as_of.microsecond:
+        raise ValueError("as_of must be aligned to the start of an hour")
+    horizons = (6, 12, 24)
     groups = {}
-    non_forecast = []
+    output = []
     for row in rows:
         if row.get("data_type") != "forecast":
-            non_forecast.append(dict(row, best_hour_status="not_rankable_data_type", best_hour_rank=""))
+            nonforecast = dict(row, best_hour_status="not_rankable_data_type", best_hour_rank="")
+            for horizon in horizons:
+                nonforecast[f"best_hour_status_{horizon}h"] = "not_rankable_data_type"
+                nonforecast[f"best_hour_rank_{horizon}h"] = ""
+            output.append(nonforecast)
             continue
         groups.setdefault((row["candidate_id"], row["region_id"]), []).append(row)
-    output = list(non_forecast)
     for key, group in groups.items():
-        scored = [r for r in group if r.get("overall_fish_condition_index", "") != ""]
-        if not scored:
-            output.extend(dict(r, best_hour_status="not_established", best_hour_rank="") for r in group)
-            continue
-        scored.sort(key=lambda r: (-float(r["overall_fish_condition_index"]), r["valid_time"]))
-        best_time = scored[0]["valid_time"]
-        ranks = {r["valid_time"]: i + 1 for i, r in enumerate(scored)}
-        output.extend(dict(
-            r,
-            best_hour_status=(
-                "unscored_hour" if r.get("overall_fish_condition_index", "") == ""
-                else "best_hour" if r["valid_time"] == best_time else "ranked_hour"
-            ),
-            best_hour_rank=str(ranks.get(r["valid_time"], "")),
-        ) for r in group)
+        scored_rows = [r for r in group if r.get("overall_fish_condition_index", "") != ""]
+        by_time = {r["valid_time"]: dict(r) for r in group}
+        for row in group:
+            row["best_hour_status"] = "outside_horizon"
+            row["best_hour_rank"] = ""
+            for horizon in horizons:
+                row[f"best_hour_status_{horizon}h"] = "outside_horizon"
+                row[f"best_hour_rank_{horizon}h"] = ""
+        for horizon in horizons:
+            end = as_of + timedelta(hours=horizon)
+            window = [
+                r for r in group
+                if as_of <= parse_dt(r["valid_time"], "valid_time") < end
+            ]
+            scored = [r for r in window if r.get("overall_fish_condition_index", "") != ""]
+            if not scored:
+                for row in window:
+                    row[f"best_hour_status_{horizon}h"] = "not_established"
+                continue
+            scored.sort(key=lambda r: (-float(r["overall_fish_condition_index"]), r["valid_time"]))
+            best_time = scored[0]["valid_time"]
+            ranks = {r["valid_time"]: i + 1 for i, r in enumerate(scored)}
+            for row in window:
+                if row.get("overall_fish_condition_index", "") == "":
+                    status, rank = "unscored_hour", ""
+                else:
+                    status = "best_hour" if row["valid_time"] == best_time else "ranked_hour"
+                    rank = str(ranks[row["valid_time"]])
+                row[f"best_hour_status_{horizon}h"] = status
+                row[f"best_hour_rank_{horizon}h"] = rank
+        for row in group:
+            row["best_hour_status"] = row["best_hour_status_6h"]
+            row["best_hour_rank"] = row["best_hour_rank_6h"]
+            output.append(row)
     return output
 
 def main():
@@ -324,6 +349,7 @@ def main():
     p.add_argument("--candidates-csv", type=Path, required=True)
     p.add_argument("--rules-csv", type=Path, required=True)
     p.add_argument("--weights-csv", type=Path, required=True)
+    p.add_argument("--as-of", required=True, help="timezone-aware ISO-8601 timestamp aligned to the hour")
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
     records = select_latest_forecast_vintages([json.loads(x) for x in a.environment_jsonl.read_text(encoding="utf-8").splitlines() if x.strip()])
@@ -333,14 +359,16 @@ def main():
     rows = []
     for record in records:
         rows.extend(assess_hour(record, candidates, rules, weights))
-    rows = rank_best_hours(rows)
+    as_of = parse_dt(a.as_of, "--as-of")
+    rows = rank_best_hours(rows, as_of)
     fields = [
         "candidate_id", "region_id", "valid_time", "data_type", "model_status",
         "feeding_condition_score", "feeding_condition_status", "feeding_condition_coverage",
         "environment_suitability_score", "environment_suitability_status", "environment_suitability_coverage",
         "fish_activity_score", "fish_activity_status", "fish_activity_coverage",
         "overall_fish_condition_index", "species_weights_json", "best_hour_status", "best_hour_rank",
-        "indicator_trace_json", "interpretation",
+        "best_hour_status_6h", "best_hour_rank_6h", "best_hour_status_12h", "best_hour_rank_12h",
+        "best_hour_status_24h", "best_hour_rank_24h", "indicator_trace_json", "interpretation",
     ]
     a.out.parent.mkdir(parents=True, exist_ok=True)
     with a.out.open("w", encoding="utf-8", newline="") as f:
