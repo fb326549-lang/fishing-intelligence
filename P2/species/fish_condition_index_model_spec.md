@@ -81,7 +81,7 @@ species_indicator_weights_template.csv 只有在 east_taiwan_effort_validated_ca
 這是明確的模型資料狀態，不是用假分數填滿儀表板。補足直接證據及本地驗證後，才會啟用分數。
 ## 本地垂釣回報資料的可用性限制
 
-海洋保育署 iOcean 垂釣回報為免費政府開放資料，欄位包含 Fishing_Time、People_Count、經緯度、Species_Name、Name_Code、Fishing_Count 及 Fishing_Length（資料集： https://data.gov.tw/dataset/157622 ）。它可作為正向釣獲回報的時空分布參考，但目前公開欄位沒有完整垂釣時數／努力量，也沒有足夠的無漁獲回報作為負樣本。因此不能直接計算 CPUE、中魚機率，亦不能單憑回報筆數推導某一時段「魚比較多」。
+海洋保育署 iOcean 垂釣回報為免費政府開放資料，公開字典列有 Fishing_Time、People_Count、經緯度、Species_Name、Name_Code、Fishing_Count 及 Fishing_Length（資料集：https://data.gov.tw/dataset/157622）。官方2024年操作說明另指出垂釣時數及現場人數為非必填，若正確填寫可估算努力量；但公開資料字典未明列垂釣時數欄位，必須先檢查原始CSV/JSON實際欄位及完整率。另缺乏可確認的零漁獲努力量時段，不能直接將正向回報尾數換算成完整CPUE或中魚機率。墾丁2017年與北部港區研究已有標準化人時CPUE方法，但屬不同區域，不可移植為東部參數。詳細方法見 fishery_effort_validation_methodology.md。
 
 如日後取得可稽核的東部地區、物種級、時間與釣點資料，且有努力量或適當背景樣本，才可用於活動分布驗證及魚種權重校準。單純的正向回報只能作輔助上下文，不可標記為 effort-validated catch validation。
 
