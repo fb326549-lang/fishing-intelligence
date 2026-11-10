@@ -14,7 +14,7 @@ FIELDS = {
 DIMENSIONS = {"seasonal_aggregation","seasonal_nearshore_aggregation","seasonal_distribution",
               "seasonal_feeding","seasonal_activity_proxy","spawning_timing"}
 KINDS = {"direct_field_observation","underwater_visual_survey","natural_history_observation",
-         "fishery_catch_model","telemetry_proxy","captive_trial","taxonomic_summary"}
+         "fishery_catch_model","telemetry_proxy","captive_trial","taxonomic_summary", "captive_activity_observation"}
 
 def read_csv(path: Path):
     with path.open(encoding="utf-8-sig", newline="") as f:
