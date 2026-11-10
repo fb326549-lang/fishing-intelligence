@@ -59,6 +59,7 @@ a{color:#8be8ef}
 #radarDashboard .radar-score-layout{display:grid;grid-template-columns:148px minmax(0,1fr);align-items:center;gap:14px;margin-top:14px}
 #radarDashboard .radar-gauge{width:148px;height:148px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from 220deg,#1a8793 0deg,#35d5bb 115deg,rgba(61,178,180,.16) 116deg 280deg,transparent 281deg 360deg);position:relative;filter:drop-shadow(0 0 12px rgba(49,217,193,.14))}
 #radarDashboard .radar-gauge:before{content:"";position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 40% 28%,#0b5262,#062b40 72%);border:1px solid rgba(123,230,218,.28)}
++#radarDashboard .radar-gauge[data-state="unavailable"]{background:conic-gradient(from 220deg,rgba(111,157,169,.42) 0deg,rgba(111,157,169,.42) 280deg,transparent 281deg 360deg);filter:none}
 #radarDashboard .radar-gauge-inner{position:relative;text-align:center;z-index:1}
 #radarDashboard .radar-number{font-size:38px;line-height:1;font-weight:850;letter-spacing:-1px;color:#b9ffe7;text-shadow:0 0 16px rgba(63,255,191,.34)}
 #radarDashboard .radar-denom{font-size:12px;color:#a6d5d7;margin-top:4px}
@@ -93,7 +94,7 @@ a{color:#8be8ef}
 <section id="radarDashboard" aria-live="polite">
  <div class="radar-head"><div class="radar-title">◉ 智慧魚情儀表板</div><span class="tag" id="radarModelStatus">模型證據檢查中</span></div>
  <div class="radar-score-layout">
-  <div class="radar-gauge" aria-label="綜合魚情指數尚無可驗證分數"><div class="radar-gauge-inner"><div class="radar-number" id="radarIndex">—</div><div class="radar-denom">/ 100</div></div></div>
+  <div class="radar-gauge" data-state="unavailable" aria-label="綜合魚情指數尚無可驗證分數"><div class="radar-gauge-inner"><div class="radar-number" id="radarIndex">—</div><div class="radar-denom">/ 100</div></div></div>
   <div class="radar-summary"><div class="radar-grade" id="radarGrade">尚未具備可核准計分條件</div><div class="radar-sub" id="radarScoreNote">目前沒有經審查的台灣東部魚種環境反應規則與逐時活動模型；不以舊版通用權重或歷史出現紀錄填補分數。</div></div>
  </div>
  <div class="radar-indicators">
@@ -719,6 +720,7 @@ function renderRadarDashboard(){
  const name=row?(aliases[row.candidate_id]||row.common_name_zh||row.candidate_id):'尚未選擇';
  $('radarTarget').textContent=name;
  $('radarIndex').textContent='—';
+ $('radarGauge')?.setAttribute('data-state','unavailable');
  $('radarGrade').textContent=candidateId?'證據不足・暫不評分':'請先選擇目標魚種';
  $('radarScoreNote').textContent='目前 P2 沒有任何經審查的東部數值環境反應規則，活動分數與最佳時段也明確維持未建立；因此不產生虛構的 0–100 分。';
  $('radarForage').textContent='尚未建立';
