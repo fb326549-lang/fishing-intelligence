@@ -81,7 +81,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L050,c003,activity_period,https://doi.org/10.18903/fisheng.47.1_47,context_only_captive_activity\n"
                 "L051,c036,feeding_condition,https://doi.org/10.11233/aquaculturesci.64.209,context_only_captive_feeding\n"
                 "L052,c036,temperature_response,https://www2.fish-u.ac.jp/kenkyu/sangakukou/kenkyuhoukoku/64/04_1.pdf,context_only_captive_feeding\n"
-                "L053,c036,activity_period,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n",encoding="utf-8")
+                "L053,c036,diel_feeding,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
             self.assertEqual(len(rows),168)
             white=next(r for r in rows if r["candidate_id"]=="c002")
