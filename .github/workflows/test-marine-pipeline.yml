@@ -44,8 +44,6 @@ jobs:
         run: python -m unittest discover -s P1/collector -p "test_*.py" -v
       - name: Run offline P2 integration regression tests
         run: python -m unittest discover -s P2 -p "test_*.py" -v
-      - name: Run offline P2 fish outlook regression tests
-        run: python -m unittest discover -s P2/species -p "test_*.py" -v
       - name: Validate PWA inline JavaScript syntax
         run: |
           python - <<'PY'
