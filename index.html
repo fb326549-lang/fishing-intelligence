@@ -730,7 +730,11 @@ function renderRadarDashboard(){
  const name=outlookRow?(aliases[outlookRow.candidate_id]||outlookRow.common_name_zh||outlookRow.candidate_id):(aliases[candidateId]||'尚未選擇');
  $('radarTarget').textContent=name;
  const rows=(index?.rows||[]).filter(r=>r.region_id===regionId&&r.candidate_id===candidateId&&r.data_type==='forecast');
- const best=rows.find(r=>r.best_hour_status_6h==='best_hour');
+ const best6=rows.find(r=>r.best_hour_status_6h==='best_hour');
+ const best12=rows.find(r=>r.best_hour_status_12h==='best_hour');
+ const best24=rows.find(r=>r.best_hour_status_24h==='best_hour');
+ const best=best6||best12||best24||null;
+ const bestHorizon=best6?6:best12?12:best24?24:0;
  const display=best||rows.find(r=>r.overall_fish_condition_index!==null&&r.overall_fish_condition_index!==undefined)||rows[0]||null;
  const scoreValue=display?.overall_fish_condition_index;
  const hasScore=typeof scoreValue==='number'&&Number.isFinite(scoreValue);
@@ -753,11 +757,11 @@ function renderRadarDashboard(){
   scored:'分數為該魚種專屬相對魚情指數，不是中魚機率。'
  };
  $('radarScoreNote').textContent=display?(modelNotes[display.model_status]||'模型狀態：'+display.model_status+'。不以缺值補分。'):'尚未取得本區、本魚種逐時魚情指數資料。';
- if(hasScore)$('radarScoreNote').textContent='此分數對應所選海域未來最佳預報小時的相對魚情指數，不是中魚機率。';
+ if(hasScore)$('radarScoreNote').textContent='此分數對應'+(bestHorizon?('未來'+bestHorizon+'小時內的最佳預報小時'):'該預報小時')+'之相對魚情指數，不是中魚機率。';
  if(best){
   const t=new Date(best.valid_time);
   $('radarBestWindow').textContent=t.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  $('radarBestNote').textContent='未來6小時內三項指標完整且綜合魚情指數最高的預報小時；僅為相對排序，不代表中魚機率。';
+  $('radarBestNote').textContent='未來'+bestHorizon+'小時內三項指標完整且綜合魚情指數最高的預報小時；僅為相對排序，不代表中魚機率。';
  }else{
   $('radarBestWindow').textContent='尚未建立';
   $('radarBestNote').textContent='未來6小時尚無完整且通過驗證的三指標綜合分數；不會以環境較平穩代替魚類最佳時段。';
