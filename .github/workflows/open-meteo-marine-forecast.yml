@@ -169,7 +169,7 @@ jobs:
           from pathlib import Path
           data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           schema=json.loads(Path("P2/schema/hourly_fish_condition_index.schema.json").read_text(encoding="utf-8"))
-          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-fci-preliminary-1.1"
+          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-fci-preliminary-1.2"
           assert len(data.get("regions",[]))==6 and data.get("horizons_hours")==[6,12,24]
           assert isinstance(data.get("rows"),list)
           top_required=set(schema["required"])
@@ -185,12 +185,12 @@ jobs:
           for i,row in enumerate(data["rows"]):
               assert row_required<=set(row), f"FCI row {i} missing: {sorted(row_required-set(row))}"
               assert set(row)<=row_properties, f"FCI row {i} has undeclared fields: {sorted(set(row)-row_properties)}"
-              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.1"
+              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.2"
           scored=[row for row in data["rows"] if row.get("overall_fish_condition_index") is not None]
           assert scored, "preliminary scoring must produce rows when environment forecast is available"
           for row in scored:
               assert row.get("model_status")=="preliminary_scored"
-              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.1"
+              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.2"
               assert all(row.get(key) is not None for key in ("feeding_condition_score","environment_suitability_score","fish_activity_score"))
               weights=row.get("species_weights") or {}
               assert set(weights)=={"feeding_condition","environment_suitability","fish_activity"}
