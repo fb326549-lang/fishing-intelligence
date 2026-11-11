@@ -12,11 +12,15 @@ class FisheryEffortStudyRegisterTests(unittest.TestCase):
         by_id={r["effort_source_id"]:r for r in rows}
         self.assertEqual(set(by_id),{"EV001","EV002","EV003","EV004"})
         self.assertIn("非必填",by_id["EV001"]["sampling_design"])
+        self.assertIn("76435",by_id["EV001"]["effort_measure"])
+        self.assertEqual(by_id["EV001"]["model_use_status"],"context_only_no_effort_hours_or_zero_catch")
         self.assertIn("3–4小時",by_id["EV002"]["sampling_design"])
         self.assertIn("Kyphosus spp.",by_id["EV002"]["target_taxon_scope"])
         self.assertIn("1.37±2.99",by_id["EV003"]["reported_result"])
         self.assertIn("65%",by_id["EV003"]["reported_result"])
-        self.assertEqual(by_id["EV004"]["model_use_status"],"awaiting_full_report_review")
+        self.assertIn("花蓮64筆",by_id["EV004"]["effort_measure"])
+        self.assertIn("宜蘭1354筆",by_id["EV004"]["effort_measure"])
+        self.assertEqual(by_id["EV004"]["model_use_status"],"methodology_only_report_count_not_angler_hour_or_hourly_response")
         self.assertTrue(all(r["source_url"].startswith("https://") for r in rows))
         self.assertFalse(any(r["model_use_status"]=="east_taiwan_effort_validated_catch" for r in rows))
 

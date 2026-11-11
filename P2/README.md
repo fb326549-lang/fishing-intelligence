@@ -839,5 +839,18 @@ python P2/species/audit_environment_response_rules.py \\
 
 目前 indicator_scoring_rules_template.csv 與 species_indicator_weights_template.csv 都沒有核准規則／權重列，因此工作流程會輸出明確的證據不足狀態與空分數，不會假造魚情指數。雷達面板不再把一般環境摘要分數當成魚種環境適合度，也不會顯示虛構最佳時段。
 
+### iOcean 努力量欄位稽核
+
+`P2/species/audit_iocean_effort_data.py` 可對官方下載CSV重跑欄位完整度、日期／日內時刻、同行人數、尾數零值／空值與時數欄位檢查，並輸出來源檔SHA-256。此工具只作資料結構篩查，不計算CPUE或魚情分數；空白魚獲不會被當成零漁獲。執行方式與2026-11-11官方資料快照結果見 `P2/species/fishery_effort_validation_methodology.md`。
+
 本次只改漁獵雷達模型及其資料輸出；沒有新增安全判斷面板或安全規則，沒有修改原有安全模組、海域選擇、氣象海洋蒐集、潮汐或其他首頁功能。
+
+### 四種目標魚的獨立研究規格
+
+新增三份與南方舵魚規格並列的魚種專屬研究規格：
+- `species/rabbitfish_response_model_spec.md`：臭肚，分開處理藻類餌源、動物性食物、海溫、日夜與季節證據。
+- `species/black_seabream_response_model_spec.md`：黑鯛，區分西部刺網空間模型、幼生育幼研究與異地食性資料。
+- `species/girella_punctata_response_model_spec.md`：瓜子鱲，限定個體物種鑑定，區分北台灣歷史野外資料、東部單筆出現及養殖資料。
+
+每份規格都定義覓食條件、環境適合度、魚類活動力的候選變數、缺值行為、可追溯證據及啟用前驗證資料。現有研究仍不足以核准台灣東部逐時門檻或物種權重；文獻中的異地、圈養、漁業分布或物種概述持續標記為 context-only，故雷達維持不輸出正式分數／最佳時段。`test_species_response_model_specs.py` 會確認四種規格的三指標章節及其引用證據仍存在於文獻登錄表。
 
