@@ -33,6 +33,13 @@ def load_profiles(path: Path):
             if set(profile) != set(PHASES) or any(v is not None and not 0 <= float(v) <= 100 for v in profile.values()):
                 raise ValueError(f"{cid}: {key} must define dawn/day/dusk/night points in 0..100 or null when unsupported")
             row["_" + key] = {k: None if v is None else float(v) for k, v in profile.items()}
+        month_overrides = json.loads(row.get("activity_month_overrides_json", "{}") or "{}")
+        for month, values in month_overrides.items():
+            if month not in {str(m) for m in range(1, 13)} or set(values) != set(PHASES):
+                raise ValueError(f"{cid}: invalid monthly activity override")
+            if any(value is not None and not 0 <= float(value) <= 100 for value in values.values()):
+                raise ValueError(f"{cid}: monthly activity points must be 0..100 or null")
+        row["_activity_month_overrides"] = month_overrides
         weight = float(row["weight_each"])
         if abs(weight - 1 / 3) > 1e-5:
             raise ValueError(f"{cid}: preliminary weights must document the equal-weight convention")
@@ -117,6 +124,9 @@ def build_rows(records, candidate_rows, profiles, as_of):
             activity_profile = profile["_activity_phase_points"]
             feeding = feeding_profile.get(phase)
             activity = activity_profile.get(phase)
+            month_override = profile["_activity_month_overrides"].get(str(parse_dt(valid_time, "valid_time").month))
+            if month_override is not None:
+                activity = month_override.get(phase)
             coverage_phase = 0.25 if solar_available else 0.0  # time phase is one of four planned feeding/activity inputs.
             indicators = {"feeding_condition": feeding, "environment_suitability": env_score, "fish_activity": activity}
             if any(value is None for value in indicators.values()):
@@ -140,7 +150,8 @@ def build_rows(records, candidate_rows, profiles, as_of):
                  "coverage": env_coverage, "excluded_unvalidated_inputs": ["sea_surface_temperature_c", "ocean_current_velocity_ms", "tide_height_m"]},
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
                  "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_urls"],
-                 "evidence_class": profile["evidence_class"], "limitation": profile["limitations"]},
+                 "evidence_class": profile["evidence_class"], "seasonal_override_month": parse_dt(valid_time, "valid_time").month if month_override is not None else None,
+                 "limitation": profile["limitations"]},
                 {"indicator_code": "composite", "weights": WEIGHTS if overall is not None else {},
                  "weight_basis": ("provisional_equal_weight_convention_not_empirically_calibrated" if overall is not None
                                   else "not_applicable_no_composite_score"),

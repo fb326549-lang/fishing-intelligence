@@ -105,6 +105,27 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         self.assertEqual(c001["model_confidence"], "low")
         self.assertIn("confirmed G. punctata", __import__("json").loads(c001["indicator_trace_json"])[0]["limitation"])
 
+    def test_rabbitfish_month_specific_diel_proxy_follows_registered_captive_observation(self):
+        expected = {7: (40.0, 70.0), 8: (70.0, 40.0), 12: (70.0, 40.0)}
+        for month, (day_score, night_score) in expected.items():
+            records, as_of = fixture_records()
+            records = [{**record,
+                        "valid_time": datetime.fromisoformat(record["valid_time"]).replace(month=month).isoformat(),
+                        "environment": {**record["environment"],
+                                        "sunrise": datetime.fromisoformat(record["environment"]["sunrise"]).replace(month=month).isoformat(),
+                                        "sunset": datetime.fromisoformat(record["environment"]["sunset"]).replace(month=month).isoformat()}}
+                       for record in records]
+            as_of = as_of.replace(month=month)
+            rows = [row for row in build_rows(records, candidate_rows(), self.profiles, as_of)
+                    if row["candidate_id"] == "c003"]
+            noon = next(row for row in rows if row["valid_time"].endswith("12:00:00+08:00"))
+            night = next(row for row in rows if row["valid_time"].endswith("23:00:00+08:00"))
+            self.assertEqual(float(noon["fish_activity_score"]), day_score)
+            self.assertEqual(float(night["fish_activity_score"]), night_score)
+            trace = json.loads(night["indicator_trace_json"])[2]
+            self.assertEqual(trace["seasonal_override_month"], month)
+            self.assertIn("L050", trace["evidence_ids"])
+
     def test_girella_diurnal_activity_summary_does_not_create_feeding_score_or_composite(self):
         records, as_of = fixture_records()
         rows = [r for r in build_rows(records, candidate_rows(), self.profiles, as_of) if r["candidate_id"] == "c001"]
