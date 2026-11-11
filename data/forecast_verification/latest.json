@@ -1,10 +1,10 @@
 {
   "archive_partition_count": 7,
-  "forecast_observation_hour_pairs": 270,
+  "forecast_observation_hour_pairs": 275,
   "forecast_valid_hours_with_vintages": 636,
-  "forecast_vintages_considered": 20364,
-  "forecast_vintages_with_any_comparable_variable": 12525,
-  "generated_at_utc": "2026-11-11T12:18:59.281369+00:00",
+  "forecast_vintages_considered": 20670,
+  "forecast_vintages_with_any_comparable_variable": 12605,
+  "generated_at_utc": "2026-11-11T12:46:21.979482+00:00",
   "limitations": [
     "Only exact same-region and same-valid-hour pairs are compared; no nearest-time substitution or interpolation.",
     "All archived forecast vintages are retained for lead-time analysis, but repeated vintages for the same region and valid hour count as one independent valid-hour unit for the exploratory sample threshold.",
@@ -14,1128 +14,1128 @@
     "Variables with fewer than the minimum number of unique region/valid-hour pairs are marked insufficient_sample; forecast-vintage pair counts are reported separately.",
     "Unique region/valid-hour pairs remove repeated forecast vintages but are not guaranteed statistically independent across neighboring regions or serially correlated hours."
   ],
-  "matched_variable_pairs": 57467,
+  "matched_variable_pairs": 57857,
   "method": "exact_region_and_valid_hour_join_latest_observation_revision_all_archived_forecast_vintages",
   "minimum_unique_region_valid_hours_for_exploratory_metrics": 5,
-  "observation_valid_hours_available": 515,
+  "observation_valid_hours_available": 520,
   "schema_version": "1.0.0",
   "status": "exploratory_metrics_available",
   "variables": {
     "current_direction_deg": {
-      "forecast_vintage_pair_count": 5097,
+      "forecast_vintage_pair_count": 5145,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 1053,
-          "mae": 108.2849,
+          "forecast_vintage_pair_count": 1071,
+          "mae": 108.3007,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 97
+          "unique_region_valid_hours": 100
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 1945,
-          "mae": 84.2129,
+          "forecast_vintage_pair_count": 1954,
+          "mae": 84.2641,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 85
+          "unique_region_valid_hours": 88
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 1092,
-          "mae": 103.033,
+          "forecast_vintage_pair_count": 1101,
+          "mae": 102.97,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 42
+          "unique_region_valid_hours": 45
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1007,
-          "mae": 106.6802,
+          "forecast_vintage_pair_count": 1019,
+          "mae": 106.5466,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 85
+          "unique_region_valid_hours": 88
         }
       },
-      "mae": 97.6569,
-      "mean_bias": 11.5721,
+      "mae": 97.6838,
+      "mean_bias": 11.1357,
       "regional": {
         "hualien_north": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 140.4191,
+              "forecast_vintage_pair_count": 519,
+              "mae": 140.3141,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 80.303,
+              "forecast_vintage_pair_count": 960,
+              "mae": 80.3271,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 116.5389,
+              "forecast_vintage_pair_count": 543,
+              "mae": 116.3812,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 123.097,
+              "forecast_vintage_pair_count": 499,
+              "mae": 122.8156,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 108.8818,
-          "mean_bias": -24.2383,
-          "rmse": 121.6561,
+          "mae": 108.8524,
+          "mean_bias": -24.7461,
+          "rmse": 121.507,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "taitung_south": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 75.2827,
+              "forecast_vintage_pair_count": 519,
+              "mae": 75.5491,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 86.7607,
+              "forecast_vintage_pair_count": 960,
+              "mae": 86.8021,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 89.137,
+              "forecast_vintage_pair_count": 543,
+              "mae": 89.1971,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 89.6364,
+              "forecast_vintage_pair_count": 499,
+              "mae": 89.7194,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 85.4906,
-          "mean_bias": 49.4778,
-          "rmse": 87.8307,
+          "mae": 85.5787,
+          "mean_bias": 48.5331,
+          "rmse": 87.9087,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "yilan_suao": {
-          "forecast_vintage_pair_count": 87,
+          "forecast_vintage_pair_count": 103,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 27,
-              "mae": 124.7778,
+              "forecast_vintage_pair_count": 33,
+              "mae": 119.9091,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 31,
-              "mae": 126.2581,
+              "forecast_vintage_pair_count": 34,
+              "mae": 123.7647,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 12,
-              "mae": 120.5833,
+              "forecast_vintage_pair_count": 15,
+              "mae": 116.0667,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 6
+              "unique_valid_hours": 7
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 17,
-              "mae": 124.9412,
+              "forecast_vintage_pair_count": 21,
+              "mae": 119.8095,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             }
           },
-          "mae": 124.7586,
-          "mean_bias": -48.7586,
-          "rmse": 128.508,
+          "mae": 120.6019,
+          "mean_bias": -25.9612,
+          "rmse": 124.2612,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 11
+          "unique_valid_hours": 12
         }
       },
       "regions_with_exploratory_metrics": 3,
-      "rmse": 106.522,
-      "sample_count": 5097,
+      "rmse": 106.4421,
+      "sample_count": 5145,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 119
+      "unique_region_valid_hours": 122
     },
     "current_speed_ms": {
-      "forecast_vintage_pair_count": 5097,
+      "forecast_vintage_pair_count": 5145,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 1053,
-          "mae": 0.2148,
+          "forecast_vintage_pair_count": 1071,
+          "mae": 0.2179,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 97
+          "unique_region_valid_hours": 100
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 1945,
-          "mae": 0.266,
+          "forecast_vintage_pair_count": 1954,
+          "mae": 0.2667,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 85
+          "unique_region_valid_hours": 88
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 1092,
-          "mae": 0.3099,
+          "forecast_vintage_pair_count": 1101,
+          "mae": 0.3107,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 42
+          "unique_region_valid_hours": 45
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1007,
-          "mae": 0.2642,
+          "forecast_vintage_pair_count": 1019,
+          "mae": 0.2659,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 85
+          "unique_region_valid_hours": 88
         }
       },
-      "mae": 0.2645,
-      "mean_bias": 0.2273,
+      "mae": 0.2658,
+      "mean_bias": 0.228,
       "regional": {
         "hualien_north": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.277,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.2784,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.4506,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.4505,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.3587,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.3591,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 0.3416,
+              "forecast_vintage_pair_count": 499,
+              "mae": 0.3423,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.3737,
-          "mean_bias": 0.3737,
-          "rmse": 0.386,
+          "mae": 0.374,
+          "mean_bias": 0.374,
+          "rmse": 0.3862,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "taitung_south": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.1451,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.1452,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.078,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.0782,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.2572,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.2566,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 0.1832,
+              "forecast_vintage_pair_count": 499,
+              "mae": 0.1829,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
           "mae": 0.1512,
-          "mean_bias": 0.076,
-          "rmse": 0.1897,
+          "mean_bias": 0.0746,
+          "rmse": 0.1895,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "yilan_suao": {
-          "forecast_vintage_pair_count": 87,
+          "forecast_vintage_pair_count": 103,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 27,
-              "mae": 0.3563,
+              "forecast_vintage_pair_count": 33,
+              "mae": 0.4115,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 31,
-              "mae": 0.3726,
+              "forecast_vintage_pair_count": 34,
+              "mae": 0.3979,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 12,
-              "mae": 0.4817,
+              "forecast_vintage_pair_count": 15,
+              "mae": 0.5173,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 6
+              "unique_valid_hours": 7
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 17,
-              "mae": 0.3659,
+              "forecast_vintage_pair_count": 21,
+              "mae": 0.4219,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 11
+              "unique_valid_hours": 12
             }
           },
-          "mae": 0.3813,
-          "mean_bias": 0.3675,
-          "rmse": 0.4275,
+          "mae": 0.4246,
+          "mean_bias": 0.4129,
+          "rmse": 0.4712,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 11
+          "unique_valid_hours": 12
         }
       },
       "regions_with_exploratory_metrics": 3,
-      "rmse": 0.3066,
-      "sample_count": 5097,
+      "rmse": 0.3084,
+      "sample_count": 5145,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 119
+      "unique_region_valid_hours": 122
     },
     "sea_surface_temperature_c": {
-      "forecast_vintage_pair_count": 7515,
+      "forecast_vintage_pair_count": 7563,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 1539,
-          "mae": 1.5534,
+          "forecast_vintage_pair_count": 1557,
+          "mae": 1.556,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 129
+          "unique_region_valid_hours": 132
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 2871,
-          "mae": 1.4675,
+          "forecast_vintage_pair_count": 2880,
+          "mae": 1.4682,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 111
+          "unique_region_valid_hours": 114
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 1620,
-          "mae": 1.4743,
+          "forecast_vintage_pair_count": 1629,
+          "mae": 1.4755,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 54
+          "unique_region_valid_hours": 57
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1485,
-          "mae": 1.584,
+          "forecast_vintage_pair_count": 1497,
+          "mae": 1.5849,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 111
+          "unique_region_valid_hours": 114
         }
       },
-      "mae": 1.5096,
-      "mean_bias": 1.5096,
+      "mae": 1.5109,
+      "mean_bias": 1.5109,
       "regional": {
         "chenggong_donghe": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.7759,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.7812,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.9619,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.9617,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.0529,
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.052,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
+              "forecast_vintage_pair_count": 499,
               "mae": 0.8968,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.9305,
-          "mean_bias": 0.9305,
-          "rmse": 0.9408,
+          "mae": 0.9311,
+          "mean_bias": 0.9311,
+          "rmse": 0.9414,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "hualien_north": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
+              "forecast_vintage_pair_count": 519,
               "mae": 0.806,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.8911,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.8908,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.8681,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.8678,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 0.878,
+              "forecast_vintage_pair_count": 499,
+              "mae": 0.8774,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.8661,
-          "mean_bias": 0.8661,
-          "rmse": 0.8684,
+          "mae": 0.8657,
+          "mean_bias": 0.8657,
+          "rmse": 0.8679,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "yilan_suao": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 3.0782,
+              "forecast_vintage_pair_count": 519,
+              "mae": 3.0809,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 2.5495,
+              "forecast_vintage_pair_count": 960,
+              "mae": 2.552,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 2.502,
+              "forecast_vintage_pair_count": 543,
+              "mae": 2.5067,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 2.9773,
+              "forecast_vintage_pair_count": 499,
+              "mae": 2.9804,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 2.7321,
-          "mean_bias": 2.7321,
-          "rmse": 2.7549,
+          "mae": 2.7359,
+          "mean_bias": 2.7359,
+          "rmse": 2.7591,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         }
       },
       "regions_with_exploratory_metrics": 3,
-      "rmse": 1.7539,
-      "sample_count": 7515,
+      "rmse": 1.7561,
+      "sample_count": 7563,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 162
+      "unique_region_valid_hours": 165
     },
     "wave_height_m": {
-      "forecast_vintage_pair_count": 10009,
+      "forecast_vintage_pair_count": 10068,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 2051,
-          "mae": 0.6776,
+          "forecast_vintage_pair_count": 2070,
+          "mae": 0.6746,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 171
+          "unique_region_valid_hours": 175
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 3825,
-          "mae": 0.6317,
+          "forecast_vintage_pair_count": 3837,
+          "mae": 0.6309,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 147
+          "unique_region_valid_hours": 151
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 2157,
-          "mae": 0.5284,
+          "forecast_vintage_pair_count": 2169,
+          "mae": 0.5275,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 71
+          "unique_region_valid_hours": 75
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1976,
-          "mae": 0.8719,
+          "forecast_vintage_pair_count": 1992,
+          "mae": 0.8677,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 147
+          "unique_region_valid_hours": 151
         }
       },
-      "mae": 0.6663,
-      "mean_bias": 0.3886,
+      "mae": 0.6644,
+      "mean_bias": 0.3864,
       "regional": {
         "chenggong_donghe": {
-          "forecast_vintage_pair_count": 2494,
+          "forecast_vintage_pair_count": 2505,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 512,
-              "mae": 0.2083,
+              "forecast_vintage_pair_count": 513,
+              "mae": 0.2086,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 42
+              "unique_valid_hours": 43
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 954,
-              "mae": 0.2164,
+              "forecast_vintage_pair_count": 957,
+              "mae": 0.217,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 36
+              "unique_valid_hours": 37
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 537,
-              "mae": 0.2895,
+              "forecast_vintage_pair_count": 540,
+              "mae": 0.2903,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 17
+              "unique_valid_hours": 18
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 491,
-              "mae": 0.8806,
+              "forecast_vintage_pair_count": 495,
+              "mae": 0.8762,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 36
+              "unique_valid_hours": 37
             }
           },
-          "mae": 0.3612,
-          "mean_bias": -0.2543,
-          "rmse": 0.5338,
+          "mae": 0.3613,
+          "mean_bias": -0.2549,
+          "rmse": 0.5333,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 53
+          "unique_valid_hours": 54
         },
         "hualien_north": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.8258,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.8202,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.4157,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.4154,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.4163,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.4165,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 0.4522,
+              "forecast_vintage_pair_count": 499,
+              "mae": 0.4513,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.507,
-          "mean_bias": 0.0104,
-          "rmse": 0.5852,
+          "mae": 0.5061,
+          "mean_bias": 0.0081,
+          "rmse": 0.584,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "taitung_south": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.8349,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.8271,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.9546,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.952,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.5966,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.5938,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 1.1954,
+              "forecast_vintage_pair_count": 499,
+              "mae": 1.1871,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.9005,
-          "mean_bias": 0.9005,
-          "rmse": 0.9557,
+          "mae": 0.8957,
+          "mean_bias": 0.8957,
+          "rmse": 0.9528,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "yilan_suao": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 0.8405,
+              "forecast_vintage_pair_count": 519,
+              "mae": 0.8372,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 0.9388,
+              "forecast_vintage_pair_count": 960,
+              "mae": 0.9378,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 0.8098,
+              "forecast_vintage_pair_count": 543,
+              "mae": 0.808,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 0.9594,
+              "forecast_vintage_pair_count": 499,
+              "mae": 0.9562,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 0.8949,
-          "mean_bias": 0.8949,
-          "rmse": 0.9077,
+          "mae": 0.8928,
+          "mean_bias": 0.8928,
+          "rmse": 0.9059,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         }
       },
       "regions_with_exploratory_metrics": 4,
-      "rmse": 0.7691,
-      "sample_count": 10009,
+      "rmse": 0.7674,
+      "sample_count": 10068,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 215
+      "unique_region_valid_hours": 219
     },
     "wave_period_s": {
-      "forecast_vintage_pair_count": 10009,
+      "forecast_vintage_pair_count": 10068,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 2051,
-          "mae": 1.6673,
+          "forecast_vintage_pair_count": 2070,
+          "mae": 1.6632,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 171
+          "unique_region_valid_hours": 175
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 3825,
-          "mae": 2.1576,
+          "forecast_vintage_pair_count": 3837,
+          "mae": 2.1547,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 147
+          "unique_region_valid_hours": 151
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 2157,
-          "mae": 1.8068,
+          "forecast_vintage_pair_count": 2169,
+          "mae": 1.8029,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 71
+          "unique_region_valid_hours": 75
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1976,
-          "mae": 1.8066,
+          "forecast_vintage_pair_count": 1992,
+          "mae": 1.803,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 147
+          "unique_region_valid_hours": 151
         }
       },
-      "mae": 1.9122,
-      "mean_bias": 1.9122,
+      "mae": 1.9083,
+      "mean_bias": 1.9083,
       "regional": {
         "chenggong_donghe": {
-          "forecast_vintage_pair_count": 2494,
-          "lead_bands": {
-            "0-6h": {
-              "forecast_vintage_pair_count": 512,
-              "mae": 1.4296,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 42
-            },
-            "12-24h": {
-              "forecast_vintage_pair_count": 954,
-              "mae": 2.201,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            },
-            "24-48h": {
-              "forecast_vintage_pair_count": 537,
-              "mae": 1.5777,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 17
-            },
-            "6-12h": {
-              "forecast_vintage_pair_count": 491,
-              "mae": 0.903,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            }
-          },
-          "mae": 1.6529,
-          "mean_bias": 1.6529,
-          "rmse": 1.7972,
-          "status": "exploratory_metrics",
-          "unique_valid_hours": 53
-        },
-        "hualien_north": {
           "forecast_vintage_pair_count": 2505,
           "lead_bands": {
             "0-6h": {
               "forecast_vintage_pair_count": 513,
-              "mae": 1.4945,
+              "mae": 1.4293,
               "status": "exploratory_metrics",
               "unique_valid_hours": 43
             },
             "12-24h": {
               "forecast_vintage_pair_count": 957,
-              "mae": 2.2857,
+              "mae": 2.1979,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
             },
             "24-48h": {
               "forecast_vintage_pair_count": 540,
-              "mae": 2.1372,
+              "mae": 1.5745,
               "status": "exploratory_metrics",
               "unique_valid_hours": 18
             },
             "6-12h": {
               "forecast_vintage_pair_count": 495,
-              "mae": 1.9602,
+              "mae": 0.9062,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
             }
           },
-          "mae": 2.0273,
-          "mean_bias": 2.0273,
-          "rmse": 2.091,
+          "mae": 1.6509,
+          "mean_bias": 1.6509,
+          "rmse": 1.795,
           "status": "exploratory_metrics",
           "unique_valid_hours": 54
+        },
+        "hualien_north": {
+          "forecast_vintage_pair_count": 2521,
+          "lead_bands": {
+            "0-6h": {
+              "forecast_vintage_pair_count": 519,
+              "mae": 1.4882,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 44
+            },
+            "12-24h": {
+              "forecast_vintage_pair_count": 960,
+              "mae": 2.2812,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            },
+            "24-48h": {
+              "forecast_vintage_pair_count": 543,
+              "mae": 2.1293,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 19
+            },
+            "6-12h": {
+              "forecast_vintage_pair_count": 499,
+              "mae": 1.9521,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            }
+          },
+          "mae": 2.0201,
+          "mean_bias": 2.0201,
+          "rmse": 2.0855,
+          "status": "exploratory_metrics",
+          "unique_valid_hours": 55
         },
         "taitung_south": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 1.5396,
+              "forecast_vintage_pair_count": 519,
+              "mae": 1.5385,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 1.8877,
+              "forecast_vintage_pair_count": 960,
+              "mae": 1.8855,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.5615,
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.5587,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 1.8902,
+              "forecast_vintage_pair_count": 499,
+              "mae": 1.8867,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 1.7466,
-          "mean_bias": 1.7466,
-          "rmse": 1.7835,
+          "mae": 1.7439,
+          "mean_bias": 1.7439,
+          "rmse": 1.7811,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "yilan_suao": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 2.2052,
+              "forecast_vintage_pair_count": 519,
+              "mae": 2.1941,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 2.2562,
+              "forecast_vintage_pair_count": 960,
+              "mae": 2.2545,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.9494,
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.9478,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 2.4658,
+              "forecast_vintage_pair_count": 499,
+              "mae": 2.46,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 2.221,
-          "mean_bias": 2.221,
-          "rmse": 2.2404,
+          "mae": 2.2167,
+          "mean_bias": 2.2167,
+          "rmse": 2.2368,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         }
       },
       "regions_with_exploratory_metrics": 4,
-      "rmse": 1.9878,
-      "sample_count": 10009,
+      "rmse": 1.9844,
+      "sample_count": 10068,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 215
+      "unique_region_valid_hours": 219
     },
     "wind_direction_deg": {
-      "forecast_vintage_pair_count": 9870,
+      "forecast_vintage_pair_count": 9934,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 2052,
-          "mae": 40.8453,
+          "forecast_vintage_pair_count": 2076,
+          "mae": 40.9755,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 172
+          "unique_region_valid_hours": 176
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 3678,
-          "mae": 63.9433,
+          "forecast_vintage_pair_count": 3690,
+          "mae": 63.9317,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 146
+          "unique_region_valid_hours": 150
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 2160,
-          "mae": 70.7134,
+          "forecast_vintage_pair_count": 2172,
+          "mae": 70.6456,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 72
+          "unique_region_valid_hours": 76
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1980,
-          "mae": 53.5346,
+          "forecast_vintage_pair_count": 1996,
+          "mae": 53.5351,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 148
+          "unique_region_valid_hours": 152
         }
       },
-      "mae": 58.5347,
-      "mean_bias": -11.6594,
+      "mae": 58.5133,
+      "mean_bias": -11.6018,
       "regional": {
         "chenggong_donghe": {
-          "forecast_vintage_pair_count": 2430,
+          "forecast_vintage_pair_count": 2446,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 34.6491,
+              "forecast_vintage_pair_count": 519,
+              "mae": 34.4798,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 882,
-              "mae": 24.0884,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            },
-            "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 23.5704,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 18
-            },
-            "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 36.5374,
+              "forecast_vintage_pair_count": 885,
+              "mae": 24.0588,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
+            },
+            "24-48h": {
+              "forecast_vintage_pair_count": 543,
+              "mae": 23.5985,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 19
+            },
+            "6-12h": {
+              "forecast_vintage_pair_count": 499,
+              "mae": 36.3026,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
             }
           },
-          "mae": 28.7387,
-          "mean_bias": 16.2399,
-          "rmse": 32.8684,
+          "mae": 28.6656,
+          "mean_bias": 16.2486,
+          "rmse": 32.7986,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 53
+          "unique_valid_hours": 54
         },
         "fengbin_shitiping": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 11.9825,
+              "forecast_vintage_pair_count": 519,
+              "mae": 12.6994,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 66.0815,
+              "forecast_vintage_pair_count": 960,
+              "mae": 66.0781,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 51.9185,
+              "forecast_vintage_pair_count": 543,
+              "mae": 51.768,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 37.8909,
+              "forecast_vintage_pair_count": 499,
+              "mae": 38.2806,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 46.3788,
-          "mean_bias": -46.1569,
-          "rmse": 54.228,
+          "mae": 46.5046,
+          "mean_bias": -46.284,
+          "rmse": 54.3436,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "hualien_north": {
-          "forecast_vintage_pair_count": 2430,
+          "forecast_vintage_pair_count": 2446,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 71.1306,
+              "forecast_vintage_pair_count": 519,
+              "mae": 71.2505,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 882,
-              "mae": 128.8328,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            },
-            "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 131.9824,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 18
-            },
-            "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 78.302,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 37
-            }
-          },
-          "mae": 107.0578,
-          "mean_bias": 29.1245,
-          "rmse": 114.1999,
-          "status": "exploratory_metrics",
-          "unique_valid_hours": 53
-        },
-        "yilan_suao": {
-          "forecast_vintage_pair_count": 2505,
-          "lead_bands": {
-            "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 45.6191,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 43
-            },
-            "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 38.7326,
+              "forecast_vintage_pair_count": 885,
+              "mae": 128.7288,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 75.3822,
+              "forecast_vintage_pair_count": 543,
+              "mae": 132.0018,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 61.4083,
+              "forecast_vintage_pair_count": 499,
+              "mae": 78.0932,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 52.5242,
-          "mean_bias": -43.7888,
-          "rmse": 61.6382,
+          "mae": 106.9295,
+          "mean_bias": 29.5059,
+          "rmse": 114.0764,
           "status": "exploratory_metrics",
           "unique_valid_hours": 54
+        },
+        "yilan_suao": {
+          "forecast_vintage_pair_count": 2521,
+          "lead_bands": {
+            "0-6h": {
+              "forecast_vintage_pair_count": 519,
+              "mae": 45.4724,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 44
+            },
+            "12-24h": {
+              "forecast_vintage_pair_count": 960,
+              "mae": 38.8082,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            },
+            "24-48h": {
+              "forecast_vintage_pair_count": 543,
+              "mae": 75.214,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 19
+            },
+            "6-12h": {
+              "forecast_vintage_pair_count": 499,
+              "mae": 61.4639,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            }
+          },
+          "mae": 52.5061,
+          "mean_bias": -43.8261,
+          "rmse": 61.8165,
+          "status": "exploratory_metrics",
+          "unique_valid_hours": 55
         }
       },
       "regions_with_exploratory_metrics": 4,
-      "rmse": 72.0238,
-      "sample_count": 9870,
+      "rmse": 72.0299,
+      "sample_count": 9934,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 214
+      "unique_region_valid_hours": 218
     },
     "wind_speed_ms": {
-      "forecast_vintage_pair_count": 9870,
+      "forecast_vintage_pair_count": 9934,
       "lead_bands": {
         "0-6h": {
-          "forecast_vintage_pair_count": 2052,
-          "mae": 5.8451,
+          "forecast_vintage_pair_count": 2076,
+          "mae": 5.7955,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 172
+          "unique_region_valid_hours": 176
         },
         "12-24h": {
-          "forecast_vintage_pair_count": 3678,
-          "mae": 2.3345,
+          "forecast_vintage_pair_count": 3690,
+          "mae": 2.3329,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 146
+          "unique_region_valid_hours": 150
         },
         "24-48h": {
-          "forecast_vintage_pair_count": 2160,
-          "mae": 1.6904,
+          "forecast_vintage_pair_count": 2172,
+          "mae": 1.6906,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 72
+          "unique_region_valid_hours": 76
         },
         "6-12h": {
-          "forecast_vintage_pair_count": 1980,
-          "mae": 5.5694,
+          "forecast_vintage_pair_count": 1996,
+          "mae": 5.541,
           "status": "exploratory_metrics",
-          "unique_region_valid_hours": 148
+          "unique_region_valid_hours": 152
         }
       },
-      "mae": 3.5723,
-      "mean_bias": -3.1869,
+      "mae": 3.5607,
+      "mean_bias": -3.1766,
       "regional": {
         "chenggong_donghe": {
-          "forecast_vintage_pair_count": 2430,
+          "forecast_vintage_pair_count": 2446,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 1.7738,
+              "forecast_vintage_pair_count": 519,
+              "mae": 1.7711,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 882,
-              "mae": 1.6423,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            },
-            "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.0672,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 18
-            },
-            "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 1.2549,
+              "forecast_vintage_pair_count": 885,
+              "mae": 1.6424,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
+            },
+            "24-48h": {
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.0689,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 19
+            },
+            "6-12h": {
+              "forecast_vintage_pair_count": 499,
+              "mae": 1.2577,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
             }
           },
-          "mae": 1.4634,
-          "mean_bias": -0.0853,
-          "rmse": 1.8371,
+          "mae": 1.4639,
+          "mean_bias": -0.0948,
+          "rmse": 1.8354,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 53
+          "unique_valid_hours": 54
         },
         "fengbin_shitiping": {
-          "forecast_vintage_pair_count": 2505,
+          "forecast_vintage_pair_count": 2521,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 7.0301,
+              "forecast_vintage_pair_count": 519,
+              "mae": 6.9777,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 3.3697,
+              "forecast_vintage_pair_count": 960,
+              "mae": 3.367,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 2.6079,
+              "forecast_vintage_pair_count": 543,
+              "mae": 2.6062,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 8.2347,
+              "forecast_vintage_pair_count": 499,
+              "mae": 8.191,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 4.9164,
-          "mean_bias": -4.9164,
-          "rmse": 5.7038,
+          "mae": 4.9013,
+          "mean_bias": -4.9013,
+          "rmse": 5.6893,
           "status": "exploratory_metrics",
-          "unique_valid_hours": 54
+          "unique_valid_hours": 55
         },
         "hualien_north": {
-          "forecast_vintage_pair_count": 2430,
+          "forecast_vintage_pair_count": 2446,
           "lead_bands": {
             "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 10.4744,
+              "forecast_vintage_pair_count": 519,
+              "mae": 10.377,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 43
+              "unique_valid_hours": 44
             },
             "12-24h": {
-              "forecast_vintage_pair_count": 882,
-              "mae": 1.9651,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 36
-            },
-            "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.4719,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 18
-            },
-            "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 9.1452,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 37
-            }
-          },
-          "mae": 5.1145,
-          "mean_bias": -4.9316,
-          "rmse": 6.975,
-          "status": "exploratory_metrics",
-          "unique_valid_hours": 53
-        },
-        "yilan_suao": {
-          "forecast_vintage_pair_count": 2505,
-          "lead_bands": {
-            "0-6h": {
-              "forecast_vintage_pair_count": 513,
-              "mae": 4.1021,
-              "status": "exploratory_metrics",
-              "unique_valid_hours": 43
-            },
-            "12-24h": {
-              "forecast_vintage_pair_count": 957,
-              "mae": 2.2777,
+              "forecast_vintage_pair_count": 885,
+              "mae": 1.9665,
               "status": "exploratory_metrics",
               "unique_valid_hours": 37
             },
             "24-48h": {
-              "forecast_vintage_pair_count": 540,
-              "mae": 1.6145,
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.477,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 18
+              "unique_valid_hours": 19
             },
             "6-12h": {
-              "forecast_vintage_pair_count": 495,
-              "mae": 3.6428,
+              "forecast_vintage_pair_count": 499,
+              "mae": 9.0916,
               "status": "exploratory_metrics",
-              "unique_valid_hours": 37
+              "unique_valid_hours": 38
             }
           },
-          "mae": 2.7781,
-          "mean_bias": -2.7738,
-          "rmse": 3.1272,
+          "mae": 5.0959,
+          "mean_bias": -4.9142,
+          "rmse": 6.9546,
           "status": "exploratory_metrics",
           "unique_valid_hours": 54
+        },
+        "yilan_suao": {
+          "forecast_vintage_pair_count": 2521,
+          "lead_bands": {
+            "0-6h": {
+              "forecast_vintage_pair_count": 519,
+              "mae": 4.0562,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 44
+            },
+            "12-24h": {
+              "forecast_vintage_pair_count": 960,
+              "mae": 2.2734,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            },
+            "24-48h": {
+              "forecast_vintage_pair_count": 543,
+              "mae": 1.6106,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 19
+            },
+            "6-12h": {
+              "forecast_vintage_pair_count": 499,
+              "mae": 3.6235,
+              "status": "exploratory_metrics",
+              "unique_valid_hours": 38
+            }
+          },
+          "mae": 2.7649,
+          "mean_bias": -2.7559,
+          "rmse": 3.1183,
+          "status": "exploratory_metrics",
+          "unique_valid_hours": 55
         }
       },
       "regions_with_exploratory_metrics": 4,
-      "rmse": 4.8526,
-      "sample_count": 9870,
+      "rmse": 4.8395,
+      "sample_count": 9934,
       "status": "exploratory_metrics",
-      "unique_region_valid_hours": 214
+      "unique_region_valid_hours": 218
     }
   },
   "variables_with_exploratory_metrics": 7
