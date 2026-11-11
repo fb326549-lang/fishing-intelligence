@@ -116,7 +116,9 @@ def build_rows(records, candidate_rows, profiles, as_of):
         env = record.get("environment") or {}
         phase, solar_available = phase_for(record)
         env_parts = [x for x in (wave_scores.get((region, valid_time)), wind_scores.get((region, valid_time))) if x is not None]
-        env_score = round(sum(env_parts) / len(env_parts), 2) if env_parts else None
+        # This preliminary composite requires both declared proxy inputs. A lone
+        # wave or wind rank is insufficient evidence for an environment score.
+        env_score = round(sum(env_parts) / 2, 2) if len(env_parts) == 2 else None
         env_coverage = len(env_parts) / 4  # wave, wind, SST and current are the planned environment inputs.
         for cid in sorted(TARGETS):
             profile, candidate = profiles[cid], candidates[cid]
