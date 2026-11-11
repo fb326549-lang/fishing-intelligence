@@ -15,18 +15,28 @@ def build_payload(rows, edna_context=None, generated_at=None, species_context=No
     horizons=sorted({r.get("horizon_hours","") for r in rows},key=int)
     if horizons!=["6","12","24"]:
         raise ValueError(f"Expected all 6/12/24-hour horizons; got {horizons}")
+    generated_at = generated_at or datetime.now(timezone.utc).isoformat()
     context = edna_context or {
-        "schema_version": 1,
-        "generated_at_utc": None,
+        "schema_version": 2,
+        "source": "No historical eDNA context published",
+        "dataset_page": "https://data.gov.tw/dataset/172487",
+        "generated_at_utc": generated_at,
         "interpretation": "No historical eDNA context has been published; this is not evidence of absence.",
         "records": [],
     }
-    if context.get("schema_version") != 1 or not isinstance(context.get("records"), list):
+    required_edna_fields = {"schema_version", "source", "dataset_page", "generated_at_utc", "interpretation", "records"}
+    if context.get("schema_version") != 2 or not required_edna_fields.issubset(context) or not isinstance(context.get("records"), list):
         raise ValueError("eDNA occurrence context schema is invalid")
     for row in context["records"]:
         if row.get("model_use_status") != "context_only_edna_occurrence":
             raise ValueError("eDNA context cannot be promoted to an activity-scoring record")
-        for field in ("exact_positive_detection_record_count","ambiguous_positive_detection_record_count"):
+        for field in ("candidate_id", "region_id", "exact_positive_detection_record_count", "ambiguous_positive_detection_record_count",
+                      "exact_sample_month_count", "exact_distinct_station_count", "first_sampled_month", "last_sampled_month",
+                      "depth_field_semantics", "dataset_ids", "ambiguous_taxon_labels"):
+            if field not in row:
+                raise ValueError(f"eDNA context record is missing schema field: {field}")
+        for field in ("exact_positive_detection_record_count", "ambiguous_positive_detection_record_count",
+                      "exact_sample_month_count", "exact_distinct_station_count"):
             if not isinstance(row.get(field), int) or row[field] < 0:
                 raise ValueError(f"invalid eDNA context count: {field}")
     ecology = species_context or {
@@ -44,7 +54,7 @@ def build_payload(rows, edna_context=None, generated_at=None, species_context=No
     return {
         "schema_version":1,
         "source":"fishing-intelligence-p2.6",
-        "generated_at":generated_at or datetime.now(timezone.utc).isoformat(),
+        "generated_at":generated_at,
         "as_of":next(iter(as_ofs)),
         "regions":regions,
         "horizons_hours":[6,12,24],
