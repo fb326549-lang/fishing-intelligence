@@ -41,6 +41,15 @@ class SpeciesResponseModelSpecTests(unittest.TestCase):
                 self.assertTrue(expected_ids.issubset(cited_ids))
                 self.assertTrue(cited_ids.issubset(registered_ids))
 
+    def test_local_rabbitfish_macroalgae_context_does_not_promote_scoring_eligibility(self):
+        with (SPECIES_DIR / "species_response_literature_register.csv").open(
+            encoding="utf-8-sig", newline=""
+        ) as source_file:
+            record = next(row for row in csv.DictReader(source_file) if row["literature_record_id"] == "L058")
+        self.assertEqual(record["candidate_id"], "c003")
+        self.assertEqual(record["model_use_status"], "context_only_local_habitat_not_species_response")
+        self.assertIn("不可作六區即時餌源量", record["limitations"])
+
 
 if __name__ == "__main__":
     unittest.main()
