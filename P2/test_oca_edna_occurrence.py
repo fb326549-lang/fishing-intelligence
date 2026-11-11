@@ -16,6 +16,20 @@ from fetch_oca_edna_occurrence import (
 ROOT = Path(__file__).parent
 
 class OcaEdnaOccurrenceTests(unittest.TestCase):
+    def test_depth_semantics_are_explicit_in_both_schemas(self):
+        record_schema = json.loads((ROOT / "schema" / "edna_occurrence_context.schema.json").read_text(encoding="utf-8"))
+        context_schema = json.loads((ROOT / "schema" / "edna_candidate_region_context.schema.json").read_text(encoding="utf-8"))
+        semantics = "source_label_unresolved_station_or_sampling_depth"
+        self.assertIn("source_reported_depth_m", record_schema["required"])
+        self.assertIn("depth_field_semantics", record_schema["required"])
+        self.assertNotIn("depth_m", record_schema["required"])
+        self.assertEqual(record_schema["properties"]["depth_field_semantics"]["const"], semantics)
+        self.assertEqual(context_schema["properties"]["schema_version"]["const"], 2)
+        context_properties = context_schema["properties"]["records"]["items"]["properties"]
+        self.assertIn("min_source_reported_depth_m", context_properties)
+        self.assertIn("max_source_reported_depth_m", context_properties)
+        self.assertEqual(context_properties["depth_field_semantics"]["const"], semantics)
+
     def test_csv_field_aliases_and_roc_date_are_normalized(self):
         row = {
             "站點名稱": "成功外海站",
@@ -32,6 +46,7 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
         normalized = normalize_fields(row)
         self.assertEqual(normalized["scientific_name"], "Abudefduf vaigiensis")
         self.assertEqual(normalized["station_name"], "成功外海站")
+        self.assertEqual(normalized["source_reported_depth_m"], "15")
         self.assertEqual(parse_year_month(normalized["sampled_at"]), "2023-03")
 
     def test_parser_supports_csv_json_and_zip_payloads(self):
@@ -73,20 +88,26 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
         self.assertEqual(far["region_id"], "")
         self.assertEqual(far["region_mapping_status"], "outside_six_region_reference_radius")
         self.assertEqual(near["model_use_status"], "context_only_edna_occurrence")
+        self.assertEqual(near["source_reported_depth_m"], 15)
+        self.assertEqual(near["depth_field_semantics"], "source_label_unresolved_station_or_sampling_depth")
+        self.assertIn("without assuming station bathymetry or DNA sampling depth", near["limitations"])
+        self.assertNotIn("depth_m", near)
         self.assertNotIn("fish_count", near)
         self.assertNotIn("activity_score", near)
         self.assertNotIn("catch_probability", near)
 
     def test_monthly_summary_counts_positive_records_not_fish_abundance(self):
         rows = [
-            {"candidate_id": "c027", "scientific_name": "Abudefduf vaigiensis", "region_id": "chenggong_donghe", "year_month": "2023-03", "station_name": "A", "depth_m": 10, "dataset_id": "d1"},
-            {"candidate_id": "c027", "scientific_name": "Abudefduf vaigiensis", "region_id": "chenggong_donghe", "year_month": "2023-03", "station_name": "B", "depth_m": 20, "dataset_id": "d2"},
+            {"candidate_id": "c027", "scientific_name": "Abudefduf vaigiensis", "region_id": "chenggong_donghe", "year_month": "2023-03", "station_name": "A", "source_reported_depth_m": 10, "dataset_id": "d1"},
+            {"candidate_id": "c027", "scientific_name": "Abudefduf vaigiensis", "region_id": "chenggong_donghe", "year_month": "2023-03", "station_name": "B", "source_reported_depth_m": 20, "dataset_id": "d2"},
         ]
         summary = build_monthly_summary(rows)[0]
         self.assertEqual(summary["positive_detection_record_count"], 2)
         self.assertEqual(summary["distinct_station_count"], 2)
-        self.assertEqual(summary["min_sample_depth_m"], 10)
-        self.assertEqual(summary["max_sample_depth_m"], 20)
+        self.assertEqual(summary["min_source_reported_depth_m"], 10)
+        self.assertEqual(summary["max_source_reported_depth_m"], 20)
+        self.assertEqual(summary["depth_field_semantics"], "source_label_unresolved_station_or_sampling_depth")
+        self.assertIn("not interpreted as DNA sampling depth", summary["interpretation_limit"])
         self.assertEqual(summary["model_use_status"], "context_only_edna_occurrence")
         self.assertNotIn("abundance", summary)
         self.assertNotIn("catch_rate", summary)
@@ -94,10 +115,10 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
     def test_region_context_separates_exact_and_ambiguous_positive_detections(self):
         rows = [
             {"candidate_id":"c027","possible_candidate_ids":"","region_id":"chenggong_donghe",
-             "year_month":"2023-03","station_name":"A","depth_m":5,"dataset_id":"d1",
+             "year_month":"2023-03","station_name":"A","source_reported_depth_m":5,"dataset_id":"d1",
              "scientific_name":"Abudefduf vaigiensis"},
             {"candidate_id":"","possible_candidate_ids":"c027","region_id":"chenggong_donghe",
-             "year_month":"2023-03","station_name":"B","depth_m":8,"dataset_id":"d2",
+             "year_month":"2023-03","station_name":"B","source_reported_depth_m":8,"dataset_id":"d2",
              "scientific_name":"Abudefduf sexfasciatus/vaigiensis"},
         ]
         context=build_candidate_region_context(rows)
@@ -123,7 +144,7 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
             detections[0].update({
                 "candidate_id": "c027", "scientific_name": "Abudefduf vaigiensis",
                 "region_id": "chenggong_donghe", "year_month": "2023-03",
-                "station_name": "A", "depth_m": None,
+                "station_name": "A", "source_reported_depth_m": None,
             })
             summary = build_monthly_summary(detections)
             context = build_candidate_region_context(detections)
@@ -132,12 +153,35 @@ class OcaEdnaOccurrenceTests(unittest.TestCase):
             self.assertEqual(manifest, disk_manifest)
             self.assertEqual(manifest["exact_candidate_record_count"], 1)
             self.assertEqual(manifest["ambiguous_taxon_record_count"], 0)
+            self.assertEqual(manifest["schema_version"], 2)
             self.assertIn("do not measure fish abundance", manifest["interpretation"])
+            self.assertIn("depth(m) field is unresolved", manifest["interpretation"])
             self.assertIn("hualien_south", manifest["regional_reference_coverage"]["regions_without_active_reference_stations"])
             self.assertIn("hualien_south", json.loads((Path(tmp) / "edna_candidate_region_context.json").read_text(encoding="utf-8"))["regional_reference_coverage"]["regions_without_active_reference_stations"])
             self.assertTrue((Path(tmp) / "edna_occurrence_context.jsonl").exists())
             self.assertTrue((Path(tmp) / "edna_species_monthly_summary.csv").exists())
             self.assertTrue((Path(tmp) / "edna_candidate_region_context.json").exists())
+            context_payload = json.loads((Path(tmp) / "edna_candidate_region_context.json").read_text(encoding="utf-8"))
+            self.assertEqual(context_payload["schema_version"], 2)
+            self.assertEqual(context_payload["records"][0]["depth_field_semantics"], "source_label_unresolved_station_or_sampling_depth")
+
+    def test_source_reported_depth_does_not_assume_sampling_or_habitat_depth(self):
+        row = {
+            "站點名稱": "外海站", "緯度(北緯)": "23.0", "經度(東經)": "121.5",
+            "深度(m)": "1968", "採樣時間": "2023/8/27",
+            "學名(Science Name)": "Girella punctata",
+        }
+        stations = load_region_stations(ROOT.parent / "P1" / "stations" / "east_region_station_mapping.csv")
+        detection = collect(
+            [("test_dataset", "test", "https://example.org/data", [row])],
+            stations,
+            {"girella punctata": "c001"},
+            "2026-11-11T00:00:00+00:00",
+        )[0]
+        self.assertEqual(detection["source_reported_depth_m"], 1968)
+        self.assertEqual(detection["depth_field_semantics"], "source_label_unresolved_station_or_sampling_depth")
+        self.assertNotIn("sample_depth_m", detection)
+        self.assertNotIn("habitat_depth_m", detection)
 
 if __name__ == "__main__":
     unittest.main()

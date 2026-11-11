@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "required": ["schema_version", "source", "dataset_page", "generated_at_utc", "interpretation", "records"],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {"const": 2},
     "source": {"type": "string"},
     "dataset_page": {"type": "string", "format": "uri"},
     "generated_at_utc": {"type": "string", "format": "date-time"},
@@ -20,7 +20,7 @@
           "candidate_id", "region_id", "exact_positive_detection_record_count",
           "ambiguous_positive_detection_record_count", "exact_sample_month_count",
           "exact_distinct_station_count", "first_sampled_month", "last_sampled_month",
-          "min_sample_depth_m", "max_sample_depth_m", "dataset_ids",
+          "min_source_reported_depth_m", "max_source_reported_depth_m", "depth_field_semantics", "dataset_ids",
           "ambiguous_taxon_labels", "model_use_status"
         ],
         "properties": {
@@ -32,8 +32,9 @@
           "exact_distinct_station_count": {"type": "integer", "minimum": 0},
           "first_sampled_month": {"type": "string"},
           "last_sampled_month": {"type": "string"},
-          "min_sample_depth_m": {"type": ["number", "null"]},
-          "max_sample_depth_m": {"type": ["number", "null"]},
+          "min_source_reported_depth_m": {"type": ["number", "null"], "description": "Range of un-interpreted source field 深度(m); do not interpret as DNA sample depth or fish habitat depth."},
+          "max_source_reported_depth_m": {"type": ["number", "null"], "description": "Range of un-interpreted source field 深度(m); do not interpret as DNA sample depth or fish habitat depth."},
+          "depth_field_semantics": {"const": "source_label_unresolved_station_or_sampling_depth"},
           "dataset_ids": {"type": "array", "items": {"type": "string"}},
           "ambiguous_taxon_labels": {"type": "array", "items": {"type": "string"}},
           "model_use_status": {"const": "context_only_edna_occurrence"}
