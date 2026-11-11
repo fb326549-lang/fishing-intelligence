@@ -30,9 +30,9 @@ def load_profiles(path: Path):
             raise ValueError(f"unexpected or duplicate preliminary profile: {cid}")
         for key in ("feeding_phase_points", "activity_phase_points"):
             profile = json.loads(row[key])
-            if set(profile) != set(PHASES) or any(not 0 <= float(v) <= 100 for v in profile.values()):
-                raise ValueError(f"{cid}: {key} must define dawn/day/dusk/night points in 0..100")
-            row["_" + key] = {k: float(v) for k, v in profile.items()}
+            if set(profile) != set(PHASES) or any(v is not None and not 0 <= float(v) <= 100 for v in profile.values()):
+                raise ValueError(f"{cid}: {key} must define dawn/day/dusk/night points in 0..100 or null when unsupported")
+            row["_" + key] = {k: None if v is None else float(v) for k, v in profile.items()}
         weight = float(row["weight_each"])
         if abs(weight - 1 / 3) > 1e-5:
             raise ValueError(f"{cid}: preliminary weights must document the equal-weight convention")
@@ -121,7 +121,8 @@ def build_rows(records, candidate_rows, profiles, as_of):
             indicators = {"feeding_condition": feeding, "environment_suitability": env_score, "fish_activity": activity}
             if any(value is None for value in indicators.values()):
                 overall = None
-                status = "preliminary_incomplete_solar_or_environment_input"
+                status = ("insufficient_species_specific_evidence" if solar_available and feeding is None and activity is None
+                          else "preliminary_incomplete_solar_or_environment_input")
             else:
                 overall = round(sum(float(indicators[k]) * WEIGHTS[k] for k in WEIGHTS), 2)
                 status = "preliminary_scored"
@@ -145,12 +146,12 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 "scientific_name": candidate.get("scientific_name", profile["scientific_name"]),
                 "region_id": region, "valid_time": valid_time, "data_type": "forecast",
                 "model_status": status,
-                "feeding_condition_score": "" if feeding is None else f"{feeding:.2f}", "feeding_condition_status": "preliminary_proxy_low_confidence" if feeding is not None else "missing_sunrise_sunset",
+                "feeding_condition_score": "" if feeding is None else f"{feeding:.2f}", "feeding_condition_status": "preliminary_proxy_low_confidence" if feeding is not None else ("insufficient_species_specific_evidence" if solar_available else "missing_sunrise_sunset"),
                 "feeding_condition_coverage": f"{coverage_phase:.4f}",
                 "environment_suitability_score": "" if env_score is None else f"{env_score:.2f}",
                 "environment_suitability_status": "preliminary_relative_sea_state_proxy" if env_score is not None else "missing_environment_inputs",
                 "environment_suitability_coverage": f"{env_coverage:.4f}",
-                "fish_activity_score": "" if activity is None else f"{activity:.2f}", "fish_activity_status": "preliminary_diel_evidence_proxy_low_confidence" if activity is not None else "missing_sunrise_sunset",
+                "fish_activity_score": "" if activity is None else f"{activity:.2f}", "fish_activity_status": "preliminary_diel_evidence_proxy_low_confidence" if activity is not None else ("insufficient_species_specific_evidence" if solar_available else "missing_sunrise_sunset"),
                 "fish_activity_coverage": f"{coverage_phase:.4f}",
                 "overall_fish_condition_index": "" if overall is None else f"{overall:.2f}",
                 "species_weights_json": json.dumps(WEIGHTS, separators=(",", ":")),
