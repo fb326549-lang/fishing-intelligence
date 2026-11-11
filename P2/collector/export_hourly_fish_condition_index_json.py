@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Export the evidence-gated hourly fish-condition index for the PWA."""
+"""Export the explicitly preliminary hourly relative fish index for the PWA."""
 from __future__ import annotations
 import argparse, csv, json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 REGIONS = [
     "yilan_suao", "hualien_north", "hualien_south",
@@ -42,6 +41,8 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
         valid = datetime.fromisoformat(row["valid_time"].replace("Z", "+00:00"))
         if not as_of_dt <= valid < as_of_dt + timedelta(hours=24):
             continue
+        if row.get("model_version") != "preliminary-relative-1.0" or row.get("model_confidence") != "low":
+            raise ValueError("FCI export requires preliminary-relative-1.0 rows marked low confidence")
         normalized.append({
             "candidate_id": row.get("candidate_id", ""),
             "common_name_zh": row.get("common_name_zh", ""),
@@ -50,6 +51,8 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
             "valid_time": row.get("valid_time", ""),
             "data_type": "forecast",
             "model_status": row.get("model_status", ""),
+            "model_confidence": row.get("model_confidence", "low"),
+            "model_version": row.get("model_version", "preliminary-relative-1.0"),
             "feeding_condition_score": number(row.get("feeding_condition_score")),
             "feeding_condition_status": row.get("feeding_condition_status", "insufficient_evidence"),
             "feeding_condition_coverage": number(row.get("feeding_condition_coverage")),
@@ -68,17 +71,17 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
             "best_hour_status_24h": row.get("best_hour_status_24h", "not_established"),
             "best_hour_rank_24h": integer(row.get("best_hour_rank_24h")),
             "indicator_trace": json_value(row.get("indicator_trace_json", ""), []),
-            "interpretation": "species_specific_relative_fish_condition_index_not_catch_probability",
+            "interpretation": "preliminary_species_relative_fish_condition_index_not_catch_probability",
         })
     output = {
         "schema_version": 1,
-        "source": "fishing-intelligence-fci-1.0",
-        "generated_at": datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
+        "source": "fishing-intelligence-fci-preliminary-1.0",
+        "generated_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),
         "as_of": as_of_dt.isoformat(),
         "regions": REGIONS,
         "horizons_hours": [6, 12, 24],
         "rows": normalized,
-        "model_note": "No score or best hour is emitted unless all three indicators and species-specific validated weights are approved.",
+        "model_note": "Preliminary low-confidence relative index. It combines qualitative diel evidence, within-region relative wave/wind ranks and equal interim indicator weights; it is not validated against East Taiwan catch data and is not a catch probability. Missing prey, habitat-specific response, current and tide effects are not inferred.",
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(output, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")

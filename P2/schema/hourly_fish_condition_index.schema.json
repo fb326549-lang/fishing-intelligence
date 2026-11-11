@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Hourly Fish Condition Index",
+  "title": "Preliminary Hourly Relative Fish Condition Index",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,7 +18,7 @@
       "const": 1
     },
     "source": {
-      "const": "fishing-intelligence-fci-1.0"
+      "const": "fishing-intelligence-fci-preliminary-1.0"
     },
     "generated_at": {
       "type": "string",
@@ -67,6 +67,8 @@
           "valid_time",
           "data_type",
           "model_status",
+          "model_confidence",
+          "model_version",
           "feeding_condition_score",
           "feeding_condition_status",
           "feeding_condition_coverage",
@@ -117,6 +119,13 @@
           },
           "model_status": {
             "type": "string"
+          },
+          "model_confidence": {
+            "type": "string",
+            "enum": ["low"]
+          },
+          "model_version": {
+            "const": "preliminary-relative-1.0"
           },
           "feeding_condition_score": {
             "type": [
@@ -228,7 +237,7 @@
             }
           },
           "interpretation": {
-            "const": "species_specific_relative_fish_condition_index_not_catch_probability"
+            "const": "preliminary_species_relative_fish_condition_index_not_catch_probability"
           }
         }
       }

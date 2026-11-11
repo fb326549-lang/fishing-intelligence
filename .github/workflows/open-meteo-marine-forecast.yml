@@ -90,7 +90,8 @@ jobs:
           python P2/species/environment_match_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/environment_response_rules_template.csv --out "$latest_dir/environment_match.csv"
           python P2/species/integrate_environment_and_activity.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --environment-match-csv "$latest_dir/environment_match.csv" --activity-csv P2/species/species_activity_evidence_register.csv --seasonal-csv P2/species/species_seasonal_activity_register.csv --out "$latest_dir/integrated_hourly_fish_assessment.csv"
           as_of=$(python -c 'from datetime import datetime,timedelta; from zoneinfo import ZoneInfo; n=datetime.now(ZoneInfo("Asia/Taipei")); h=n.replace(minute=0,second=0,microsecond=0); print((h+timedelta(hours=1) if n!=h else h).isoformat())')
-          python P2/species/indicator_score_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/indicator_scoring_rules_template.csv --weights-csv P2/species/species_indicator_weights_template.csv --as-of "$as_of" --out "$latest_dir/hourly_fish_condition_index.csv"
+          python P2/species/indicator_score_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --rules-csv P2/species/indicator_scoring_rules_template.csv --weights-csv P2/species/species_indicator_weights_template.csv --as-of "$as_of" --out "$latest_dir/hourly_fish_condition_index_validated.csv"
+          python P2/species/preliminary_relative_score_engine.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --profiles-csv P2/species/preliminary_relative_score_profiles.csv --as-of "$as_of" --out "$latest_dir/hourly_fish_condition_index.csv"
           python P2/collector/export_hourly_fish_condition_index_json.py --input "$latest_dir/hourly_fish_condition_index.csv" --as-of "$as_of" --out p2-history-data/data/latest_hourly_fish_condition_index.json
           python P2/species/build_hourly_fish_outlook.py --environment-jsonl "$latest_dir/hourly_environment_p2.jsonl" --candidates-csv P2/species/species_response_evidence_gaps.csv --integrated-csv "$latest_dir/integrated_hourly_fish_assessment.csv" --as-of "$as_of" --out "$latest_dir/hourly_fish_outlook.csv"
           edna_args=()
@@ -168,14 +169,28 @@ jobs:
           from pathlib import Path
           data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           schema=json.loads(Path("P2/schema/hourly_fish_condition_index.schema.json").read_text(encoding="utf-8"))
-          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-fci-1.0"
+          assert data.get("schema_version")==1 and data.get("source")=="fishing-intelligence-fci-preliminary-1.0"
           assert len(data.get("regions",[]))==6 and data.get("horizons_hours")==[6,12,24]
           assert isinstance(data.get("rows"),list)
+          top_required=set(schema["required"])
+          assert top_required<=set(data), f"FCI missing top-level fields: {sorted(top_required-set(data))}"
+          assert set(data)<=set(schema["properties"]), f"FCI has undeclared top-level fields: {sorted(set(data)-set(schema['properties']))}"
+          assert {row.get("candidate_id") for row in data["rows"]}=={"c036","c003","c004","c001"}
+          assert {row.get("region_id") for row in data["rows"]}==set(data["regions"])
           assert all(row.get("data_type")=="forecast" for row in data["rows"])
-          assert all(row.get("interpretation")=="species_specific_relative_fish_condition_index_not_catch_probability" for row in data["rows"])
+          assert all(row.get("interpretation")=="preliminary_species_relative_fish_condition_index_not_catch_probability" for row in data["rows"])
+          row_schema=schema["properties"]["rows"]["items"]
+          row_required=set(row_schema["required"])
+          row_properties=set(row_schema["properties"])
+          for i,row in enumerate(data["rows"]):
+              assert row_required<=set(row), f"FCI row {i} missing: {sorted(row_required-set(row))}"
+              assert set(row)<=row_properties, f"FCI row {i} has undeclared fields: {sorted(set(row)-row_properties)}"
+              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.0"
           scored=[row for row in data["rows"] if row.get("overall_fish_condition_index") is not None]
+          assert scored, "preliminary scoring must produce rows when environment forecast is available"
           for row in scored:
-              assert row.get("model_status")=="scored"
+              assert row.get("model_status")=="preliminary_scored"
+              assert row.get("model_confidence")=="low" and row.get("model_version")=="preliminary-relative-1.0"
               assert all(row.get(key) is not None for key in ("feeding_condition_score","environment_suitability_score","fish_activity_score"))
               weights=row.get("species_weights") or {}
               assert set(weights)=={"feeding_condition","environment_suitability","fish_activity"}
@@ -185,7 +200,9 @@ jobs:
                   assert row.get("best_hour_status_6h") not in {"best_hour","ranked_hour"}
                   assert row.get("best_hour_status_12h") not in {"best_hour","ranked_hour"}
                   assert row.get("best_hour_status_24h") not in {"best_hour","ranked_hour"}
-          print({"status":"passed","rows":len(data["rows"]),"scored_rows":len(scored),"scores_withheld":not bool(scored)})
+          assert all(r.get("catch_probability") is None for r in data["rows"])
+          assert "low-confidence" in data.get("model_note","")
+          print({"status":"passed","rows":len(data["rows"]),"scored_rows":len(scored),"low_confidence":True,"catch_probability_emitted":False})
           PY
           cp "$fci_payload" "$latest_dir/latest_hourly_fish_condition_index.json"
 
