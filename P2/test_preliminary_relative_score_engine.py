@@ -156,7 +156,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             mobile_json = root / "latest.json"
             export_index(scored_csv, mobile_json, as_of.isoformat())
             payload = json.loads(mobile_json.read_text(encoding="utf-8"))
-            self.assertEqual(payload["source"], "fishing-intelligence-fci-preliminary-1.0")
+            self.assertEqual(payload["source"], "fishing-intelligence-fci-preliminary-1.1")
             self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS)
             self.assertEqual(len(payload["rows"]), 24 * 4)
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))

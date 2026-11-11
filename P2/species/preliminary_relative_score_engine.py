@@ -19,7 +19,7 @@ from indicator_score_engine import parse_dt, read_csv, select_latest_forecast_vi
 TARGETS = {"c036", "c003", "c004", "c001"}
 PHASES = ("dawn", "day", "dusk", "night")
 WEIGHTS = {"feeding_condition": 1 / 3, "environment_suitability": 1 / 3, "fish_activity": 1 / 3}
-MODEL_VERSION = "preliminary-relative-1.0"
+MODEL_VERSION = "preliminary-relative-1.1"
 
 
 def load_profiles(path: Path):
