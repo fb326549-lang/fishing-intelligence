@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),37)
+        self.assertEqual(len(rows),38)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -124,6 +124,19 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertIn("45.6%",later["reported_pattern"])
         self.assertEqual(later["model_use_status"],"context_only_captive_activity")
         self.assertTrue(all("台灣東部" in r["limitations"] for r in (early,later)))
+
+    def test_black_seabream_telemetry_is_external_spawning_activity_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        evidence=next(r for r in rows if r["activity_evidence_id"]=="AE038")
+        self.assertEqual(evidence["candidate_id"],"c004")
+        self.assertEqual(evidence["source_literature_id"],"L056")
+        self.assertEqual(evidence["activity_dimension"],"movement_activity")
+        self.assertEqual(evidence["evidence_kind"],"telemetry_proxy")
+        self.assertEqual(evidence["model_use_status"],"context_only_external_region")
+        self.assertIn("雄魚",evidence["reported_pattern"])
+        self.assertIn("台灣東部",evidence["limitations"])
+        self.assertIn("不能代表索餌或咬餌",evidence["limitations"])
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
