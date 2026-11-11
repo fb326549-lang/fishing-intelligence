@@ -15,13 +15,24 @@ class ExportHourlyFishOutlookTests(unittest.TestCase):
 
     def test_historical_edna_context_is_embedded_but_not_used_as_activity_score(self):
         context = {
-            "schema_version":1,
+            "schema_version":2,
+            "source":"OCA Taiwan fish eDNA survey",
+            "dataset_page":"https://data.gov.tw/dataset/example",
             "generated_at_utc":"2026-11-09T12:00:00+00:00",
             "interpretation":"Historical positive eDNA occurrence context only.",
             "records":[{
                 "candidate_id":"c027","region_id":"chenggong_donghe",
                 "exact_positive_detection_record_count":0,
                 "ambiguous_positive_detection_record_count":4,
+                "exact_sample_month_count":0,
+                "exact_distinct_station_count":0,
+                "first_sampled_month":"",
+                "last_sampled_month":"",
+                "min_source_reported_depth_m":None,
+                "max_source_reported_depth_m":None,
+                "depth_field_semantics":"source_label_unresolved_station_or_sampling_depth",
+                "dataset_ids":["oca_example"],
+                "ambiguous_taxon_labels":["Siganus canaliculatus/fuscescens"],
                 "model_use_status":"context_only_edna_occurrence",
             }],
         }
@@ -39,15 +50,33 @@ class ExportHourlyFishOutlookTests(unittest.TestCase):
 
     def test_context_cannot_be_promoted_to_activity_evidence(self):
         context={
-            "schema_version":1,
+            "schema_version":2,
+            "source":"OCA Taiwan fish eDNA survey",
+            "dataset_page":"https://data.gov.tw/dataset/example",
+            "generated_at_utc":"2026-11-09T12:00:00+00:00",
+            "interpretation":"Historical positive eDNA occurrence context only.",
             "records":[{
                 "candidate_id":"c027","region_id":"chenggong_donghe",
                 "exact_positive_detection_record_count":1,
                 "ambiguous_positive_detection_record_count":0,
+                "exact_sample_month_count":1,
+                "exact_distinct_station_count":1,
+                "first_sampled_month":"2026-01",
+                "last_sampled_month":"2026-01",
+                "min_source_reported_depth_m":None,
+                "max_source_reported_depth_m":None,
+                "depth_field_semantics":"source_label_unresolved_station_or_sampling_depth",
+                "dataset_ids":["oca_example"],
+                "ambiguous_taxon_labels":[],
                 "model_use_status":"eligible_for_activity_scoring",
             }],
         }
         with self.assertRaisesRegex(ValueError,"cannot be promoted"):
+            build_payload(self.rows,context)
+
+    def test_rejects_legacy_edna_context_schema(self):
+        context={"schema_version":1,"records":[]}
+        with self.assertRaisesRegex(ValueError,"schema is invalid"):
             build_payload(self.rows,context)
 
     def test_species_ecology_context_is_embedded_with_provenance(self):

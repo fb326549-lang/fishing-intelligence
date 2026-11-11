@@ -41,8 +41,8 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
         valid = datetime.fromisoformat(row["valid_time"].replace("Z", "+00:00"))
         if not as_of_dt <= valid < as_of_dt + timedelta(hours=24):
             continue
-        if row.get("model_version") != "preliminary-relative-1.0" or row.get("model_confidence") != "low":
-            raise ValueError("FCI export requires preliminary-relative-1.0 rows marked low confidence")
+        if row.get("model_version") != "preliminary-relative-1.1" or row.get("model_confidence") != "low":
+            raise ValueError("FCI export requires preliminary-relative-1.1 rows marked low confidence")
         normalized.append({
             "candidate_id": row.get("candidate_id", ""),
             "common_name_zh": row.get("common_name_zh", ""),
@@ -52,7 +52,7 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
             "data_type": "forecast",
             "model_status": row.get("model_status", ""),
             "model_confidence": row.get("model_confidence", "low"),
-            "model_version": row.get("model_version", "preliminary-relative-1.0"),
+            "model_version": row.get("model_version", "preliminary-relative-1.1"),
             "feeding_condition_score": number(row.get("feeding_condition_score")),
             "feeding_condition_status": row.get("feeding_condition_status", "insufficient_evidence"),
             "feeding_condition_coverage": number(row.get("feeding_condition_coverage")),
@@ -75,7 +75,7 @@ def export_index(input_path: Path, output_path: Path, as_of: str):
         })
     output = {
         "schema_version": 1,
-        "source": "fishing-intelligence-fci-preliminary-1.0",
+        "source": "fishing-intelligence-fci-preliminary-1.1",
         "generated_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),
         "as_of": as_of_dt.isoformat(),
         "regions": REGIONS,

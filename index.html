@@ -744,7 +744,7 @@ function renderRadarDashboard(){
  const hasScore=typeof scoreValue==='number'&&Number.isFinite(scoreValue);
  const indicatorText=(value,status)=>{
   if(typeof value==='number'&&Number.isFinite(value))return Math.round(value)+'/100';
-  const labels={insufficient_evidence:'缺少東部直接證據',incomplete_input:'環境資料缺值',taxon_or_distribution_gate:'物種資格未通過',preliminary_proxy_low_confidence:'初版時段代理',preliminary_relative_sea_state_proxy:'海況相對排序',preliminary_diel_evidence_proxy_low_confidence:'初版活動代理'};
+  const labels={insufficient_evidence:'缺少東部直接證據',insufficient_species_specific_evidence:'缺少東部逐時物種依據',incomplete_input:'環境資料缺值',taxon_or_distribution_gate:'物種資格未通過',preliminary_proxy_low_confidence:'初版時段代理',preliminary_relative_sea_state_proxy:'海況相對排序',preliminary_diel_evidence_proxy_low_confidence:'初版活動代理'};
   return labels[status]||'尚未建立';
  };
  $('radarIndex').textContent=hasScore?Math.round(scoreValue):'—';
@@ -759,7 +759,8 @@ function renderRadarDashboard(){
   one_or_more_indicators_unavailable:'覓食條件、環境適合度、魚類活動力至少一項缺少合格的台灣東部直接證據或必要輸入。',
   species_weights_not_validated:'三項指標已有分數，但此魚種專屬權重尚未通過台灣東部努力量驗證。',
   preliminary_scored:'低信心初版相對指數：時段研究多來自外地或控制試驗；海況按本區預報作相對排序，三指標暫採等權。未經東部魚獲資料驗證，不是中魚機率。',
-  preliminary_incomplete_environment_input:'初版指數所需的浪況或風速預報缺值。'
+  preliminary_incomplete_environment_input:'初版指數所需的浪況或風速預報缺值。',
+  insufficient_species_specific_evidence:'已有食性與棲地研究，但目前沒有足以支持黑鯛東部逐時覓食／活動計分的證據，因此不填中性分數。'
  };
  $('radarScoreNote').textContent=display?(modelNotes[display.model_status]||'模型狀態：'+display.model_status+'。'):'尚未取得本區、本魚種逐時魚情指數資料。';
  if(hasScore)$('radarScoreNote').textContent='低信心初版分數，對應'+(bestHorizon?('未來'+bestHorizon+'小時內的相對排序最佳小時'):'該預報小時')+'。食物可利用量及現場魚群未納入；不是中魚機率。';

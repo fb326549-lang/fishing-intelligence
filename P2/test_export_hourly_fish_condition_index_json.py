@@ -23,15 +23,15 @@ class ExportHourlyFishConditionIndexTests(unittest.TestCase):
             ]
             rows=[
                 ["c036","南方舵魚","Kyphosus bigibbus","taitung_south","2026-11-10T10:00:00+08:00","forecast",
-                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.0","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
+                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.1","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
                  "","insufficient_evidence","0.0000","","{}","not_established","","not_established","","not_established","","[]",
                  "preliminary_species_relative_fish_condition_index_not_catch_probability"],
                 ["c036","南方舵魚","Kyphosus bigibbus","taitung_south","2026-11-10T10:00:00+08:00","observation",
-                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.0","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
+                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.1","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
                  "","insufficient_evidence","0.0000","","{}","not_rankable_data_type","","not_rankable_data_type","","not_rankable_data_type","","[]",
                  "preliminary_species_relative_fish_condition_index_not_catch_probability"],
                 ["c036","南方舵魚","Kyphosus bigibbus","taitung_south","2026-11-11T12:00:00+08:00","forecast",
-                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.0","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
+                 "preliminary_incomplete_solar_or_environment_input","low","preliminary-relative-1.1","","insufficient_evidence","0.0000","","insufficient_evidence","0.0000",
                  "","insufficient_evidence","0.0000","","{}","not_established","","not_established","","not_established","","[]",
                  "preliminary_species_relative_fish_condition_index_not_catch_probability"],
             ]
@@ -43,7 +43,7 @@ class ExportHourlyFishConditionIndexTests(unittest.TestCase):
             export_index(source,output,"2026-11-10T10:00:00+08:00")
             payload=json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(payload["schema_version"],1)
-            self.assertEqual(payload["source"],"fishing-intelligence-fci-preliminary-1.0")
+            self.assertEqual(payload["source"],"fishing-intelligence-fci-preliminary-1.1")
             self.assertIn("low-confidence",payload["model_note"])
             self.assertEqual(len(payload["rows"]),1)
             row=payload["rows"][0]
@@ -52,6 +52,6 @@ class ExportHourlyFishConditionIndexTests(unittest.TestCase):
             self.assertEqual(row["best_hour_status_6h"],"not_established")
             self.assertEqual(row["interpretation"],"preliminary_species_relative_fish_condition_index_not_catch_probability")
             self.assertEqual(row["model_confidence"],"low")
-            self.assertEqual(row["model_version"],"preliminary-relative-1.0")
+            self.assertEqual(row["model_version"],"preliminary-relative-1.1")
 
 if __name__=="__main__": unittest.main()

@@ -67,13 +67,14 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
                 self.assertIn(source_id, source_by_id)
                 self.assertIn(source_by_id[source_id], urls)
 
-    def test_four_species_receive_traceable_low_confidence_relative_scores(self):
+    def test_species_with_phase_evidence_receive_traceable_low_confidence_scores(self):
         records, as_of = fixture_records()
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         self.assertEqual({r["candidate_id"] for r in rows}, TARGETS)
         self.assertEqual(len(rows), 24 * 4)
         scored = [r for r in rows if r["overall_fish_condition_index"]]
-        self.assertEqual(len(scored), len(rows))
+        self.assertEqual({r["candidate_id"] for r in scored}, TARGETS - {"c004"})
+        self.assertEqual(len(scored), 24 * 3)
         for row in scored:
             self.assertEqual(row["model_status"], "preliminary_scored")
             self.assertEqual(row["model_confidence"], "low")
@@ -96,17 +97,28 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
     def test_food_and_activity_priors_are_species_specific_but_explicitly_low_confidence(self):
         records, as_of = fixture_records()
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
-        at_noon = {r["candidate_id"]: float(r["feeding_condition_score"]) for r in rows if r["valid_time"].endswith("12:00:00+08:00")}
-        self.assertEqual(len({at_noon[cid] for cid in TARGETS}), 4)
+        at_noon = {r["candidate_id"]: float(r["feeding_condition_score"]) for r in rows if r["valid_time"].endswith("12:00:00+08:00") and r["feeding_condition_score"]}
+        self.assertEqual(len({at_noon[cid] for cid in TARGETS - {"c004"}}), 3)
+        self.assertNotIn("c004", at_noon)
         c001 = next(r for r in rows if r["candidate_id"] == "c001")
         self.assertEqual(c001["model_confidence"], "low")
         self.assertIn("confirmed G. punctata", __import__("json").loads(c001["indicator_trace_json"])[0]["limitation"])
+
+    def test_species_without_hourly_east_taiwan_evidence_is_not_given_neutral_scores(self):
+        records, as_of = fixture_records()
+        rows = [r for r in build_rows(records, candidate_rows(), self.profiles, as_of) if r["candidate_id"] == "c004"]
+        self.assertTrue(all(r["feeding_condition_score"] == "" and r["fish_activity_score"] == "" for r in rows))
+        self.assertTrue(all(r["overall_fish_condition_index"] == "" for r in rows))
+        self.assertTrue(all(r["model_status"] == "insufficient_species_specific_evidence" for r in rows))
+        self.assertTrue(all(r["feeding_condition_status"] == "insufficient_species_specific_evidence" for r in rows))
+        self.assertTrue(all(json.loads(r["species_weights_json"]) == {} for r in rows))
+        self.assertTrue(all(json.loads(r["indicator_trace_json"])[-1]["weight_basis"] == "not_applicable_no_composite_score" for r in rows))
 
     def test_missing_sea_state_keeps_index_blank_instead_of_filling_zero(self):
         records, as_of = fixture_records(include_sea_state=False)
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         self.assertTrue(all(not r["overall_fish_condition_index"] for r in rows))
-        self.assertTrue(all(r["model_status"] == "preliminary_incomplete_solar_or_environment_input" for r in rows))
+        self.assertEqual({r["model_status"] for r in rows}, {"preliminary_incomplete_solar_or_environment_input", "insufficient_species_specific_evidence"})
 
     def test_missing_sunrise_sunset_never_treats_unknown_time_as_night(self):
         records, as_of = fixture_records()
@@ -146,11 +158,15 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             mobile_json = root / "latest.json"
             export_index(scored_csv, mobile_json, as_of.isoformat())
             payload = json.loads(mobile_json.read_text(encoding="utf-8"))
-            self.assertEqual(payload["source"], "fishing-intelligence-fci-preliminary-1.0")
+            self.assertEqual(payload["source"], "fishing-intelligence-fci-preliminary-1.1")
             self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS)
             self.assertEqual(len(payload["rows"]), 24 * 4)
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))
-            self.assertTrue(all(row["overall_fish_condition_index"] is not None for row in payload["rows"]))
+            scored_species = {row["candidate_id"] for row in payload["rows"] if row["overall_fish_condition_index"] is not None}
+            self.assertEqual(scored_species, TARGETS - {"c004"})
+            black_sea_bream = [row for row in payload["rows"] if row["candidate_id"] == "c004"]
+            self.assertTrue(all(row["overall_fish_condition_index"] is None for row in black_sea_bream))
+            self.assertTrue(all(row["species_weights"] == {} for row in black_sea_bream))
             self.assertTrue(all("catch_probability" not in row for row in payload["rows"]))
 
 
