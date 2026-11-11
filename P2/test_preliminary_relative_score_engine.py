@@ -27,7 +27,7 @@ def fixture_records(count=24, include_sea_state=True):
         }
         if include_sea_state:
             env.update({"wave_height_m": float((hour * 7) % 9) / 2, "wind_speed_10m_ms": float((hour * 5) % 11)})
-        rows.append({"region_id": "taitung_south", "valid_time": valid.isoformat(), "data_type": "forecast", "environment": env})
+        rows.append({"region_id": "taitung_south", "valid_time": valid.isoformat(), "collected_at": "2026-11-10T23:00:00+08:00", "data_type": "forecast", "environment": env})
     return rows, start
 
 
@@ -137,11 +137,12 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
                 writer.writeheader()
                 writer.writerows(candidate_rows())
             scored_csv = root / "scored.csv"
-            subprocess.run([
+            result = subprocess.run([
                 sys.executable, str(Path(__file__).parent / "species" / "preliminary_relative_score_engine.py"),
                 "--environment-jsonl", str(environment_path), "--candidates-csv", str(candidates_path),
                 "--profiles-csv", str(PROFILE), "--as-of", as_of.isoformat(), "--out", str(scored_csv),
-            ], check=True, capture_output=True, text=True)
+            ], check=False, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
             mobile_json = root / "latest.json"
             export_index(scored_csv, mobile_json, as_of.isoformat())
             payload = json.loads(mobile_json.read_text(encoding="utf-8"))
@@ -150,7 +151,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual(len(payload["rows"]), 24 * 4)
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))
             self.assertTrue(all(row["overall_fish_condition_index"] is not None for row in payload["rows"]))
-            self.assertTrue(all(row["catch_probability"] is None for row in payload["rows"]))
+            self.assertTrue(all("catch_probability" not in row for row in payload["rows"]))
 
 
 if __name__ == "__main__":
