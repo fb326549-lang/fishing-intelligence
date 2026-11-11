@@ -192,6 +192,47 @@ def rank_best_hours(rows, as_of):
     for row in rows:
         row["best_hour_status"] = row.get("best_hour_status_6h", "outside_horizon")
         row["best_hour_rank"] = row.get("best_hour_rank_6h", "")
+    rank_indicator_hours(rows, as_of, "feeding_condition_score", "best_feeding_hour")
+    rank_indicator_hours(rows, as_of, "fish_activity_score", "best_activity_hour")
+
+
+def rank_indicator_hours(rows, as_of, score_field, output_prefix):
+    """Rank each indicator independently; all tied maxima remain best hours."""
+    for row in rows:
+        for horizon in (6, 12, 24):
+            row[f"{output_prefix}_status_{horizon}h"] = "outside_horizon"
+            row[f"{output_prefix}_rank_{horizon}h"] = ""
+    for horizon in (6, 12, 24):
+        groups = {}
+        for row in rows:
+            valid = parse_dt(row["valid_time"], "valid_time")
+            if as_of <= valid < as_of + timedelta(hours=horizon):
+                groups.setdefault((row["candidate_id"], row["region_id"]), []).append(row)
+        for group in groups.values():
+            scored = [r for r in group if r.get(score_field) not in (None, "")]
+            if not scored:
+                for row in group:
+                    row[f"{output_prefix}_status_{horizon}h"] = "unscored_hour"
+                continue
+            ordered = sorted(scored, key=lambda r: (-float(r[score_field]), r["valid_time"]))
+            score_ranks = {}
+            previous_score = None
+            current_rank = 0
+            for position, row in enumerate(ordered, 1):
+                score = float(row[score_field])
+                if previous_score is None or score != previous_score:
+                    current_rank = position
+                    previous_score = score
+                score_ranks[row["valid_time"]] = current_rank
+            maximum = float(ordered[0][score_field])
+            for row in group:
+                value = row.get(score_field)
+                if value in (None, ""):
+                    row[f"{output_prefix}_status_{horizon}h"] = "unscored_hour"
+                    continue
+                score = float(value)
+                row[f"{output_prefix}_status_{horizon}h"] = "best_hour" if score == maximum else "ranked_hour"
+                row[f"{output_prefix}_rank_{horizon}h"] = str(score_ranks[row["valid_time"]])
 
 
 def main():
@@ -209,7 +250,11 @@ def main():
               "environment_suitability_status", "environment_suitability_coverage", "fish_activity_score", "fish_activity_status",
               "fish_activity_coverage", "overall_fish_condition_index", "species_weights_json", "model_confidence", "model_version",
               "best_hour_status", "best_hour_rank", "best_hour_status_6h", "best_hour_rank_6h", "best_hour_status_12h", "best_hour_rank_12h",
-              "best_hour_status_24h", "best_hour_rank_24h", "indicator_trace_json", "interpretation"]
+              "best_hour_status_24h", "best_hour_rank_24h",
+              "best_feeding_hour_status_6h", "best_feeding_hour_rank_6h", "best_feeding_hour_status_12h", "best_feeding_hour_rank_12h",
+              "best_feeding_hour_status_24h", "best_feeding_hour_rank_24h",
+              "best_activity_hour_status_6h", "best_activity_hour_rank_6h", "best_activity_hour_status_12h", "best_activity_hour_rank_12h",
+              "best_activity_hour_status_24h", "best_activity_hour_rank_24h", "indicator_trace_json", "interpretation"]
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
