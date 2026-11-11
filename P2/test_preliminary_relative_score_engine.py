@@ -148,6 +148,29 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual(len(winners), 1)
             self.assertTrue(winners[0][f"best_hour_rank_{horizon}h"])
 
+    def test_feeding_and_activity_are_ranked_independently_for_all_horizons(self):
+        records, as_of = fixture_records()
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        for horizon in (6, 12, 24):
+            for prefix, score_field in (("best_feeding_hour", "feeding_condition_score"), ("best_activity_hour", "fish_activity_score")):
+                winners = [r for r in rows if r["candidate_id"] == "c036" and r[f"{prefix}_status_{horizon}h"] == "best_hour"]
+                self.assertTrue(winners)
+                in_horizon = [r for r in rows if r["candidate_id"] == "c036" and r[score_field]
+                              and as_of <= datetime.fromisoformat(r["valid_time"]) < as_of + timedelta(hours=horizon)]
+                maximum = max(float(r[score_field]) for r in in_horizon)
+                self.assertTrue(all(float(r[score_field]) == maximum for r in winners))
+                self.assertTrue(all(r[f"{prefix}_rank_{horizon}h"] == "1" for r in winners))
+
+    def test_indicator_ranks_preserve_missing_species_evidence(self):
+        records, as_of = fixture_records()
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        girella = [r for r in rows if r["candidate_id"] == "c001"]
+        black_sea_bream = [r for r in rows if r["candidate_id"] == "c004"]
+        self.assertTrue(all(r["best_feeding_hour_status_24h"] == "unscored_hour" for r in girella))
+        self.assertTrue(any(r["best_activity_hour_status_24h"] == "best_hour" for r in girella))
+        self.assertTrue(all(r["best_feeding_hour_status_24h"] == "unscored_hour" for r in black_sea_bream))
+        self.assertTrue(all(r["best_activity_hour_status_24h"] == "unscored_hour" for r in black_sea_bream))
+
     def test_engine_to_mobile_json_integration(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -173,6 +196,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS)
             self.assertEqual(len(payload["rows"]), 24 * 4)
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))
+            self.assertTrue(all("best_feeding_hour_status_6h" in row and "best_activity_hour_status_24h" in row for row in payload["rows"]))
             scored_species = {row["candidate_id"] for row in payload["rows"] if row["overall_fish_condition_index"] is not None}
             self.assertEqual(scored_species, TARGETS - {"c004", "c001"})
             black_sea_bream = [row for row in payload["rows"] if row["candidate_id"] == "c004"]
@@ -181,6 +205,8 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             girella = [row for row in payload["rows"] if row["candidate_id"] == "c001"]
             self.assertTrue(all(row["feeding_condition_score"] is None for row in girella))
             self.assertTrue(all(row["fish_activity_score"] is not None for row in girella))
+            self.assertTrue(any(row["best_activity_hour_status_24h"] == "best_hour" for row in girella))
+            self.assertTrue(all(row["best_feeding_hour_status_24h"] == "unscored_hour" for row in girella))
             self.assertTrue(all(row["overall_fish_condition_index"] is None and row["species_weights"] == {} for row in girella))
             self.assertTrue(all("catch_probability" not in row for row in payload["rows"]))
 

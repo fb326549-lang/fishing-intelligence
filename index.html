@@ -99,7 +99,7 @@ a{color:#8be8ef}
   <div class="radar-indicator"><div class="radar-indicator-label">魚類活動力</div><div class="radar-indicator-value" id="radarActivity">尚無模型</div></div>
  </div>
  <div class="radar-lower">
-  <div class="radar-info"><div class="radar-info-label">預估最佳時段</div><div class="radar-info-value" id="radarBestWindow">尚未建立</div><div class="radar-sub" id="radarBestNote">初版相對排序，非中魚機率。</div><div class="radar-sub" id="radarHorizonSummary">6小時／12小時／24小時排序等待資料</div></div>
+  <div class="radar-info"><div class="radar-info-label">預估最佳時段</div><div class="radar-info-value" id="radarBestWindow">尚未建立</div><div class="radar-sub" id="radarBestNote">初版相對排序，非中魚機率。</div><div class="radar-sub" id="radarHorizonSummary">6小時／12小時／24小時排序等待資料</div><div class="radar-sub" id="radarIndicatorHorizonSummary">覓食與活動時段代理等待資料</div></div>
   <div class="radar-info"><div class="radar-info-label">分析對象</div><div class="radar-info-value" id="radarTarget">等待選擇魚種</div><div class="radar-sub" id="radarForecastState">等待六區逐時展望資料</div></div>
  </div>
  <div class="radar-footnote" id="radarDataQuality">資料品質：初版低信心；會顯示各指標輸入覆蓋度。</div>
@@ -779,6 +779,20 @@ function renderRadarDashboard(){
   return horizon+'小時：'+(Number.isFinite(t.getTime())?t.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit'}):'未排序');
  };
  $('radarHorizonSummary').textContent=[formatHorizon(best6,6),formatHorizon(best12,12),formatHorizon(best24,24)].join('｜');
+ const formatIndicatorWindow=(horizon,prefix)=>{
+  const winners=rows.filter(r=>r[`best_${prefix}_hour_status_${horizon}h`]==='best_hour')
+   .map(r=>new Date(r.valid_time)).filter(t=>Number.isFinite(t.getTime())).sort((a,b)=>a-b);
+  if(!winners.length)return '未排序（缺少此魚種逐時依據）';
+  const ranges=[]; let start=winners[0], end=winners[0];
+  for(const time of winners.slice(1)){
+   if(time.getTime()-end.getTime()===3600000){end=time;continue;}
+   ranges.push([start,end]);start=end=time;
+  }
+  ranges.push([start,end]);
+  const clock=t=>t.toLocaleTimeString('zh-TW',{timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit'});
+  return ranges.map(([a,b])=>clock(a)+'–'+clock(new Date(b.getTime()+3600000))).join('、');
+ };
+ $('radarIndicatorHorizonSummary').textContent=[6,12,24].map(h=>`${h}小時 覓食代理：${formatIndicatorWindow(h,'feeding')}｜活動代理：${formatIndicatorWindow(h,'activity')}`).join('；');
  if(display){
   const pct=value=>typeof value==='number'&&Number.isFinite(value)?Math.round(value*100)+'%':'缺值';
   $('radarDataQuality').textContent='資料品質：低信心初版｜覓食輸入覆蓋 '+pct(display.feeding_condition_coverage)+'｜環境輸入覆蓋 '+pct(display.environment_suitability_coverage)+'｜活動輸入覆蓋 '+pct(display.fish_activity_coverage)+'。餌源量、潮流與現場魚況未納入。';
