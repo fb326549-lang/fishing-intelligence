@@ -760,7 +760,8 @@ function renderRadarDashboard(){
   species_weights_not_validated:'三項指標已有分數，但此魚種專屬權重尚未通過台灣東部努力量驗證。',
   preliminary_scored:'低信心初版相對指數：時段研究多來自外地或控制試驗；海況按本區預報作相對排序，三指標暫採等權。未經東部魚獲資料驗證，不是中魚機率。',
   preliminary_incomplete_environment_input:'初版指數所需的浪況或風速預報缺值。',
-  insufficient_species_specific_evidence:'已有食性與棲地研究，但目前沒有足以支持黑鯛東部逐時覓食／活動計分的證據，因此不填中性分數。'
+  insufficient_species_specific_evidence:'目前至少一項指標缺少足以支持此魚種東部逐時計分的證據，因此不填中性分數。',
+  preliminary_incomplete_solar_input:'缺少日出或日落時間，無法判定此預報小時的日照階段。'
  };
  $('radarScoreNote').textContent=display?(modelNotes[display.model_status]||'模型狀態：'+display.model_status+'。'):'尚未取得本區、本魚種逐時魚情指數資料。';
  if(hasScore)$('radarScoreNote').textContent='低信心初版分數，對應'+(bestHorizon?('未來'+bestHorizon+'小時內的相對排序最佳小時'):'該預報小時')+'。食物可利用量及現場魚群未納入；不是中魚機率。';

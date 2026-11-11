@@ -19,7 +19,7 @@ from indicator_score_engine import parse_dt, read_csv, select_latest_forecast_vi
 TARGETS = {"c036", "c003", "c004", "c001"}
 PHASES = ("dawn", "day", "dusk", "night")
 WEIGHTS = {"feeding_condition": 1 / 3, "environment_suitability": 1 / 3, "fish_activity": 1 / 3}
-MODEL_VERSION = "preliminary-relative-1.1"
+MODEL_VERSION = "preliminary-relative-1.2"
 
 
 def load_profiles(path: Path):
@@ -121,8 +121,12 @@ def build_rows(records, candidate_rows, profiles, as_of):
             indicators = {"feeding_condition": feeding, "environment_suitability": env_score, "fish_activity": activity}
             if any(value is None for value in indicators.values()):
                 overall = None
-                status = ("insufficient_species_specific_evidence" if solar_available and feeding is None and activity is None
-                          else "preliminary_incomplete_solar_or_environment_input")
+                if not solar_available:
+                    status = "preliminary_incomplete_solar_input"
+                elif feeding is None or activity is None:
+                    status = "insufficient_species_specific_evidence"
+                else:
+                    status = "preliminary_incomplete_environment_input"
             else:
                 overall = round(sum(float(indicators[k]) * WEIGHTS[k] for k in WEIGHTS), 2)
                 status = "preliminary_scored"
