@@ -152,6 +152,16 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         self.assertTrue(all(not r["overall_fish_condition_index"] for r in rows))
         self.assertEqual({r["model_status"] for r in rows}, {"preliminary_incomplete_environment_input", "insufficient_species_specific_evidence"})
 
+    def test_one_missing_sea_state_proxy_does_not_create_environment_or_composite_score(self):
+        records, as_of = fixture_records()
+        for record in records:
+            record["environment"].pop("wind_speed_10m_ms")
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        eligible = [row for row in rows if row["candidate_id"] in {"c036", "c003"}]
+        self.assertTrue(all(row["environment_suitability_score"] == "" for row in eligible))
+        self.assertTrue(all(row["overall_fish_condition_index"] == "" for row in eligible))
+        self.assertTrue(all(row["model_status"] == "preliminary_incomplete_environment_input" for row in eligible))
+
     def test_missing_sunrise_sunset_never_treats_unknown_time_as_night(self):
         records, as_of = fixture_records()
         for record in records:
