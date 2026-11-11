@@ -51,7 +51,7 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             evidence.write_text("evidence_id,source_name,source_url\n",encoding="utf-8")
             occurrence.write_text(
                 "regional_occurrence_id,candidate_id,taxon_scientific_name,common_name_zh,site_code,site_name,region_id,visit_number,recorded_presence,study_year,study_scope,method,source_name,source_url,confidence,model_use_status,limitations\n"
-                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\n"
+                "RO001,c036,Kyphosus bigibbus,南方舵魚,A1,杉原北側,taitung_south,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,not a fishing catch record\n"
                 "RO008,c026,Abudefduf septemfasciatus,七帶豆娘魚,A1,杉原北側,chenggong_donghe,2,present,2016,東部海岸淺海,水下調查,官方報告,https://example.org/report,medium,context_only_east_coast_biodiversity_survey,one member species only\n",
                 encoding="utf-8")
             catalog=build_catalog(candidates,ecology,evidence,occurrence)
@@ -59,7 +59,7 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             self.assertEqual(catalog["regional_occurrence_record_count"],2)
             row=next(x for x in catalog["regional_occurrence_records"] if x["candidate_id"]=="c036")
             self.assertEqual(row["candidate_id"],"c036")
-            self.assertEqual(row["region_id"],"chenggong_donghe")
+            self.assertEqual(row["region_id"],"taitung_south")
             self.assertEqual(row["recorded_presence"],"present")
             self.assertEqual(row["model_use_status"],"context_only_east_coast_biodiversity_survey")
             damselfish=next(x for x in catalog["regional_occurrence_records"] if x["candidate_id"]=="c026")
@@ -84,6 +84,15 @@ class SpeciesContextCatalogTests(unittest.TestCase):
         self.assertEqual(rabbitfish["recorded_presence"],"present")
         self.assertIn("不是數量",rabbitfish["limitations"])
 
+    def test_2016_southern_drummer_site_uses_taitung_south_region(self):
+        register = Path(__file__).parent / "species" / "species_regional_occurrence_register.csv"
+        with register.open(encoding="utf-8-sig", newline="") as source_file:
+            row = next(item for item in csv.DictReader(source_file) if item["regional_occurrence_id"] == "RO001")
+        self.assertEqual(row["candidate_id"], "c036")
+        self.assertEqual(row["site_name"], "杉原北側")
+        self.assertEqual(row["region_id"], "taitung_south")
+        self.assertEqual(row["recorded_presence"], "present")
+        self.assertEqual(row["model_use_status"], "context_only_east_coast_biodiversity_survey")
     def test_unknown_candidate_and_missing_source_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
