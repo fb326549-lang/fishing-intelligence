@@ -137,8 +137,9 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
                  "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_urls"],
                  "evidence_class": profile["evidence_class"], "limitation": profile["limitations"]},
-                {"indicator_code": "composite", "weights": WEIGHTS,
-                 "weight_basis": "provisional_equal_weight_convention_not_empirically_calibrated",
+                {"indicator_code": "composite", "weights": WEIGHTS if overall is not None else {},
+                 "weight_basis": ("provisional_equal_weight_convention_not_empirically_calibrated" if overall is not None
+                                  else "not_applicable_no_composite_score"),
                  "model_version": MODEL_VERSION},
             ]
             row = {
@@ -154,7 +155,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 "fish_activity_score": "" if activity is None else f"{activity:.2f}", "fish_activity_status": "preliminary_diel_evidence_proxy_low_confidence" if activity is not None else ("insufficient_species_specific_evidence" if solar_available else "missing_sunrise_sunset"),
                 "fish_activity_coverage": f"{coverage_phase:.4f}",
                 "overall_fish_condition_index": "" if overall is None else f"{overall:.2f}",
-                "species_weights_json": json.dumps(WEIGHTS, separators=(",", ":")),
+                "species_weights_json": json.dumps(WEIGHTS if overall is not None else {}, separators=(",", ":")),
                 "model_confidence": "low", "model_version": MODEL_VERSION,
                 "best_hour_status": "not_rankable", "best_hour_rank": "",
                 "indicator_trace_json": json.dumps(trace, ensure_ascii=False, separators=(",", ":")),

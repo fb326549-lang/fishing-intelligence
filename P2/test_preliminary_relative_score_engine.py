@@ -111,6 +111,8 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         self.assertTrue(all(r["overall_fish_condition_index"] == "" for r in rows))
         self.assertTrue(all(r["model_status"] == "insufficient_species_specific_evidence" for r in rows))
         self.assertTrue(all(r["feeding_condition_status"] == "insufficient_species_specific_evidence" for r in rows))
+        self.assertTrue(all(json.loads(r["species_weights_json"]) == {} for r in rows))
+        self.assertTrue(all(json.loads(r["indicator_trace_json"])[-1]["weight_basis"] == "not_applicable_no_composite_score" for r in rows))
 
     def test_missing_sea_state_keeps_index_blank_instead_of_filling_zero(self):
         records, as_of = fixture_records(include_sea_state=False)
@@ -164,6 +166,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual(scored_species, TARGETS - {"c004"})
             black_sea_bream = [row for row in payload["rows"] if row["candidate_id"] == "c004"]
             self.assertTrue(all(row["overall_fish_condition_index"] is None for row in black_sea_bream))
+            self.assertTrue(all(row["species_weights"] == {} for row in black_sea_bream))
             self.assertTrue(all("catch_probability" not in row for row in payload["rows"]))
 
 
