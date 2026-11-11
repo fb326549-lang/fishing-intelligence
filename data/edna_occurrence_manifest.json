@@ -1,8 +1,8 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
   "dataset_page": "https://data.gov.tw/dataset/172487",
-  "generated_at_utc": "2026-11-10T03:35:19.422264+00:00",
+  "generated_at_utc": "2026-11-11T03:59:16.891085+00:00",
   "detection_record_count": 19731,
   "exact_candidate_record_count": 618,
   "ambiguous_taxon_record_count": 238,
@@ -32,7 +32,7 @@
     "assignment_method": "nearest_active_reference_station_within_35km",
     "interpretation": "Nearest-station region is geographic context only; it is not proof that the sample belongs to a fishing spot or that every region has equal reference coverage."
   },
-  "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
+  "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence. The source depth(m) field is unresolved and must not be interpreted as sample or habitat depth.",
   "source_datasets": [
     {
       "dataset_id": "oca_edna_diving_110_113",
