@@ -32,7 +32,7 @@ ALIASES = {
     "station_name": ("站點名稱", "站點", "station_name", "station"),
     "latitude": ("緯度(北緯)", "緯度", "latitude", "lat"),
     "longitude": ("經度(東經)", "經度", "longitude", "lon", "lng"),
-    "depth_m": ("深度(m)", "深度", "depth_m", "depth"),
+    "source_reported_depth_m": ("深度(m)", "深度", "source_reported_depth_m", "depth_m", "depth"),
     "sampled_at": ("採樣時間", "採樣日期", "sample_time", "sampling_time", "date"),
     "scientific_name": ("學名(Science Name)", "學名", "scientific_name", "science_name", "species"),
     "common_name_zh": ("中文學名", "中文名", "common_name_zh", "chinese_name"),
@@ -196,12 +196,13 @@ def collect(sources, stations, candidates, fetched_at):
             scientific = fields["scientific_name"].strip()
             if not scientific:
                 continue
-            lat, lon, depth = numeric(fields["latitude"]), numeric(fields["longitude"]), numeric(fields["depth_m"])
+            lat, lon = numeric(fields["latitude"]), numeric(fields["longitude"])
+            source_depth = numeric(fields["source_reported_depth_m"])
             region, nearest_station, distance, mapping_status = nearest_region_context(lat, lon, stations)
             sample_time = fields["sampled_at"].strip()
             basis = parse_year_month(sample_time)
             candidate_id, candidate_match_status, possible_candidate_ids = match_candidate(scientific, candidates)
-            identity = "|".join((dataset_id, fields["station_name"], sample_time, scientific, str(depth), str(lat), str(lon)))
+            identity = "|".join((dataset_id, fields["station_name"], sample_time, scientific, str(source_depth), str(lat), str(lon)))
             record_id = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:20]
             if record_id in seen:
                 continue
@@ -216,7 +217,8 @@ def collect(sources, stations, candidates, fetched_at):
                 "station_name": fields["station_name"],
                 "latitude": lat,
                 "longitude": lon,
-                "depth_m": depth,
+                "source_reported_depth_m": source_depth,
+                "depth_field_semantics": "source_label_unresolved_station_or_sampling_depth",
                 "sampled_at": sample_time,
                 "year_month": basis,
                 "scientific_name": scientific,
@@ -233,7 +235,7 @@ def collect(sources, stations, candidates, fetched_at):
                 "region_mapping_status": mapping_status,
                 "detection_type": "positive_edna_detection_record",
                 "model_use_status": "context_only_edna_occurrence",
-                "limitations": "eDNA positive detection is not an individual fish count, biomass, catch rate, hourly activity, or proof of absence when not detected; nearest-region mapping is contextual only.",
+                "limitations": "eDNA positive detection is not an individual fish count, biomass, catch rate, hourly activity, or proof of absence when not detected; nearest-region mapping is contextual only; source field depth(m) is retained without assuming station bathymetry or DNA sampling depth.",
             })
     return detections
 
@@ -244,7 +246,7 @@ def build_monthly_summary(detections):
             groups[(row["candidate_id"], row["scientific_name"], row["region_id"], row["year_month"])].append(row)
     output = []
     for (cid, scientific, region, year_month), rows in sorted(groups.items()):
-        depths = [r["depth_m"] for r in rows if r["depth_m"] is not None]
+        depths = [r["source_reported_depth_m"] for r in rows if r["source_reported_depth_m"] is not None]
         output.append({
             "candidate_id": cid,
             "scientific_name": scientific,
@@ -252,11 +254,12 @@ def build_monthly_summary(detections):
             "year_month": year_month,
             "positive_detection_record_count": len(rows),
             "distinct_station_count": len({r["station_name"] for r in rows if r["station_name"]}),
-            "min_sample_depth_m": min(depths) if depths else "",
-            "max_sample_depth_m": max(depths) if depths else "",
+            "min_source_reported_depth_m": min(depths) if depths else "",
+            "max_source_reported_depth_m": max(depths) if depths else "",
+            "depth_field_semantics": "source_label_unresolved_station_or_sampling_depth",
             "dataset_ids": ";".join(sorted({r["dataset_id"] for r in rows})),
             "model_use_status": "context_only_edna_occurrence",
-            "interpretation_limit": "Positive detection records only; not abundance, effort-standardized prevalence, catch, activity, or absence evidence.",
+            "interpretation_limit": "Positive detection records only; not abundance, effort-standardized prevalence, catch, activity, or absence evidence; source depth(m) field is not interpreted as DNA sampling depth or fish habitat depth.",
         })
     return output
 
@@ -281,7 +284,8 @@ def build_candidate_region_context(detections):
                 "ambiguous_positive_detection_record_count": 0,
                 "exact_sample_month_count": 0, "exact_distinct_station_count": 0,
                 "first_sampled_month": "", "last_sampled_month": "",
-                "min_sample_depth_m": None, "max_sample_depth_m": None,
+                "min_source_reported_depth_m": None, "max_source_reported_depth_m": None,
+                "depth_field_semantics": "source_label_unresolved_station_or_sampling_depth",
                 "dataset_ids": set(), "ambiguous_taxon_labels": set(),
                 "model_use_status": "context_only_edna_occurrence",
             }
@@ -291,13 +295,13 @@ def build_candidate_region_context(detections):
             target["exact_positive_detection_record_count"] += len(rows)
             months = sorted({r["year_month"] for r in rows if r.get("year_month")})
             stations = {r["station_name"] for r in rows if r.get("station_name")}
-            depths = [r["depth_m"] for r in rows if r.get("depth_m") is not None]
+            depths = [r["source_reported_depth_m"] for r in rows if r.get("source_reported_depth_m") is not None]
             target["exact_sample_month_count"] = len(months)
             target["exact_distinct_station_count"] = len(stations)
             target["first_sampled_month"] = months[0] if months else ""
             target["last_sampled_month"] = months[-1] if months else ""
-            target["min_sample_depth_m"] = min(depths) if depths else None
-            target["max_sample_depth_m"] = max(depths) if depths else None
+            target["min_source_reported_depth_m"] = min(depths) if depths else None
+            target["max_source_reported_depth_m"] = max(depths) if depths else None
         else:
             target["ambiguous_positive_detection_record_count"] += len(rows)
             target["ambiguous_taxon_labels"].update(r["scientific_name"] for r in rows)
@@ -322,13 +326,13 @@ def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at
     with (out_dir / "edna_occurrence_context.jsonl").open("w", encoding="utf-8", newline="") as handle:
         for row in detections:
             handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
-    fields = ["candidate_id", "scientific_name", "region_id", "year_month", "positive_detection_record_count", "distinct_station_count", "min_sample_depth_m", "max_sample_depth_m", "dataset_ids", "model_use_status", "interpretation_limit"]
+    fields = ["candidate_id", "scientific_name", "region_id", "year_month", "positive_detection_record_count", "distinct_station_count", "min_source_reported_depth_m", "max_source_reported_depth_m", "depth_field_semantics", "dataset_ids", "model_use_status", "interpretation_limit"]
     with (out_dir / "edna_species_monthly_summary.csv").open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
         writer.writerows(summary)
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
         "dataset_page": DATASET_PAGE,
         "generated_at_utc": fetched_at,
@@ -340,17 +344,17 @@ def write_outputs(out_dir: Path, detections, summary, region_context, fetched_at
         "candidate_month_region_summary_count": len(summary),
         "candidate_region_context_count": len(region_context),
         "regional_reference_coverage": coverage,
-        "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence.",
+        "interpretation": "Positive eDNA detections provide occurrence context only. They do not measure fish abundance, catch rate, fishing activity, or absence. The source depth(m) field is unresolved and must not be interpreted as sample or habitat depth.",
         "source_datasets": [{"dataset_id": x[0], "name": x[1], "url": x[2]} for x in SOURCES],
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     context_payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": "OCA 110-113 Taiwan adjacent waters fish eDNA survey",
         "dataset_page": DATASET_PAGE,
         "generated_at_utc": fetched_at,
         "regional_reference_coverage": coverage,
-        "interpretation": "Historical positive eDNA occurrence context only; not abundance, current presence, catch rate, activity, or absence.",
+        "interpretation": "Historical positive eDNA occurrence context only; not abundance, current presence, catch rate, activity, or absence. The source depth(m) field is unresolved and must not be interpreted as sample or habitat depth.",
         "records": region_context,
     }
     (out_dir / "edna_candidate_region_context.json").write_text(

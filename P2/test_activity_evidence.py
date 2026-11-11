@@ -18,7 +18,7 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(errors,[])
         with REGISTER.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual(len(rows),16)
+        self.assertEqual(len(rows),37)
         self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in rows))
 
     def test_east_taiwan_museum_occurrence_records_remain_context_only(self):
@@ -39,6 +39,91 @@ class ActivityEvidenceTests(unittest.TestCase):
         self.assertEqual(row["model_use_status"],"context_only_northern_taiwan_field_study")
         self.assertIn("護卵雄魚",row["limitations"])
         self.assertIn("沒有測量",row["limitations"])
+
+
+    def test_southern_drummer_new_feeding_and_movement_studies_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        feeding=next(r for r in rows if r["activity_evidence_id"]=="AE017")
+        movement=next(r for r in rows if r["activity_evidence_id"]=="AE018")
+        self.assertEqual(feeding["candidate_id"],"c036")
+        self.assertEqual(feeding["source_literature_id"],"L034")
+        self.assertEqual(feeding["activity_dimension"],"feeding_activity")
+        self.assertEqual(feeding["model_use_status"],"context_only_external_region")
+        self.assertIn("日落至日出",feeding["reported_pattern"])
+        self.assertIn("不可直接作為東部夜釣",feeding["limitations"])
+        self.assertEqual(movement["candidate_id"],"c036")
+        self.assertEqual(movement["source_literature_id"],"L035")
+        self.assertEqual(movement["activity_dimension"],"movement_activity")
+        self.assertEqual(movement["model_use_status"],"context_only_external_region")
+        self.assertIn("1至5月",movement["reported_pattern"])
+        self.assertIn("不是魚群豐度",movement["limitations"])
+
+
+    def test_southern_drummer_captive_feeding_trials_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        diel=next(r for r in rows if r["activity_evidence_id"]=="AE019")
+        temp=next(r for r in rows if r["activity_evidence_id"]=="AE020")
+        self.assertEqual(diel["candidate_id"],"c036")
+        self.assertEqual(diel["source_literature_id"],"L036")
+        self.assertEqual(diel["evidence_kind"],"captive_feeding_trial")
+        self.assertEqual(diel["model_use_status"],"context_only_captive_feeding")
+        self.assertIn("45.6%",diel["reported_pattern"])
+        self.assertIn("不是野外魚群活動",diel["limitations"])
+        self.assertEqual(temp["candidate_id"],"c036")
+        self.assertEqual(temp["source_literature_id"],"L037")
+        self.assertEqual(temp["evidence_kind"],"captive_feeding_trial")
+        self.assertEqual(temp["model_use_status"],"context_only_captive_feeding")
+        self.assertIn("12°C",temp["reported_pattern"])
+        self.assertIn("不得直接套用台灣東部",temp["limitations"])
+
+
+    def test_taiwan_wide_fishery_guides_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        selected={r["activity_evidence_id"]:r for r in rows if r["activity_evidence_id"] in {"AE028","AE029","AE030"}}
+        self.assertEqual(set(selected),{"AE028","AE029","AE030"})
+        self.assertEqual(selected["AE028"]["source_literature_id"],"L043")
+        self.assertIn("冬季盛產",selected["AE028"]["reported_pattern"])
+        self.assertEqual(selected["AE029"]["source_literature_id"],"L044")
+        self.assertIn("冬季味美",selected["AE029"]["reported_pattern"])
+        self.assertEqual(selected["AE030"]["source_literature_id"],"L045")
+        self.assertIn("春冬",selected["AE030"]["reported_pattern"])
+        self.assertTrue(all(r["model_use_status"]=="context_only_taiwan_fishery_reference" for r in selected.values()))
+
+
+    def test_rabbitfish_field_diet_and_captive_activity_sources_remain_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        selected={r["activity_evidence_id"]:r for r in rows if r["activity_evidence_id"] in {"AE031","AE032","AE033","AE034","AE035"}}
+        self.assertEqual(set(selected),{"AE031","AE032","AE033","AE034","AE035"})
+        self.assertEqual(selected["AE031"]["source_literature_id"],"L046")
+        self.assertIn("低於濕重2%",selected["AE031"]["reported_pattern"])
+        self.assertEqual(selected["AE032"]["source_literature_id"],"L047")
+        self.assertIn("夏季45%",selected["AE032"]["reported_pattern"])
+        self.assertEqual(selected["AE033"]["source_literature_id"],"L048")
+        self.assertIn("15及30株",selected["AE033"]["reported_pattern"])
+        self.assertEqual(selected["AE034"]["source_literature_id"],"L049")
+        self.assertEqual(selected["AE035"]["source_literature_id"],"L050")
+        self.assertEqual(selected["AE035"]["evidence_kind"],"captive_activity_observation")
+        self.assertTrue(all(r["model_use_status"].startswith("context_only_") for r in selected.values()))
+
+
+    def test_southern_drummer_2016_and_2021_diel_trials_remain_captive_context_only(self):
+        with REGISTER.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        early=next(r for r in rows if r["activity_evidence_id"]=="AE036")
+        later=next(r for r in rows if r["activity_evidence_id"]=="AE037")
+        self.assertEqual(early["source_literature_id"],"L051")
+        self.assertEqual(early["evidence_kind"],"captive_feeding_trial")
+        self.assertIn("21:00–24:00",early["reported_pattern"])
+        self.assertEqual(early["model_use_status"],"context_only_captive_feeding")
+        self.assertEqual(later["source_literature_id"],"L053")
+        self.assertEqual(later["evidence_kind"],"captive_activity_observation")
+        self.assertIn("45.6%",later["reported_pattern"])
+        self.assertEqual(later["model_use_status"],"context_only_captive_activity")
+        self.assertTrue(all("台灣東部" in r["limitations"] for r in (early,later)))
 
     def test_scoring_eligibility_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -66,6 +66,24 @@ class SpeciesContextCatalogTests(unittest.TestCase):
             self.assertEqual(damselfish["common_name_zh"],"七帶豆娘魚")
             self.assertEqual(damselfish["scientific_name"],"Abudefduf septemfasciatus")
 
+
+    def test_2020_east_coast_survey_adds_species_specific_presence_context(self):
+        register=Path(__file__).parent/"species"/"species_regional_occurrence_register.csv"
+        with register.open(encoding="utf-8-sig",newline="") as f:
+            rows=list(csv.DictReader(f))
+        drummer=next(r for r in rows if r["regional_occurrence_id"]=="RO009")
+        rabbitfish=next(r for r in rows if r["regional_occurrence_id"]=="RO010")
+        self.assertEqual(drummer["candidate_id"],"c036")
+        self.assertEqual(drummer["taxon_scientific_name"],"Kyphosus bigibbus")
+        self.assertEqual(drummer["region_id"],"taitung_south")
+        self.assertEqual(drummer["recorded_presence"],"present")
+        self.assertEqual(drummer["study_year"],"2020")
+        self.assertEqual(drummer["model_use_status"],"context_only_east_coast_biodiversity_survey")
+        self.assertEqual(rabbitfish["candidate_id"],"c003")
+        self.assertEqual(rabbitfish["region_id"],"chenggong_donghe")
+        self.assertEqual(rabbitfish["recorded_presence"],"present")
+        self.assertIn("不是數量",rabbitfish["limitations"])
+
     def test_unknown_candidate_and_missing_source_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)

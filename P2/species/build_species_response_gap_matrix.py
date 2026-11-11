@@ -38,6 +38,7 @@ DOMAINS = [
     ("current_preference", "ocean_current_response"),
     ("tide_response", "tide_response"),
     ("wind_sensitivity", "wind_response"),
+    ("feeding_conditions", "feeding_condition"),
     ("activity_period", "activity_period"),
     ("salinity_preference", "salinity_response"),
 ]
@@ -77,8 +78,9 @@ def build_matrix(candidate_path: Path, ecology_path: Path, evidence_path: Path, 
                 "current_preference": {"ocean_current_response"},
                 "tide_response": {"tide_response"},
                 "wind_sensitivity": {"wind_response"},
+                "feeding_conditions": {"feeding_condition"},
                 # Seasonal commercial distribution remains context only.
-                "activity_period": {"activity_period", "seasonal_activity"},
+                "activity_period": {"activity_period", "seasonal_activity", "diel_feeding"},
                 "salinity_preference": {"salinity_response"},
             }[domain]
             domain_literature = [
