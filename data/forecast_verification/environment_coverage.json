@@ -3,18 +3,18 @@
   "all_regions_with_expected_observations_have_data": true,
   "expected_region_count": 6,
   "interpretation": "Coverage audit only. Record counts and unique valid hours are reported as stored; missing hours are not inferred, interpolated, or filled from another region. Presence does not imply sufficient sample size or measurement quality. Hualien South is explicitly excluded from expected CWA observation coverage because the verified regional mapping has no CWA marine station coverage there.",
-  "partition_count": 8,
+  "partition_count": 9,
   "regions": [
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
-        "collection_vintages": 52,
-        "record_count": 169,
-        "unique_valid_hours": 127
+        "collection_vintages": 56,
+        "record_count": 174,
+        "unique_valid_hours": 131
       },
       "observation_expected": true,
       "observation_policy": "expected_from_archived_cwa_region_feed",
@@ -23,14 +23,14 @@
     },
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
-        "collection_vintages": 50,
-        "record_count": 144,
-        "unique_valid_hours": 127
+        "collection_vintages": 54,
+        "record_count": 149,
+        "unique_valid_hours": 131
       },
       "observation_expected": true,
       "observation_policy": "expected_from_archived_cwa_region_feed",
@@ -39,9 +39,9 @@
     },
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
         "collection_vintages": 0,
@@ -55,14 +55,14 @@
     },
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
-        "collection_vintages": 54,
-        "record_count": 127,
-        "unique_valid_hours": 127
+        "collection_vintages": 58,
+        "record_count": 131,
+        "unique_valid_hours": 131
       },
       "observation_expected": true,
       "observation_policy": "expected_from_archived_cwa_region_feed",
@@ -71,14 +71,14 @@
     },
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
-        "collection_vintages": 54,
-        "record_count": 146,
-        "unique_valid_hours": 127
+        "collection_vintages": 58,
+        "record_count": 151,
+        "unique_valid_hours": 131
       },
       "observation_expected": true,
       "observation_policy": "expected_from_archived_cwa_region_feed",
@@ -87,14 +87,14 @@
     },
     {
       "forecast": {
-        "collection_vintages": 228,
-        "record_count": 5472,
-        "unique_valid_hours": 144
+        "collection_vintages": 231,
+        "record_count": 5544,
+        "unique_valid_hours": 168
       },
       "observation": {
-        "collection_vintages": 51,
-        "record_count": 146,
-        "unique_valid_hours": 127
+        "collection_vintages": 55,
+        "record_count": 151,
+        "unique_valid_hours": 131
       },
       "observation_expected": true,
       "observation_policy": "expected_from_archived_cwa_region_feed",
