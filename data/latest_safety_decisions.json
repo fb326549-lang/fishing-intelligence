@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "as_of": "2026-11-14T16:20:34.844208+00:00",
+  "as_of": "2026-11-14T17:03:37.599272+00:00",
   "regions": {
     "yilan_suao": {
       "schema_version": "1.0.0",
       "region_id": "yilan_suao",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
       "state": "no_active_alerts_reported",
       "safety_clearance": false,
       "active_alert_count": 0,
@@ -21,27 +21,31 @@
     "hualien_north": {
       "schema_version": "1.0.0",
       "region_id": "hualien_north",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
-      "state": "no_active_alerts_reported",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
+      "state": "warning",
       "safety_clearance": false,
-      "active_alert_count": 0,
-      "active_alerts": [],
+      "active_alert_count": 1,
+      "active_alerts": [
+        "heavy_rain:2026-11-15T00:21:00+08:00:2026-11-15T11:00:00+08:00"
+      ],
       "missing_sources": [],
       "stale_sources": [],
       "validation_issue_count": 0,
       "reasoning": [
-        "已查核來源未回報有效警特報；不代表海面安全，也不排除突發長浪"
+        "heavy_rain: 鋒面通過，易有短延時強降雨，高雄市已有局部豪雨發生，今(15)日高屏地區及臺中、南投、花蓮山區有局部大雨發生的機率，請注意雷擊及強陣風，低窪地區請慎防積水。"
       ],
       "mandatory_notice": "本結果不是安全許可；出發前仍須確認現場海況、岸際公告、管制區及裝備。"
     },
     "hualien_south": {
       "schema_version": "1.0.0",
       "region_id": "hualien_south",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
-      "state": "insufficient_data",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
+      "state": "warning",
       "safety_clearance": false,
-      "active_alert_count": 0,
-      "active_alerts": [],
+      "active_alert_count": 1,
+      "active_alerts": [
+        "heavy_rain:2026-11-15T00:21:00+08:00:2026-11-15T11:00:00+08:00"
+      ],
       "missing_sources": [
         "O-B0069-001（本區無監測站覆蓋）",
         "O-B0070-001（本區無監測站覆蓋）"
@@ -49,6 +53,7 @@
       "stale_sources": [],
       "validation_issue_count": 0,
       "reasoning": [
+        "heavy_rain: 鋒面通過，易有短延時強降雨，高雄市已有局部豪雨發生，今(15)日高屏地區及臺中、南投、花蓮山區有局部大雨發生的機率，請注意雷擊及強陣風，低窪地區請慎防積水。",
         "來源未取得：O-B0069-001（本區無監測站覆蓋）, O-B0070-001（本區無監測站覆蓋）"
       ],
       "mandatory_notice": "本結果不是安全許可；出發前仍須確認現場海況、岸際公告、管制區及裝備。"
@@ -56,11 +61,13 @@
     "fengbin_shitiping": {
       "schema_version": "1.0.0",
       "region_id": "fengbin_shitiping",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
-      "state": "insufficient_data",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
+      "state": "warning",
       "safety_clearance": false,
-      "active_alert_count": 0,
-      "active_alerts": [],
+      "active_alert_count": 1,
+      "active_alerts": [
+        "heavy_rain:2026-11-15T00:21:00+08:00:2026-11-15T11:00:00+08:00"
+      ],
       "missing_sources": [
         "O-B0069-001（本區無監測站覆蓋）",
         "O-B0070-001（本區無監測站覆蓋）"
@@ -68,6 +75,7 @@
       "stale_sources": [],
       "validation_issue_count": 0,
       "reasoning": [
+        "heavy_rain: 鋒面通過，易有短延時強降雨，高雄市已有局部豪雨發生，今(15)日高屏地區及臺中、南投、花蓮山區有局部大雨發生的機率，請注意雷擊及強陣風，低窪地區請慎防積水。",
         "來源未取得：O-B0069-001（本區無監測站覆蓋）, O-B0070-001（本區無監測站覆蓋）"
       ],
       "mandatory_notice": "本結果不是安全許可；出發前仍須確認現場海況、岸際公告、管制區及裝備。"
@@ -75,7 +83,7 @@
     "chenggong_donghe": {
       "schema_version": "1.0.0",
       "region_id": "chenggong_donghe",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
       "state": "warning",
       "safety_clearance": false,
       "active_alert_count": 1,
@@ -93,7 +101,7 @@
     "taitung_south": {
       "schema_version": "1.0.0",
       "region_id": "taitung_south",
-      "as_of": "2026-11-14T16:20:34.844208+00:00",
+      "as_of": "2026-11-14T17:03:37.599272+00:00",
       "state": "warning",
       "safety_clearance": false,
       "active_alert_count": 1,
