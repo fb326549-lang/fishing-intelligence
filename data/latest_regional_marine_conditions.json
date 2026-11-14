@@ -2,7 +2,7 @@
   "schema_version": 1,
   "source": "CWA",
   "data_kind": "regional_in_situ_observations",
-  "generated_at": "2026-11-14T00:04:41.766753+00:00",
+  "generated_at": "2026-11-14T01:04:56.558325+00:00",
   "region_order": [
     "yilan_suao",
     "hualien_north",
@@ -17,20 +17,20 @@
       "observed_48h": {
         "data_kind": "observed",
         "temporal_scope": "rolling_48_hour",
-        "latest_observation_time": "2026-11-14T07:00:00+08:00",
+        "latest_observation_time": "2026-11-14T08:00:00+08:00",
         "mapped_station_count": 5,
         "stations_with_observations": 4,
         "latest_values": {
-          "wave_height_m": 0.8,
-          "wave_period_s": 6.2,
-          "wave_direction_deg": 78.0,
-          "sea_temperature_c": 24.55,
-          "tide_height_m": 0.045,
-          "wind_speed_ms": 1.95,
-          "wind_direction_deg": 331.0,
-          "current_direction_deg": null,
-          "current_speed_ms": null,
-          "current_speed_knots": null
+          "wave_height_m": 0.7,
+          "wave_period_s": 6.1,
+          "wave_direction_deg": 90.0,
+          "sea_temperature_c": 24.5,
+          "tide_height_m": 0.2,
+          "wind_speed_ms": 1.6,
+          "wind_direction_deg": 319.5,
+          "current_direction_deg": 242.0,
+          "current_speed_ms": 0.06,
+          "current_speed_knots": 0.12
         },
         "variable_coverage": {
           "wave_height_m": {
@@ -101,27 +101,27 @@
             "unit": "degree",
             "eligible_stations": 1,
             "coverage_denominator_basis": "currently_active_stations_advertising_element",
-            "stations_with_data_latest_time": 0,
-            "coverage_ratio": 0.0,
-            "status": "not_reported"
+            "stations_with_data_latest_time": 1,
+            "coverage_ratio": 1.0,
+            "status": "available"
           },
           "current_speed_ms": {
             "label": "海流速度",
             "unit": "m/s",
             "eligible_stations": 1,
             "coverage_denominator_basis": "currently_active_stations_advertising_element",
-            "stations_with_data_latest_time": 0,
-            "coverage_ratio": 0.0,
-            "status": "not_reported"
+            "stations_with_data_latest_time": 1,
+            "coverage_ratio": 1.0,
+            "status": "available"
           },
           "current_speed_knots": {
             "label": "海流速度（節）",
             "unit": "kn",
             "eligible_stations": 1,
             "coverage_denominator_basis": "currently_active_stations_advertising_element",
-            "stations_with_data_latest_time": 0,
-            "coverage_ratio": 0.0,
-            "status": "not_reported"
+            "stations_with_data_latest_time": 1,
+            "coverage_ratio": 1.0,
+            "status": "available"
           }
         },
         "status": "observed",
@@ -246,20 +246,20 @@
       "observed_48h": {
         "data_kind": "observed",
         "temporal_scope": "rolling_48_hour",
-        "latest_observation_time": "2026-11-14T07:00:00+08:00",
+        "latest_observation_time": "2026-11-14T08:00:00+08:00",
         "mapped_station_count": 3,
         "stations_with_observations": 2,
         "latest_values": {
-          "wave_height_m": 0.8,
+          "wave_height_m": 0.7,
           "wave_period_s": 6.9,
-          "wave_direction_deg": 90.0,
-          "sea_temperature_c": 26.7,
-          "tide_height_m": 0.16,
-          "wind_speed_ms": 2.75,
-          "wind_direction_deg": 231.0,
-          "current_direction_deg": 149.0,
-          "current_speed_ms": 0.08,
-          "current_speed_knots": 0.16
+          "wave_direction_deg": 258.0,
+          "sea_temperature_c": 26.75,
+          "tide_height_m": 0.28,
+          "wind_speed_ms": 3.0,
+          "wind_direction_deg": 239.5,
+          "current_direction_deg": 2.0,
+          "current_speed_ms": 0.04,
+          "current_speed_knots": 0.08
         },
         "variable_coverage": {
           "wave_height_m": {
@@ -682,7 +682,7 @@
       "observed_48h": {
         "data_kind": "observed",
         "temporal_scope": "rolling_48_hour",
-        "latest_observation_time": "2026-11-14T07:00:00+08:00",
+        "latest_observation_time": "2026-11-14T08:00:00+08:00",
         "mapped_station_count": 2,
         "stations_with_observations": 2,
         "latest_values": {
@@ -690,9 +690,9 @@
           "wave_period_s": null,
           "wave_direction_deg": null,
           "sea_temperature_c": null,
-          "tide_height_m": 0.25,
+          "tide_height_m": 0.39,
           "wind_speed_ms": 2.0,
-          "wind_direction_deg": 180.0,
+          "wind_direction_deg": 184.0,
           "current_direction_deg": null,
           "current_speed_ms": null,
           "current_speed_knots": null
@@ -911,7 +911,7 @@
       "observed_48h": {
         "data_kind": "observed",
         "temporal_scope": "rolling_48_hour",
-        "latest_observation_time": "2026-11-14T07:00:00+08:00",
+        "latest_observation_time": "2026-11-14T08:00:00+08:00",
         "mapped_station_count": 3,
         "stations_with_observations": 3,
         "latest_values": {
@@ -919,9 +919,9 @@
           "wave_period_s": null,
           "wave_direction_deg": null,
           "sea_temperature_c": 26.3,
-          "tide_height_m": 0.215,
-          "wind_speed_ms": null,
-          "wind_direction_deg": 301.0,
+          "tide_height_m": 0.385,
+          "wind_speed_ms": 0.7,
+          "wind_direction_deg": 302.0,
           "current_direction_deg": null,
           "current_speed_ms": null,
           "current_speed_knots": null
@@ -977,9 +977,9 @@
             "unit": "m/s",
             "eligible_stations": 1,
             "coverage_denominator_basis": "currently_active_stations_advertising_element",
-            "stations_with_data_latest_time": 0,
-            "coverage_ratio": 0.0,
-            "status": "not_reported"
+            "stations_with_data_latest_time": 1,
+            "coverage_ratio": 1.0,
+            "status": "available"
           },
           "wind_direction_deg": {
             "label": "風向",
@@ -1140,20 +1140,20 @@
       "observed_48h": {
         "data_kind": "observed",
         "temporal_scope": "rolling_48_hour",
-        "latest_observation_time": "2026-11-14T07:00:00+08:00",
+        "latest_observation_time": "2026-11-14T08:00:00+08:00",
         "mapped_station_count": 3,
         "stations_with_observations": 2,
         "latest_values": {
           "wave_height_m": 0.8,
-          "wave_period_s": 6.1,
+          "wave_period_s": 6.0,
           "wave_direction_deg": null,
           "sea_temperature_c": null,
-          "tide_height_m": 0.16,
+          "tide_height_m": 0.3,
           "wind_speed_ms": null,
           "wind_direction_deg": null,
-          "current_direction_deg": 200.0,
-          "current_speed_ms": 0.07,
-          "current_speed_knots": 0.14
+          "current_direction_deg": 321.0,
+          "current_speed_ms": 0.05,
+          "current_speed_knots": 0.1
         },
         "variable_coverage": {
           "wave_height_m": {
