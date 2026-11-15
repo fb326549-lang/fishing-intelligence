@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "source": "CWA_OPENDATA",
   "data_kind": "observations_not_forecast",
-  "generated_at": "2026-11-15T20:26:45.596347+00:00",
+  "generated_at": "2026-11-15T21:04:18.473200+00:00",
   "dataset_status": {
     "O-B0075-001": {
       "status": "ok",
@@ -180,11 +180,11 @@
           "latitude": 24.8686,
           "longitude": 121.8396,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.21",
-              "TideLevel": "退潮",
+              "TideHeight": "-0.28",
+              "TideLevel": "漲潮",
               "SeaTemperature": "23.0",
               "Temperature": "None",
               "StationPressure": "1012.5",
@@ -198,8 +198,8 @@
               }
             },
             "flattened": {
-              "TideHeight": "-0.21",
-              "TideLevel": "退潮",
+              "TideHeight": "-0.28",
+              "TideLevel": "漲潮",
               "SeaTemperature": "23.0",
               "Temperature": null,
               "StationPressure": "1012.5",
@@ -214,7 +214,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -225,41 +225,41 @@
           "latitude": 24.5925,
           "longitude": 121.8658,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.24",
+              "TideHeight": "-0.28",
               "TideLevel": "退潮",
-              "SeaTemperature": "25.1",
+              "SeaTemperature": "24.9",
               "Temperature": "None",
-              "StationPressure": "1014.5",
+              "StationPressure": "1014.3",
               "PrimaryAnemometer": {
-                "WindSpeed": "3.1",
+                "WindSpeed": "2.2",
                 "WindScale": "2",
-                "WindDirection": "354.0",
+                "WindDirection": "353.0",
                 "WindDirectionDescription": "N",
-                "MaximumWindSpeed": "4.9",
-                "MaximumWindScale": "3"
+                "MaximumWindSpeed": "3.3",
+                "MaximumWindScale": "2"
               }
             },
             "flattened": {
-              "TideHeight": "-0.24",
+              "TideHeight": "-0.28",
               "TideLevel": "退潮",
-              "SeaTemperature": "25.1",
+              "SeaTemperature": "24.9",
               "Temperature": null,
-              "StationPressure": "1014.5",
-              "PrimaryAnemometer.WindSpeed": "3.1",
+              "StationPressure": "1014.3",
+              "PrimaryAnemometer.WindSpeed": "2.2",
               "PrimaryAnemometer.WindScale": "2",
-              "PrimaryAnemometer.WindDirection": "354.0",
+              "PrimaryAnemometer.WindDirection": "353.0",
               "PrimaryAnemometer.WindDirectionDescription": "N",
-              "PrimaryAnemometer.MaximumWindSpeed": "4.9",
-              "PrimaryAnemometer.MaximumWindScale": "3"
+              "PrimaryAnemometer.MaximumWindSpeed": "3.3",
+              "PrimaryAnemometer.MaximumWindScale": "2"
             }
           },
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -270,34 +270,34 @@
           "latitude": 24.6247,
           "longitude": 121.8758,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "TideHeight": "None",
               "TideLevel": "-",
-              "WaveHeight": "1.2",
-              "WaveDirection": "33.0",
-              "WaveDirectionDescription": "NNE",
-              "WavePeriod": "5.5",
+              "WaveHeight": "1.3",
+              "WaveDirection": "56.0",
+              "WaveDirectionDescription": "NE",
+              "WavePeriod": "5.7",
               "SeaTemperature": "None",
-              "Temperature": "19.6",
-              "StationPressure": "1015.7",
+              "Temperature": "19.9",
+              "StationPressure": "1015.5",
               "PrimaryAnemometer": {
-                "WindSpeed": "4.0",
+                "WindSpeed": "4.2",
                 "WindScale": "3",
-                "WindDirection": "277.0",
+                "WindDirection": "279.0",
                 "WindDirectionDescription": "W",
-                "MaximumWindSpeed": "6.2",
+                "MaximumWindSpeed": "6.4",
                 "MaximumWindScale": "4"
               },
               "SeaCurrents": {
                 "Layer": [
                   {
                     "LayerNumber": "1",
-                    "CurrentDirection": "178",
-                    "CurrentDirectionDescription": "S",
-                    "CurrentSpeed": "0.15",
-                    "CurrentSpeedInKnots": "0.29"
+                    "CurrentDirection": "None",
+                    "CurrentDirectionDescription": "None",
+                    "CurrentSpeed": "None",
+                    "CurrentSpeedInKnots": "None"
                   }
                 ]
               }
@@ -305,26 +305,26 @@
             "flattened": {
               "TideHeight": null,
               "TideLevel": null,
-              "WaveHeight": "1.2",
-              "WaveDirection": "33.0",
-              "WaveDirectionDescription": "NNE",
-              "WavePeriod": "5.5",
+              "WaveHeight": "1.3",
+              "WaveDirection": "56.0",
+              "WaveDirectionDescription": "NE",
+              "WavePeriod": "5.7",
               "SeaTemperature": null,
-              "Temperature": "19.6",
-              "StationPressure": "1015.7",
-              "PrimaryAnemometer.WindSpeed": "4.0",
+              "Temperature": "19.9",
+              "StationPressure": "1015.5",
+              "PrimaryAnemometer.WindSpeed": "4.2",
               "PrimaryAnemometer.WindScale": "3",
-              "PrimaryAnemometer.WindDirection": "277.0",
+              "PrimaryAnemometer.WindDirection": "279.0",
               "PrimaryAnemometer.WindDirectionDescription": "W",
-              "PrimaryAnemometer.MaximumWindSpeed": "6.2",
+              "PrimaryAnemometer.MaximumWindSpeed": "6.4",
               "PrimaryAnemometer.MaximumWindScale": "4",
               "SeaCurrents.Layer": [
                 {
                   "LayerNumber": "1",
-                  "CurrentDirection": "178",
-                  "CurrentDirectionDescription": "S",
-                  "CurrentSpeed": "0.15",
-                  "CurrentSpeedInKnots": "0.29"
+                  "CurrentDirection": "None",
+                  "CurrentDirectionDescription": "None",
+                  "CurrentSpeed": "None",
+                  "CurrentSpeedInKnots": "None"
                 }
               ]
             }
@@ -332,7 +332,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -343,8 +343,8 @@
           "latitude": 24.9488,
           "longitude": 121.9291,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "TideHeight": "None",
               "TideLevel": "-",
@@ -405,7 +405,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         }
       ]
@@ -426,41 +426,41 @@
           "latitude": 23.9806,
           "longitude": 121.6236,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.19",
-              "TideLevel": "退潮",
-              "SeaTemperature": "26.8",
+              "TideHeight": "-0.24",
+              "TideLevel": "漲潮",
+              "SeaTemperature": "26.9",
               "Temperature": "None",
-              "StationPressure": "1013.7",
+              "StationPressure": "1013.8",
               "PrimaryAnemometer": {
-                "WindSpeed": "1.5",
+                "WindSpeed": "1.2",
                 "WindScale": "1",
-                "WindDirection": "242.0",
+                "WindDirection": "252.0",
                 "WindDirectionDescription": "WSW",
-                "MaximumWindSpeed": "2.5",
+                "MaximumWindSpeed": "2.2",
                 "MaximumWindScale": "2"
               }
             },
             "flattened": {
-              "TideHeight": "-0.19",
-              "TideLevel": "退潮",
-              "SeaTemperature": "26.8",
+              "TideHeight": "-0.24",
+              "TideLevel": "漲潮",
+              "SeaTemperature": "26.9",
               "Temperature": null,
-              "StationPressure": "1013.7",
-              "PrimaryAnemometer.WindSpeed": "1.5",
+              "StationPressure": "1013.8",
+              "PrimaryAnemometer.WindSpeed": "1.2",
               "PrimaryAnemometer.WindScale": "1",
-              "PrimaryAnemometer.WindDirection": "242.0",
+              "PrimaryAnemometer.WindDirection": "252.0",
               "PrimaryAnemometer.WindDirectionDescription": "WSW",
-              "PrimaryAnemometer.MaximumWindSpeed": "2.5",
+              "PrimaryAnemometer.MaximumWindSpeed": "2.2",
               "PrimaryAnemometer.MaximumWindScale": "2"
             }
           },
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -471,34 +471,34 @@
           "latitude": 24.0314,
           "longitude": 121.6328,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "TideHeight": "None",
               "TideLevel": "-",
               "WaveHeight": "1.1",
               "WaveDirection": "45.0",
               "WaveDirectionDescription": "NE",
-              "WavePeriod": "6.0",
-              "SeaTemperature": "26.1",
-              "Temperature": "21.0",
-              "StationPressure": "1015.1",
+              "WavePeriod": "6.2",
+              "SeaTemperature": "26.2",
+              "Temperature": "21.1",
+              "StationPressure": "1015.0",
               "PrimaryAnemometer": {
                 "WindSpeed": "1.7",
                 "WindScale": "2",
-                "WindDirection": "250.0",
-                "WindDirectionDescription": "WSW",
-                "MaximumWindSpeed": "2.6",
+                "WindDirection": "262.0",
+                "WindDirectionDescription": "W",
+                "MaximumWindSpeed": "2.9",
                 "MaximumWindScale": "2"
               },
               "SeaCurrents": {
                 "Layer": [
                   {
                     "LayerNumber": "1",
-                    "CurrentDirection": "132",
-                    "CurrentDirectionDescription": "SE",
-                    "CurrentSpeed": "0.04",
-                    "CurrentSpeedInKnots": "0.08"
+                    "CurrentDirection": "188",
+                    "CurrentDirectionDescription": "S",
+                    "CurrentSpeed": "0.08",
+                    "CurrentSpeedInKnots": "0.16"
                   }
                 ]
               }
@@ -509,23 +509,23 @@
               "WaveHeight": "1.1",
               "WaveDirection": "45.0",
               "WaveDirectionDescription": "NE",
-              "WavePeriod": "6.0",
-              "SeaTemperature": "26.1",
-              "Temperature": "21.0",
-              "StationPressure": "1015.1",
+              "WavePeriod": "6.2",
+              "SeaTemperature": "26.2",
+              "Temperature": "21.1",
+              "StationPressure": "1015.0",
               "PrimaryAnemometer.WindSpeed": "1.7",
               "PrimaryAnemometer.WindScale": "2",
-              "PrimaryAnemometer.WindDirection": "250.0",
-              "PrimaryAnemometer.WindDirectionDescription": "WSW",
-              "PrimaryAnemometer.MaximumWindSpeed": "2.6",
+              "PrimaryAnemometer.WindDirection": "262.0",
+              "PrimaryAnemometer.WindDirectionDescription": "W",
+              "PrimaryAnemometer.MaximumWindSpeed": "2.9",
               "PrimaryAnemometer.MaximumWindScale": "2",
               "SeaCurrents.Layer": [
                 {
                   "LayerNumber": "1",
-                  "CurrentDirection": "132",
-                  "CurrentDirectionDescription": "SE",
-                  "CurrentSpeed": "0.04",
-                  "CurrentSpeedInKnots": "0.08"
+                  "CurrentDirection": "188",
+                  "CurrentDirectionDescription": "S",
+                  "CurrentSpeed": "0.08",
+                  "CurrentSpeedInKnots": "0.16"
                 }
               ]
             }
@@ -533,7 +533,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         }
       ]
@@ -563,27 +563,27 @@
           "latitude": 23.4947,
           "longitude": 121.5061,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "Temperature": "None",
-              "StationPressure": "1012.8",
+              "StationPressure": "1012.6",
               "PrimaryAnemometer": {
-                "WindSpeed": "1.8",
+                "WindSpeed": "2.0",
                 "WindScale": "2",
-                "WindDirection": "307.0",
-                "WindDirectionDescription": "NW",
+                "WindDirection": "252.0",
+                "WindDirectionDescription": "WSW",
                 "MaximumWindSpeed": "None",
                 "MaximumWindScale": "None"
               }
             },
             "flattened": {
               "Temperature": null,
-              "StationPressure": "1012.8",
-              "PrimaryAnemometer.WindSpeed": "1.8",
+              "StationPressure": "1012.6",
+              "PrimaryAnemometer.WindSpeed": "2.0",
               "PrimaryAnemometer.WindScale": "2",
-              "PrimaryAnemometer.WindDirection": "307.0",
-              "PrimaryAnemometer.WindDirectionDescription": "NW",
+              "PrimaryAnemometer.WindDirection": "252.0",
+              "PrimaryAnemometer.WindDirectionDescription": "WSW",
               "PrimaryAnemometer.MaximumWindSpeed": null,
               "PrimaryAnemometer.MaximumWindScale": null
             }
@@ -591,7 +591,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -602,10 +602,10 @@
           "latitude": 23.4947,
           "longitude": 121.5061,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.26",
+              "TideHeight": "-0.28",
               "TideLevel": "退潮",
               "SeaTemperature": "None",
               "Temperature": "None",
@@ -620,7 +620,7 @@
               }
             },
             "flattened": {
-              "TideHeight": "-0.26",
+              "TideHeight": "-0.28",
               "TideLevel": "退潮",
               "SeaTemperature": null,
               "Temperature": null,
@@ -636,7 +636,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         }
       ]
@@ -657,8 +657,8 @@
           "latitude": 23.1325,
           "longitude": 121.4201,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "WaveHeight": "None",
               "WaveDirection": "None",
@@ -677,7 +677,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -688,41 +688,41 @@
           "latitude": 23.0972,
           "longitude": 121.3799,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.10",
+              "TideHeight": "-0.19",
               "TideLevel": "退潮",
-              "SeaTemperature": "26.3",
+              "SeaTemperature": "26.2",
               "Temperature": "None",
               "StationPressure": "1013.8",
               "PrimaryAnemometer": {
-                "WindSpeed": "0.9",
+                "WindSpeed": "1.0",
                 "WindScale": "1",
-                "WindDirection": "13.0",
-                "WindDirectionDescription": "NNE",
-                "MaximumWindSpeed": "1.7",
-                "MaximumWindScale": "2"
+                "WindDirection": "341.0",
+                "WindDirectionDescription": "NNW",
+                "MaximumWindSpeed": "1.5",
+                "MaximumWindScale": "1"
               }
             },
             "flattened": {
-              "TideHeight": "-0.10",
+              "TideHeight": "-0.19",
               "TideLevel": "退潮",
-              "SeaTemperature": "26.3",
+              "SeaTemperature": "26.2",
               "Temperature": null,
               "StationPressure": "1013.8",
-              "PrimaryAnemometer.WindSpeed": "0.9",
+              "PrimaryAnemometer.WindSpeed": "1.0",
               "PrimaryAnemometer.WindScale": "1",
-              "PrimaryAnemometer.WindDirection": "13.0",
-              "PrimaryAnemometer.WindDirectionDescription": "NNE",
-              "PrimaryAnemometer.MaximumWindSpeed": "1.7",
-              "PrimaryAnemometer.MaximumWindScale": "2"
+              "PrimaryAnemometer.WindDirection": "341.0",
+              "PrimaryAnemometer.WindDirectionDescription": "NNW",
+              "PrimaryAnemometer.MaximumWindSpeed": "1.5",
+              "PrimaryAnemometer.MaximumWindScale": "1"
             }
           },
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -733,11 +733,11 @@
           "latitude": 23.1589,
           "longitude": 121.4036,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.25",
-              "TideLevel": "退潮",
+              "TideHeight": "-0.31",
+              "TideLevel": "漲潮",
               "SeaTemperature": "None",
               "Temperature": "None",
               "StationPressure": "None",
@@ -751,8 +751,8 @@
               }
             },
             "flattened": {
-              "TideHeight": "-0.25",
-              "TideLevel": "退潮",
+              "TideHeight": "-0.31",
+              "TideLevel": "漲潮",
               "SeaTemperature": null,
               "Temperature": null,
               "StationPressure": null,
@@ -767,7 +767,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         }
       ]
@@ -788,10 +788,10 @@
           "latitude": 22.7907,
           "longitude": 121.1921,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
-              "TideHeight": "-0.09",
+              "TideHeight": "-0.16",
               "TideLevel": "退潮",
               "SeaTemperature": "None",
               "Temperature": "None",
@@ -806,7 +806,7 @@
               }
             },
             "flattened": {
-              "TideHeight": "-0.09",
+              "TideHeight": "-0.16",
               "TideLevel": "退潮",
               "SeaTemperature": null,
               "Temperature": null,
@@ -822,7 +822,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         },
         {
@@ -833,34 +833,34 @@
           "latitude": 22.7222,
           "longitude": 121.14,
           "latest_observation": {
-            "observed_at": "2026-11-16T03:00:00+08:00",
-            "observed_at_epoch": 1794769200.0,
+            "observed_at": "2026-11-16T04:00:00+08:00",
+            "observed_at_epoch": 1794772800.0,
             "weather_elements": {
               "TideHeight": "None",
               "TideLevel": "-",
-              "WaveHeight": "1.1",
-              "WaveDirection": "67.0",
+              "WaveHeight": "0.9",
+              "WaveDirection": "78.0",
               "WaveDirectionDescription": "ENE",
               "WavePeriod": "5.7",
               "SeaTemperature": "None",
               "Temperature": "None",
-              "StationPressure": "1014.1",
+              "StationPressure": "1013.9",
               "PrimaryAnemometer": {
-                "WindSpeed": "5.7",
+                "WindSpeed": "6.6",
                 "WindScale": "4",
-                "WindDirection": "341.0",
+                "WindDirection": "346.0",
                 "WindDirectionDescription": "NNW",
-                "MaximumWindSpeed": "7.5",
-                "MaximumWindScale": "4"
+                "MaximumWindSpeed": "8.9",
+                "MaximumWindScale": "5"
               },
               "SeaCurrents": {
                 "Layer": [
                   {
                     "LayerNumber": "1",
-                    "CurrentDirection": "52",
-                    "CurrentDirectionDescription": "NE",
-                    "CurrentSpeed": "0.31",
-                    "CurrentSpeedInKnots": "0.60"
+                    "CurrentDirection": "138",
+                    "CurrentDirectionDescription": "SE",
+                    "CurrentSpeed": "0.09",
+                    "CurrentSpeedInKnots": "0.17"
                   }
                 ]
               }
@@ -868,26 +868,26 @@
             "flattened": {
               "TideHeight": null,
               "TideLevel": null,
-              "WaveHeight": "1.1",
-              "WaveDirection": "67.0",
+              "WaveHeight": "0.9",
+              "WaveDirection": "78.0",
               "WaveDirectionDescription": "ENE",
               "WavePeriod": "5.7",
               "SeaTemperature": null,
               "Temperature": null,
-              "StationPressure": "1014.1",
-              "PrimaryAnemometer.WindSpeed": "5.7",
+              "StationPressure": "1013.9",
+              "PrimaryAnemometer.WindSpeed": "6.6",
               "PrimaryAnemometer.WindScale": "4",
-              "PrimaryAnemometer.WindDirection": "341.0",
+              "PrimaryAnemometer.WindDirection": "346.0",
               "PrimaryAnemometer.WindDirectionDescription": "NNW",
-              "PrimaryAnemometer.MaximumWindSpeed": "7.5",
-              "PrimaryAnemometer.MaximumWindScale": "4",
+              "PrimaryAnemometer.MaximumWindSpeed": "8.9",
+              "PrimaryAnemometer.MaximumWindScale": "5",
               "SeaCurrents.Layer": [
                 {
                   "LayerNumber": "1",
-                  "CurrentDirection": "52",
-                  "CurrentDirectionDescription": "NE",
-                  "CurrentSpeed": "0.31",
-                  "CurrentSpeedInKnots": "0.60"
+                  "CurrentDirection": "138",
+                  "CurrentDirectionDescription": "SE",
+                  "CurrentSpeed": "0.09",
+                  "CurrentSpeedInKnots": "0.17"
                 }
               ]
             }
@@ -895,7 +895,7 @@
           "observations_48h": 49,
           "observations_30d": 721,
           "history_30d_latest_at": "2026-11-15T23:00:00+08:00",
-          "latest_age_minutes": 86.8,
+          "latest_age_minutes": 64.3,
           "status": "fresh"
         }
       ]
