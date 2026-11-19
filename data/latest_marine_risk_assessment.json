@@ -2,8 +2,8 @@
   "schema_version": "1.0.0",
   "source": "CWA",
   "analysis_kind": "observed_marine_exposure_screening",
-  "generated_at": "2026-11-19T04:12:50.953826+00:00",
-  "source_snapshot_generated_at": "2026-11-19T04:12:50.920564+00:00",
+  "generated_at": "2026-11-19T13:02:49.084873+00:00",
+  "source_snapshot_generated_at": "2026-11-19T13:02:49.044279+00:00",
   "stale_after_minutes": 180,
   "threshold_policy": {
     "type": "internal_screening_only",
@@ -49,20 +49,28 @@
     "yilan_suao": {
       "region_id": "yilan_suao",
       "region_name": "宜蘭、蘇澳",
-      "state": "partial_data",
-      "exposure_level": "unknown",
-      "exposure_label": "無法判定",
+      "state": "assessed",
+      "exposure_level": "high",
+      "exposure_label": "高",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-19T11:00:00+08:00",
-      "observation_age_minutes": 72.8,
+      "latest_observation_time": "2026-11-19T20:00:00+08:00",
+      "observation_age_minutes": 62.8,
       "stale_after_minutes": 180,
       "station_count": 4,
       "mapped_station_count": 5,
-      "exposure_variable_coverage_ratio": 0.167,
+      "exposure_variable_coverage_ratio": 0.584,
       "factors": [
         {
+          "factor": "wave_height_m",
+          "value": 1.5,
+          "unit": "m",
+          "level": "high",
+          "label": "高",
+          "basis": "internal_screening_band_not_official_warning"
+        },
+        {
           "factor": "wind_speed_ms",
-          "value": 2.8,
+          "value": 3.6,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -70,11 +78,11 @@
         }
       ],
       "other_observations": {
-        "wave_period_s": null,
-        "tide_height_m": 0.135,
+        "wave_period_s": 6.3,
+        "tide_height_m": -0.055,
         "current_speed_ms": null,
-        "wave_direction_deg": null,
-        "wind_direction_deg": 20.0
+        "wave_direction_deg": 45.0,
+        "wind_direction_deg": 336.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-18T23:00:00+08:00",
@@ -93,7 +101,7 @@
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
-      "reason": "浪高與風速僅取得其中一項；顯示已取得的因子，但整體暴露級別不予判定。",
+      "reason": "浪高與風速兩項觀測均可用，提供環境暴露篩檢；不是安全判定。",
       "limitations": [
         "浪高與風速級別是本專案內部環境暴露篩檢門檻，不是中央氣象署警戒標準。",
         "測站區域平均不代表個別岸際釣點；地形、湧浪、離岸流及浪襲仍須現場判斷。",
@@ -106,20 +114,28 @@
     "hualien_north": {
       "region_id": "hualien_north",
       "region_name": "花蓮北段",
-      "state": "partial_data",
-      "exposure_level": "unknown",
-      "exposure_label": "無法判定",
+      "state": "assessed",
+      "exposure_level": "moderate",
+      "exposure_label": "中",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-19T11:00:00+08:00",
-      "observation_age_minutes": 72.8,
+      "latest_observation_time": "2026-11-19T20:00:00+08:00",
+      "observation_age_minutes": 62.8,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
-      "exposure_variable_coverage_ratio": 0.25,
+      "exposure_variable_coverage_ratio": 1.0,
       "factors": [
         {
+          "factor": "wave_height_m",
+          "value": 1.2,
+          "unit": "m",
+          "level": "moderate",
+          "label": "中",
+          "basis": "internal_screening_band_not_official_warning"
+        },
+        {
           "factor": "wind_speed_ms",
-          "value": 3.5,
+          "value": 1.35,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -127,11 +143,11 @@
         }
       ],
       "other_observations": {
-        "wave_period_s": null,
-        "tide_height_m": 0.17,
-        "current_speed_ms": null,
-        "wave_direction_deg": null,
-        "wind_direction_deg": 35.0
+        "wave_period_s": 6.2,
+        "tide_height_m": -0.06,
+        "current_speed_ms": 0.09,
+        "wave_direction_deg": 67.0,
+        "wind_direction_deg": 318.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-18T23:00:00+08:00",
@@ -150,7 +166,7 @@
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
-      "reason": "浪高與風速僅取得其中一項；顯示已取得的因子，但整體暴露級別不予判定。",
+      "reason": "浪高與風速兩項觀測均可用，提供環境暴露篩檢；不是安全判定。",
       "limitations": [
         "浪高與風速級別是本專案內部環境暴露篩檢門檻，不是中央氣象署警戒標準。",
         "測站區域平均不代表個別岸際釣點；地形、湧浪、離岸流及浪襲仍須現場判斷。",
@@ -200,23 +216,32 @@
     "fengbin_shitiping": {
       "region_id": "fengbin_shitiping",
       "region_name": "豐濱、石梯坪",
-      "state": "insufficient_data",
+      "state": "partial_data",
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-19T11:00:00+08:00",
-      "observation_age_minutes": 72.8,
+      "latest_observation_time": "2026-11-19T20:00:00+08:00",
+      "observation_age_minutes": 62.8,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 2,
-      "exposure_variable_coverage_ratio": 0.0,
-      "factors": [],
+      "exposure_variable_coverage_ratio": 1.0,
+      "factors": [
+        {
+          "factor": "wind_speed_ms",
+          "value": 3.7,
+          "unit": "m/s",
+          "level": "low",
+          "label": "低",
+          "basis": "internal_screening_band_not_official_warning"
+        }
+      ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 0.28,
+        "tide_height_m": 0.0,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": null
+        "wind_direction_deg": 31.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-18T23:00:00+08:00",
@@ -235,7 +260,7 @@
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
-      "reason": "目前沒有可用的浪高或風速觀測，不能推定海況平穩。",
+      "reason": "浪高與風速僅取得其中一項；顯示已取得的因子，但整體暴露級別不予判定。",
       "limitations": [
         "浪高與風速級別是本專案內部環境暴露篩檢門檻，不是中央氣象署警戒標準。",
         "測站區域平均不代表個別岸際釣點；地形、湧浪、離岸流及浪襲仍須現場判斷。",
@@ -252,8 +277,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-19T11:00:00+08:00",
-      "observation_age_minutes": 72.8,
+      "latest_observation_time": "2026-11-19T20:00:00+08:00",
+      "observation_age_minutes": 62.8,
       "stale_after_minutes": 180,
       "station_count": 3,
       "mapped_station_count": 3,
@@ -261,7 +286,7 @@
       "factors": [
         {
           "factor": "wind_speed_ms",
-          "value": 3.3,
+          "value": 4.8,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -270,10 +295,10 @@
       ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 0.215,
+        "tide_height_m": -0.03,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": 1.0
+        "wind_direction_deg": 349.0
       },
       "historical_window": {
         "latest_observation_time": "2026-11-18T23:00:00+08:00",
@@ -305,21 +330,30 @@
     "taitung_south": {
       "region_id": "taitung_south",
       "region_name": "台東南段",
-      "state": "insufficient_data",
+      "state": "partial_data",
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-19T11:00:00+08:00",
-      "observation_age_minutes": 72.8,
+      "latest_observation_time": "2026-11-19T20:00:00+08:00",
+      "observation_age_minutes": 62.8,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
-      "exposure_variable_coverage_ratio": 0.0,
-      "factors": [],
+      "exposure_variable_coverage_ratio": 1.0,
+      "factors": [
+        {
+          "factor": "wave_height_m",
+          "value": 1.2,
+          "unit": "m",
+          "level": "moderate",
+          "label": "中",
+          "basis": "internal_screening_band_not_official_warning"
+        }
+      ],
       "other_observations": {
-        "wave_period_s": null,
-        "tide_height_m": 0.15,
-        "current_speed_ms": null,
+        "wave_period_s": 6.2,
+        "tide_height_m": 0.03,
+        "current_speed_ms": 0.86,
         "wave_direction_deg": null,
         "wind_direction_deg": null
       },
@@ -340,7 +374,7 @@
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
-      "reason": "目前沒有可用的浪高或風速觀測，不能推定海況平穩。",
+      "reason": "浪高與風速僅取得其中一項；顯示已取得的因子，但整體暴露級別不予判定。",
       "limitations": [
         "浪高與風速級別是本專案內部環境暴露篩檢門檻，不是中央氣象署警戒標準。",
         "測站區域平均不代表個別岸際釣點；地形、湧浪、離岸流及浪襲仍須現場判斷。",
