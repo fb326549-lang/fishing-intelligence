@@ -183,6 +183,30 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         self.assertTrue(all(json.loads(r["species_weights_json"]) == {} for r in rows))
         self.assertTrue(all(json.loads(r["indicator_trace_json"])[-1]["weight_basis"] == "not_applicable_no_composite_score" for r in rows))
 
+    def test_black_seabream_spawning_activity_proxy_is_seasonal_only_and_never_unlocks_fci(self):
+        records, as_of = fixture_records()
+        records = [{**record,
+                    "valid_time": datetime.fromisoformat(record["valid_time"]).replace(month=6).isoformat(),
+                    "environment": {**record["environment"],
+                                    "sunrise": datetime.fromisoformat(record["environment"]["sunrise"]).replace(month=6).isoformat(),
+                                    "sunset": datetime.fromisoformat(record["environment"]["sunset"]).replace(month=6).isoformat()}}
+                   for record in records]
+        as_of = as_of.replace(month=6)
+        rows = [row for row in build_rows(records, candidate_rows(), self.profiles, as_of)
+                if row["candidate_id"] == "c004"]
+        dawn = next(row for row in rows if row["valid_time"].endswith("06:00:00+08:00"))
+        daytime = next(row for row in rows if row["valid_time"].endswith("12:00:00+08:00"))
+        evening = next(row for row in rows if row["valid_time"].endswith("18:00:00+08:00"))
+        self.assertEqual(dawn["fish_activity_score"], "")
+        self.assertEqual(float(daytime["fish_activity_score"]), 55.0)
+        self.assertEqual(float(evening["fish_activity_score"]), 70.0)
+        evening_trace = json.loads(evening["indicator_trace_json"])[2]
+        self.assertIn("L056", evening_trace["evidence_ids"])
+        self.assertIn("spawning-movement proxy", evening_trace["phase_basis"])
+        self.assertTrue(all(row["feeding_condition_score"] == "" for row in rows))
+        self.assertTrue(all(row["overall_fish_condition_index"] == "" for row in rows))
+        self.assertTrue(all(json.loads(row["species_weights_json"]) == {} for row in rows))
+
     def test_missing_sea_state_keeps_index_blank_instead_of_filling_zero(self):
         records, as_of = fixture_records(include_sea_state=False)
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
