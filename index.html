@@ -536,7 +536,7 @@ async function loadFishConditionIndex(){
   const response=await fetch(FISH_CONDITION_INDEX_URL+'?t='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const data=await response.json();
-  if(data.schema_version!==1||data.source!=='fishing-intelligence-fci-1.0'||!Array.isArray(data.rows)||!Array.isArray(data.regions)||!Array.isArray(data.horizons_hours))throw Error('魚情指數資料格式不符');
+  if(data.schema_version!==1||!['fishing-intelligence-fci-1.0','fishing-intelligence-fci-preliminary-1.2'].includes(data.source)||!Array.isArray(data.rows)||!Array.isArray(data.regions)||!Array.isArray(data.horizons_hours))throw Error('魚情指數資料格式不符');
   if(!data.horizons_hours.includes(6)||!data.horizons_hours.includes(12)||!data.horizons_hours.includes(24))throw Error('魚情指數預報時段不完整');
   latest.fishConditionIndex=data;
  }catch(e){
