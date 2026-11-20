@@ -98,13 +98,13 @@ class SpeciesContextCatalogTests(unittest.TestCase):
         self.assertIn("Girella mezina", rows["RO011"]["limitations"])
         self.assertIn("六個本島雷達區域", rows["RO013"]["limitations"])
 
-    def test_2016_southern_drummer_site_uses_taitung_south_region(self):
+    def test_2016_southern_drummer_shanyuan_site_uses_chenggong_donghe_region(self):
         register = Path(__file__).parent / "species" / "species_regional_occurrence_register.csv"
         with register.open(encoding="utf-8-sig", newline="") as source_file:
             row = next(item for item in csv.DictReader(source_file) if item["regional_occurrence_id"] == "RO001")
         self.assertEqual(row["candidate_id"], "c036")
         self.assertEqual(row["site_name"], "杉原北側")
-        self.assertEqual(row["region_id"], "taitung_south")
+        self.assertEqual(row["region_id"], "chenggong_donghe")
         self.assertEqual(row["recorded_presence"], "present")
         self.assertEqual(row["model_use_status"], "context_only_east_coast_biodiversity_survey")
     def test_unknown_candidate_and_missing_source_are_rejected(self):
