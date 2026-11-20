@@ -706,6 +706,8 @@ P2 整合器現在保留每個候選魚種的季節研究 ID、報告季節、�
 
 這些資料只代表該次水下生態調查曾觀察到物種，不代表數量、族群豐度、岸釣漁獲、即時存在或最佳作釣時段。表格空白也不解讀為未出現。研究範圍為東部海岸小野柳至花蓮鹽寮、潮間帶至水深 20 公尺以淺，只有單年度調查，不能作為逐時魚情模型訓練標籤。
 
+另增列 2008 年綠島漁撈利用魚種名錄中的南方舵魚、臭肚及瓜子鱲。三者在該表均標為少見（1–3 尾）；這是離岸綠島漁撈紀錄，不映射至六個本島雷達區域，也沒有努力量、魚種活動時段或餌源利用資料。名錄將 *Girella punctata* 與 *Girella mezina* 都列為俗名「黑毛」，因此俗名不能取代物種鑑定。
+
 `build_species_context_catalog.py` 會將這些紀錄一併輸出至 `species_ecology_context.json` 的 `regional_occurrence_records`，PWA 可依魚種及區域顯示歷史出現證據與原始報告連結；此層仍標記為 `context_only_east_coast_biodiversity_survey`，不參與活動分數或中魚機率。
 
 ## P2.4.5 活動／出現／季節證據可追溯上下文
@@ -872,4 +874,15 @@ python P2/species/audit_environment_response_rules.py \\
 - 網頁可在六個東部區域直接選擇四種目標魚；歷史 eDNA 未檢出不再隱藏選項，也不被當成沒有魚。瓜子鱲選項特別提醒必須確認物種，南方舵魚分數只適用於確認為 `Kyphosus bigibbus` 的個體。黑鯛與瓜子鱲目前因缺少至少一項東部逐時物種依據而不顯示綜合指數。
 
 測試：`P2/test_preliminary_relative_score_engine.py` 涵蓋四種魚的來源追溯、兩種三指標代理齊備魚種的相對海況排序與6／12／24小時排名、黑鯛繁殖季活動代理的月份限制與不解鎖 FCI、黑鯛／瓜子鱲缺少逐時覓食依據時不產生中性假分數、缺失海況及分類提醒。正式門檻與權重檔仍保持未核准；初版與正式模型分開執行。
+
+### 南方舵魚水槽溫度觀測點比較器
+
+`P2/species/southern_drummer_context_response_engine.py` 提供研究用途的原始觀測點比較：僅比較 L052 同一褐藻在研究實際測得溫度下的攝食率，回報觀測值比值並帶上來源與限制。未測溫度會回傳 `no_exact_observed_point`；不插值、不外推、不輸出魚情分數或中魚機率，也不接入預報及漁獵雷達。這不是台灣東部模型參數。
+
+```bash
+python P2/species/southern_drummer_context_response_engine.py \
+  --response-group macroalgae_sst_sargassum \
+  --reference-temperature-c 30 --comparison-temperature-c 16
+python -m unittest P2.test_southern_drummer_response_curves -v
+```
 
