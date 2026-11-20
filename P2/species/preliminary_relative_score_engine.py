@@ -117,9 +117,20 @@ def percentile_scores(records, field, lower_is_better=True):
             scores.update({(region, time): 50.0 for time, _ in ordered})
             continue
         n = len(ordered)
-        for rank, (time, _) in enumerate(ordered):
-            percentile = 100.0 * rank / (n - 1)
-            scores[(region, time)] = 100.0 - percentile if lower_is_better else percentile
+        start = 0
+        while start < n:
+            end = start + 1
+            while end < n and ordered[end][1] == ordered[start][1]:
+                end += 1
+            # Give tied forecasts their shared midrank percentile. Using time
+            # as a tiebreaker would make identical wind/wave conditions score
+            # differently for reasons unrelated to the environmental input.
+            mean_rank = (start + end - 1) / 2
+            percentile = 100.0 * mean_rank / (n - 1)
+            score = 100.0 - percentile if lower_is_better else percentile
+            for time, _ in ordered[start:end]:
+                scores[(region, time)] = score
+            start = end
     return scores
 
 
@@ -174,6 +185,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 {"indicator_code": "environment_suitability", "score": env_score,
                  "inputs_used": {k: env.get(k) for k in ("wave_height_m", "wind_speed_10m_ms")},
                  "input_ranks": {"wave_height_m": wave_scores.get((region, valid_time)), "wind_speed_10m_ms": wind_scores.get((region, valid_time))},
+                 "score_interpretation": "relative_rank_within_this_region_next_24h_for_wave_height_and_wind_speed; lower_values_rank_higher; operational_sea_state_proxy_only_not_species_ecological_suitability_or_safety_assessment",
                  "coverage": env_coverage, "excluded_unvalidated_inputs": ["sea_surface_temperature_c", "ocean_current_velocity_ms", "tide_height_m"]},
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
                  "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_activity_source_urls"],

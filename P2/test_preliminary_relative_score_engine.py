@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "species"))
 sys.path.insert(0, str(Path(__file__).parent / "collector"))
-from preliminary_relative_score_engine import build_rows, load_profiles, rank_best_hours
+from preliminary_relative_score_engine import build_rows, load_profiles, percentile_scores, rank_best_hours
 from export_hourly_fish_condition_index_json import export_index
 
 PROFILE = Path(__file__).parent / "species" / "preliminary_relative_score_profiles.csv"
@@ -129,6 +129,20 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         self.assertTrue(all(0 <= score <= 100 for score in env_scores))
         same_hour = [r for r in rows if r["valid_time"] == c003[0]["valid_time"]]
         self.assertEqual(len({r["environment_suitability_score"] for r in same_hour}), 1)
+        env_trace = json.loads(c003[0]["indicator_trace_json"])[1]
+        self.assertIn("relative_rank_within_this_region_next_24h", env_trace["score_interpretation"])
+        self.assertIn("not_species_ecological_suitability_or_safety_assessment", env_trace["score_interpretation"])
+
+    def test_equal_forecasts_receive_equal_midrank_percentile_scores(self):
+        records = [
+            {"region_id": "east", "valid_time": f"2026-11-11T{hour:02}:00:00+08:00",
+             "environment": {"wind": value}}
+            for hour, value in enumerate((1, 1, 3, 3))
+        ]
+        scores = percentile_scores(records, "wind", lower_is_better=True)
+        self.assertEqual(scores[("east", records[0]["valid_time"])], scores[("east", records[1]["valid_time"])])
+        self.assertEqual(scores[("east", records[2]["valid_time"])], scores[("east", records[3]["valid_time"])])
+        self.assertGreater(scores[("east", records[0]["valid_time"])], scores[("east", records[2]["valid_time"])])
 
     def test_food_and_activity_priors_are_species_specific_but_explicitly_low_confidence(self):
         records, as_of = fixture_records()
@@ -298,6 +312,9 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual(payload["source"], "fishing-intelligence-fci-preliminary-1.2")
             app_html = (Path(__file__).parents[1] / "index.html").read_text(encoding="utf-8")
             self.assertIn("'fishing-intelligence-fci-preliminary-1.2'", app_html)
+            self.assertIn("海況相對分（風浪）", app_html)
+            self.assertIn("不是魚種適合度", app_html)
+            self.assertIn("不代表魚種生態適合度或安全判斷", app_html)
             self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS)
             self.assertEqual(len(payload["rows"]), 24 * 4)
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))

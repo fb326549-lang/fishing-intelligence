@@ -95,7 +95,7 @@ a{color:#8be8ef}
  </div>
  <div class="radar-indicators">
   <div class="radar-indicator"><div class="radar-indicator-label">覓食條件</div><div class="radar-indicator-value" id="radarForage">尚未建立</div></div>
-  <div class="radar-indicator"><div class="radar-indicator-label">環境適合度</div><div class="radar-indicator-value" id="radarEnvironment">無核准規則</div></div>
+  <div class="radar-indicator"><div class="radar-indicator-label">海況相對分（風浪）</div><div class="radar-indicator-value" id="radarEnvironment">無核准規則</div><div class="radar-indicator-label" style="margin-top:6px;line-height:1.45">本區未來24小時內比較；不是魚種適合度</div></div>
   <div class="radar-indicator"><div class="radar-indicator-label">魚類活動力</div><div class="radar-indicator-value" id="radarActivity">尚無模型</div></div>
  </div>
  <div class="radar-lower">
@@ -805,7 +805,7 @@ function renderRadarDashboard(){
  $('radarIndicatorHorizonSummary').textContent=[6,12,24].map(h=>`${h}小時 覓食代理：${formatIndicatorWindow(h,'feeding')}｜活動代理：${formatIndicatorWindow(h,'activity')}`).join('；');
  if(display){
   const pct=value=>typeof value==='number'&&Number.isFinite(value)?Math.round(value*100)+'%':'缺值';
-  $('radarDataQuality').textContent='資料品質：低信心初版｜覓食輸入覆蓋 '+pct(display.feeding_condition_coverage)+'｜環境輸入覆蓋 '+pct(display.environment_suitability_coverage)+'｜活動輸入覆蓋 '+pct(display.fish_activity_coverage)+'。餌源量、潮流與現場魚況未納入。';
+ $('radarDataQuality').textContent='資料品質：低信心初版｜覓食輸入覆蓋 '+pct(display.feeding_condition_coverage)+'｜風浪排序輸入覆蓋 '+pct(display.environment_suitability_coverage)+'｜活動輸入覆蓋 '+pct(display.fish_activity_coverage)+'。海況相對分只比較本區未來24小時風速與浪高，不代表魚種生態適合度或安全判斷；餌源量、潮流與現場魚況未納入。';
  }else $('radarDataQuality').textContent='資料品質：低信心初版；等待本區與魚種預報資料。';
  const generated=new Date(index?.generated_at||outlook?.generated_at||'');
  const age=(Date.now()-generated.getTime())/3600000;
