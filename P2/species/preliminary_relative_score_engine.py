@@ -16,7 +16,9 @@ from pathlib import Path
 
 from indicator_score_engine import parse_dt, read_csv, select_latest_forecast_vintages
 
-TARGETS = {"c036", "c003", "c004", "c001"}
+TARGETS = {"c036", "c003", "c004", "c001", "c010", "c027", "c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
+TAITUNG_ONLY_TARGETS = {"c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
+TAITUNG_REGIONS = {"chenggong_donghe", "taitung_south"}
 PHASES = ("dawn", "day", "dusk", "night")
 WEIGHTS = {"feeding_condition": 1 / 3, "environment_suitability": 1 / 3, "fish_activity": 1 / 3}
 MODEL_VERSION = "preliminary-relative-1.2"
@@ -60,9 +62,12 @@ def load_profiles(path: Path):
         row["_urls"] = [u for u in row["source_urls"].split(";") if u.startswith("https://")]
         for key in ("feeding_source_urls", "activity_source_urls"):
             urls = [u for u in row.get(key, "").split(";") if u]
-            source_ids = row["feeding_source_ids" if key.startswith("feeding") else "activity_source_ids"].split(";")
-            if not urls or len(urls) != len(source_ids) or any(not url.startswith("https://") for url in urls):
+            source_ids = [value for value in row["feeding_source_ids" if key.startswith("feeding") else "activity_source_ids"].split(";") if value]
+            points_key = "_feeding_phase_points" if key.startswith("feeding") else "_activity_phase_points"
+            if len(urls) != len(source_ids) or any(not url.startswith("https://") for url in urls):
                 raise ValueError(f"{cid}: {key} must list one traceable URL for each indicator-specific evidence ID")
+            if not urls and any(value is not None for value in row[points_key].values()):
+                raise ValueError(f"{cid}: scored {key} requires indicator-specific evidence")
             row["_" + key] = urls
         if not row["_urls"]:
             raise ValueError(f"{cid}: at least one traceable source URL is required")
@@ -151,6 +156,8 @@ def build_rows(records, candidate_rows, profiles, as_of):
         env_score = round(sum(env_parts) / 2, 2) if len(env_parts) == 2 else None
         env_coverage = len(env_parts) / 4  # wave, wind, SST and current are the planned environment inputs.
         for cid in sorted(TARGETS):
+            if cid in TAITUNG_ONLY_TARGETS and region not in TAITUNG_REGIONS:
+                continue
             profile, candidate = profiles[cid], candidates[cid]
             feeding_profile = profile["_feeding_phase_points"]
             activity_profile = profile["_activity_phase_points"]
@@ -179,7 +186,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 status = "preliminary_scored"
             trace = [
                 {"indicator_code": "feeding_condition", "phase": phase, "score": feeding,
-                 "evidence_ids": profile["feeding_source_ids"].split(";"), "source_urls": profile["_feeding_source_urls"],
+                 "evidence_ids": [value for value in profile["feeding_source_ids"].split(";") if value], "source_urls": profile["_feeding_source_urls"],
                  "evidence_class": profile["evidence_class"], "phase_basis": feeding_basis,
                  "point_method": profile["point_method"], "quantitative_calibration": False, "limitation": profile["limitations"]},
                 {"indicator_code": "environment_suitability", "score": env_score,
@@ -188,7 +195,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                  "score_interpretation": "relative_rank_within_this_region_next_24h_for_wave_height_and_wind_speed; lower_values_rank_higher; operational_sea_state_proxy_only_not_species_ecological_suitability_or_safety_assessment",
                  "coverage": env_coverage, "excluded_unvalidated_inputs": ["sea_surface_temperature_c", "ocean_current_velocity_ms", "tide_height_m"]},
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
-                 "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_activity_source_urls"],
+                 "evidence_ids": [value for value in profile["activity_source_ids"].split(";") if value], "source_urls": profile["_activity_source_urls"],
                  "evidence_class": profile["evidence_class"], "seasonal_override_month": parse_dt(valid_time, "valid_time").month if month_override is not None else None,
                  "phase_basis": activity_basis, "point_method": profile["point_method"],
                  "quantitative_calibration": False, "limitation": profile["limitations"]},
