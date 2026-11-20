@@ -757,7 +757,8 @@ function renderRadarDashboard(){
  const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  const aliases={c001:'瓜子鱲（須確認物種）',c002:'白毛（舵魚屬未鑑種）',c036:'南方舵魚',c037:'天竺舵魚'};
  const outlookRow=outlook?.rows?.find(r=>r.region_id===regionId&&r.candidate_id===candidateId&&String(r.horizon_hours)==='6');
- const name=outlookRow?(aliases[outlookRow.candidate_id]||outlookRow.common_name_zh||outlookRow.candidate_id):(aliases[candidateId]||'尚未選擇');
+ const selectedName=$('decisionFishSelect')?.selectedOptions?.[0]?.textContent?.trim()||'';
+ const name=outlookRow?(aliases[outlookRow.candidate_id]||outlookRow.common_name_zh||outlookRow.candidate_id):(candidateId?(aliases[candidateId]||selectedName||candidateId):'尚未選擇');
  $('radarTarget').textContent=name;
  const rows=(index?.rows||[]).filter(r=>r.region_id===regionId&&r.candidate_id===candidateId&&r.data_type==='forecast');
  const winnersAt=h=>rows.filter(r=>r[`best_hour_status_${h}h`]==='best_hour');
