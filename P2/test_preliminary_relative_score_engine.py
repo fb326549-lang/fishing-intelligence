@@ -90,6 +90,17 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertEqual(set(overrides), set(override_basis))
             self.assertIn("not quantitatively calibrated", profile["point_method"].lower())
 
+    def test_southern_drummer_feeding_does_not_claim_an_unsupported_diel_gradient(self):
+        profile = next(row for row in self.profiles.values() if row["candidate_id"] == "c036")
+        points = profile["_feeding_phase_points"]
+        self.assertEqual(len(set(points.values())), 1)
+        self.assertIn("no significant day-night intake difference", profile["_feeding_phase_basis_json"]["night"])
+
+        records, as_of = fixture_records()
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        drummer_scores = [row["feeding_condition_score"] for row in rows if row["candidate_id"] == "c036"]
+        self.assertEqual(set(drummer_scores), {"65.00"})
+
     def test_trace_explains_selected_phase_and_marks_points_uncalibrated(self):
         records, as_of = fixture_records()
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
