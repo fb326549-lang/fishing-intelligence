@@ -41,6 +41,8 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
             with self.subTest(occurrence=row["regional_occurrence_id"]):
                 if row["site_code"] == "GREEN-ISLAND-FISHERY-2008" or row["candidate_id"] == "c052":
                     self.assertEqual(row["region_id"], "")
+                elif row["region_id"] == "taitung":
+                    self.assertEqual(row["candidate_id"], "c056")
                 else:
                     self.assertIn(row["region_id"], expected)
 
@@ -60,13 +62,15 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
             "RO020": ("c041", "Siganus guttatus"),
             "RO021": ("c010", "Terapon jarbua"),
             "RO038": ("c055", "Girella mezina"),
+            "RO039": ("c023", "Coryphaena hippurus"),
+            "RO040": ("c056", "Istiompax indica"),
         }
         for occurrence_id, (candidate_id, scientific_name) in expected.items():
             with self.subTest(occurrence=occurrence_id):
                 row = self.by_occurrence[occurrence_id]
                 self.assertEqual(row["candidate_id"], candidate_id)
                 self.assertEqual(row["taxon_scientific_name"], scientific_name)
-                expected_region = "chenggong_donghe" if occurrence_id in {"RO008", "RO021", "RO038"} else "taitung_south"
+                expected_region = "taitung" if occurrence_id == "RO040" else "chenggong_donghe" if occurrence_id in {"RO008", "RO021", "RO038", "RO039"} else "taitung_south"
                 self.assertEqual(row["region_id"], expected_region)
 
     def test_occurrence_ids_are_unique(self):
@@ -78,7 +82,12 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertIn("{id:'c010',name:'花身雞魚',scientific:'Terapon jarbua'}", page)
         self.assertIn("{id:'c027',name:'條紋豆娘魚',scientific:'Abudefduf vaigiensis'}", page)
         self.assertIn("x.id!=='c001'", page)
-        self.assertIn("['present','port_sample_only'].includes(r.recorded_presence)", page)
+        self.assertIn("['present','fishery_record'].includes(r.recorded_presence)", page)
+        self.assertIn("r.region_id==='taitung'", page)
+        self.assertIn("const available=isTaitungRegion", page)
+        self.assertIn("const taitungCandidateIds=getTaitungRadarCandidateIds(region,data)", page)
+        self.assertIn("(!taitungCandidateIds||taitungCandidateIds.has(r.candidate_id))", page)
+        self.assertIn("本區全部有區域證據魚種", page)
         for cid, region in (("c010", "chenggong_donghe"), ("c027", "taitung_south")):
             self.assertTrue(any(row["candidate_id"] == cid and row["region_id"] == region for row in self.occurrences))
         self.assertIn("{id:'c055',name:'黃帶瓜子鱲',scientific:'Girella mezina'}", page)
@@ -92,18 +101,29 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertEqual((island_taxon["candidate_id"], island_taxon["region_id"]), ("c052", ""))
         self.assertIn("東部離島", island_taxon["limitations"])
 
-    def test_recent_success_port_sample_species_are_visible_as_context_only_targets(self):
-        sampled_candidates = {f"c{i:03d}" for i in range(43, 55) if i != 52} | {"c018", "c023"}
-        target_occurrences = [row for row in self.occurrences if row["candidate_id"] in sampled_candidates]
-        self.assertEqual({row["candidate_id"] for row in target_occurrences}, sampled_candidates)
-        self.assertTrue(all(row["region_id"] == "chenggong_donghe" for row in target_occurrences))
-        self.assertTrue(all(row["recorded_presence"] == "port_sample_only" for row in target_occurrences))
-        self.assertTrue(all("捕獲" in row["limitations"] and "漁法" in row["limitations"] for row in target_occurrences))
+    def test_port_only_samples_are_not_region_targets_without_independent_catch_evidence(self):
+        port_only_candidates = {row["candidate_id"] for row in self.occurrences
+                                if row["recorded_presence"] == "port_sample_only" and row["region_id"]}
+        target_candidates = {row["candidate_id"] for row in self.occurrences
+                             if row["region_id"] in {"chenggong_donghe", "taitung_south", "taitung"}
+                             and row["recorded_presence"] in {"present", "fishery_record"}}
+        self.assertEqual(port_only_candidates - target_candidates, port_only_candidates - {"c023"})
+        self.assertIn("c023", target_candidates)
+        self.assertIn("c056", target_candidates)
+        self.assertNotIn("c052", target_candidates)
+        self.assertNotIn("c001", target_candidates)
+        self.assertFalse(any(row["candidate_id"] in {"c003", "c004"} and row["region_id"] == "taitung_south"
+                             for row in self.occurrences))
         page = RADAR_PAGE.read_text(encoding="utf-8")
-        for cid in sampled_candidates:
-            self.assertIn("id:'" + cid + "'", page)
-        self.assertIn("港口樣本，捕獲來源未詳", page)
-        self.assertIn("id:'c055'", page)
+        self.assertIn("id:'c056',name:'立翅旗魚（黑皮旗魚）',scientific:'Istiompax indica'", page)
+        self.assertIn("只列本區出現或有台東漁業捕獲依據的魚種", page)
+
+    def test_county_scale_taitung_capture_is_marked_and_not_mapped_to_one_subregion(self):
+        row = self.by_occurrence["RO040"]
+        self.assertEqual(row["region_id"], "taitung")
+        self.assertIn("未細分成功東河／台東南段", row["site_name"])
+        self.assertIn("未提供可映射", row["study_scope"])
+        self.assertEqual(row["recorded_presence"], "fishery_record")
 
     def test_success_port_report_sampling_events_match_reported_taxa_and_counts(self):
         sample_rows = [row for row in self.occurrences if row["site_code"] == "TAI-NEWPORT-SAMPLES-2025"]

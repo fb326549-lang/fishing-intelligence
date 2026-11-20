@@ -644,6 +644,13 @@ function renderP2EvidenceContext(title,raw,kind){
  const more=items.length>4?'<div class="small">另有 '+(items.length-4)+' 筆，資料已保留於完整 JSON。</div>':'';
  return '<details class="evidence-details"><summary>'+escapeP2Text(title)+'（'+items.length+' 筆）</summary>'+rows+more+'</details>';
 }
+function isTaitungRadarRegion(regionId){return regionId==='chenggong_donghe'||regionId==='taitung_south'}
+function taitungOccurrenceMatchesRegion(record,regionId){return record.region_id===regionId||(isTaitungRadarRegion(regionId)&&record.region_id==='taitung')}
+function getTaitungRadarCandidateIds(regionId,data){
+ if(!isTaitungRadarRegion(regionId))return null;
+ const records=data?.species_ecology_context?.regional_occurrence_records||[];
+ return new Set(records.filter(r=>taitungOccurrenceMatchesRegion(r,regionId)&&['present','fishery_record'].includes(r.recorded_presence)).map(r=>r.candidate_id));
+}
 function renderP2FishOutlook(){
  const data=latest.p2FishOutlook;
  if(!data)return;
@@ -651,7 +658,8 @@ function renderP2FishOutlook(){
  if(!region){
   $('p2FishStatus').textContent='尚未選擇區域';$('p2FishSummary').textContent='請先在地圖選擇台灣東部釣點，或在中央氣象署區域選單指定區域。';$('p2FishCards').innerHTML='';return;
  }
- const rows=data.rows.filter(r=>r.region_id===region&&String(r.horizon_hours)===horizon&&(candidate==='all'||r.candidate_id===candidate));
+ const taitungCandidateIds=getTaitungRadarCandidateIds(region,data);
+ const rows=data.rows.filter(r=>r.region_id===region&&String(r.horizon_hours)===horizon&&(candidate==='all'||r.candidate_id===candidate)&&(!taitungCandidateIds||taitungCandidateIds.has(r.candidate_id)));
  const names={yilan_suao:'宜蘭、蘇澳',hualien_north:'花蓮北段',hualien_south:'花蓮南段',fengbin_shitiping:'豐濱、石梯坪',chenggong_donghe:'成功、東河',taitung_south:'台東南段'};
  const generated=new Date(data.generated_at),age=(Date.now()-generated.getTime())/3600000,stale=!Number.isFinite(age)||age>8||age< -0.25;
  $('p2FishStatus').textContent=stale?'資料可能過期':'已取得預報';
@@ -667,9 +675,10 @@ function renderP2FishOutlook(){
   const noForecast=Number(tideRow.tide_phase_missing_forecast_hour_count)||0;
   tideSummary='潮勢預報：漲 '+rise+'h／退 '+fall+'h／高潮轉折窗 '+high+'h／低潮轉折窗 '+low+'h；已判定 '+known+'/'+horizon+'h'+(missing?'，潮勢未判定 '+missing+'h':'')+(noForecast?'，缺預報 '+noForecast+'h':'')+'。轉折窗依官方滿/乾潮預報事件推導，不代表實測潮流或停流。';
  }
- $('p2FishSummary').textContent=names[region]+'｜未來 '+horizon+' 小時｜'+rows.length+' 個研究候選。'+tideSummary+'歷史環境 DNA 僅呈現 2021–2024 年調查的採樣陽性紀錄，不代表目前魚群數量、即時存在或中魚率。'+(stale?'最新展望資料已超過 8 小時或時間異常，請視為過期。':'每個候選分別揭露預報完整度、物種資格與證據狀態。');
+ $('p2FishSummary').textContent=names[region]+'｜未來 '+horizon+' 小時｜'+(taitungCandidateIds?'本區有區域證據候選 '+taitungCandidateIds.size+' 種；本時段逐時展望列 '+rows.length+' 種。':rows.length+' 個研究候選。')+tideSummary+'歷史環境 DNA 僅呈現 2021–2024 年調查的採樣陽性紀錄，不代表目前魚群數量、即時存在或中魚率。'+(stale?'最新展望資料已超過 8 小時或時間異常，請視為過期。':'每個候選分別揭露預報完整度、物種資格與證據狀態。');
  const envLabels={taxon_or_distribution_gate:'物種鑑定／分布資格尚未通過',insufficient_evidence:'缺少可核准的東部物種環境反應規則',insufficient_environment_data:'環境資料不足',no_forecast_records:'沒有預報資料',environment_match_unavailable:'環境匹配尚不可用',partial_environment_match_coverage:'環境規則覆蓋不完整',environment_match_summary_available:'已有環境規則匹配摘要'};
  const activityLabels={taxon_or_distribution_gate:'物種或分布資格尚未通過',context_only_evidence_available:'僅有背景／出現紀錄，尚不足以推論即時魚類活動',insufficient_east_taiwan_activity_evidence:'缺少東部物種級直接活動觀測',direct_evidence_requires_activity_rule_review:'直接證據仍待規則審查',missing_activity_assessment:'尚無活動評估'};
+ const regionalOccurrenceRows=data.species_ecology_context&&Array.isArray(data.species_ecology_context.regional_occurrence_records)?data.species_ecology_context.regional_occurrence_records:[];
  $('p2FishCards').innerHTML=rows.length?rows.map(r=>{
   const coverage=Math.round(Number(r.forecast_coverage||0)*100),count=escapeP2Text(r.forecast_hour_count||'0')+'/'+escapeP2Text(r.expected_hour_count||horizon);
   const score=r.environment_match_mean!==''&&r.environment_match_mean!=null?'環境匹配摘要 '+escapeP2Text(r.environment_match_mean)+'/100（非活性分數）':'尚無可計算的環境匹配分數';
@@ -680,9 +689,8 @@ function renderP2FishOutlook(){
   const activityContextHtml=renderP2EvidenceContext('活動／生態研究來源（非即時咬況）',r.activity_evidence_context_json,'activity');
   const occurrenceContextHtml=renderP2EvidenceContext('東部出現／標本紀錄（只證明曾出現）',r.occurrence_evidence_context_json,'occurrence');
   const seasonalHtml=renderP2EvidenceContext('歷史季節研究背景（非即時作釣預測）',r.seasonal_evidence_context_json,'seasonal');
-  const regionalOccurrenceRows=data.species_ecology_context&&Array.isArray(data.species_ecology_context.regional_occurrence_records)?data.species_ecology_context.regional_occurrence_records:[];
-  const regionalOccurrences=regionalOccurrenceRows.filter(x=>x.candidate_id===r.candidate_id&&x.region_id===region&&x.recorded_presence==='present');
-  const regionalOccurrenceHtml=regionalOccurrences.length?'<div class="small">東部海岸歷史調查出現紀錄（非即時魚況）：</div>'+regionalOccurrences.map(x=>'<div class="small">'+escapeP2Text(x.study_year)+'年｜'+escapeP2Text(x.common_name_zh||x.scientific_name)+'｜'+escapeP2Text(x.site_name)+'｜第'+escapeP2Text(x.visit_number)+'次調查有記錄'+ '｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源報告</a></div>').join(''):'';
+  const regionalOccurrences=regionalOccurrenceRows.filter(x=>x.candidate_id===r.candidate_id&&taitungOccurrenceMatchesRegion(x,region)&&['present','fishery_record'].includes(x.recorded_presence));
+  const regionalOccurrenceHtml=regionalOccurrences.length?'<div class="small">區域出現／漁業紀錄（背景資料，非即時魚況）：</div>'+regionalOccurrences.map(x=>'<div class="small">'+escapeP2Text(x.study_year)+'年｜'+escapeP2Text(x.common_name_zh||x.scientific_name)+'｜'+escapeP2Text(x.site_name)+'｜'+(x.recorded_presence==='fishery_record'?'漁業捕獲研究紀錄（非本釣點釣獲率）':'第'+escapeP2Text(x.visit_number)+'次生態調查有記錄')+'｜<a href="'+escapeP2Text(x.source_url)+'" target="_blank" rel="noopener">來源報告</a></div>').join(''):'';
   const ecologyRecords=data.species_ecology_context&&Array.isArray(data.species_ecology_context.records)?data.species_ecology_context.records:[];
   const ecologyItems=ecologyRecords.filter(x=>x.candidate_id===r.candidate_id&&['habitat','depth','activity','feeding','reproduction','fishery'].includes(x.category)).slice(0,5);
   const ecologyLabels={habitat:'棲地背景',depth:'記載水深',activity:'活動描述',feeding:'食性',reproduction:'繁殖背景',fishery:'漁業季節'};
@@ -703,7 +711,10 @@ function renderP2FishOutlook(){
   const displayName=aliasNames[r.candidate_id]||r.common_name_zh;
   const taxonNote=r.candidate_id==='c001'?'黑毛為地方俗名群，個體仍須形態鑑種；不可將所有黑毛都視為瓜子鱲。':r.candidate_id==='c002'?'白毛已對應舵魚屬俗名群，但可能包含多個物種；需鑑種後才可套用物種級規則.':'';
   return '<div class="metric"><div class="row"><strong>'+escapeP2Text(displayName)+'</strong><span class="tag">'+escapeP2Text(r.candidate_id)+'</span></div><div class="small" style="margin-top:6px">'+escapeP2Text(r.scientific_name)+'</div>'+(taxonNote?'<div class="small" style="margin-top:6px">'+escapeP2Text(taxonNote)+'</div>':'')+'<div class="small" style="margin-top:7px">預報完整度：'+count+' 小時（'+coverage+'%）</div><div class="small">環境證據：'+escapeP2Text(envLabels[r.environment_match_status]||r.environment_match_status)+'</div><div class="small">活動證據：'+escapeP2Text(activityLabels[r.activity_evidence_status]||r.activity_evidence_status)+'</div><div class="small">活動研究：'+activityEvidence+' 項｜東部出現紀錄：'+occurrenceEvidence+' 筆｜季節研究：'+seasonalEvidence+' 項</div>'+(occurrenceIds.length?'<div class="small">出現紀錄編號：'+escapeP2Text(occurrenceIds.join('、'))+'</div>':'')+ecologyHtml+activityContextHtml+occurrenceContextHtml+seasonalHtml+regionalOccurrenceHtml+ednaHtml+'<div class="small" style="margin-top:6px">'+score+'</div><div class="season-note">活動分數／中魚機率：尚未估算；最佳時段：尚未建立</div></div>';
- }).join(''):'<div class="small">此區域／時段沒有對應候選資料。請確認最新展望是否已涵蓋此區。</div>';
+ }).join(''):(()=>{
+  const contextRecord=regionalOccurrenceRows.find(x=>x.candidate_id===candidate&&taitungOccurrenceMatchesRegion(x,region)&&['present','fishery_record'].includes(x.recorded_presence));
+  return contextRecord?'<div class="small">'+escapeP2Text(contextRecord.common_name_zh||contextRecord.taxon_scientific_name)+'有台東區域背景紀錄（'+escapeP2Text(contextRecord.site_name)+'），但本區目前沒有該魚種的逐時展望或可用魚情分數。此紀錄不代表即時有魚、岸釣成功率或中魚機率。<a href="'+escapeP2Text(contextRecord.source_url)+'" target="_blank" rel="noopener">查看來源</a></div>':'<div class="small">此區域／時段沒有符合區域證據條件的候選展望資料；不代表該魚種在自然界不存在。</div>';
+ })();
  $('p2FishFreshness').textContent='分析基準：'+(data.as_of||'未知')+'｜資料產生：'+(Number.isFinite(generated.getTime())?generated.toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'未知')+'｜來源：P2 六區逐時展望';
 }
 function renderDecisionFishOptions(regionId){
@@ -735,6 +746,7 @@ function renderDecisionFishOptions(regionId){
   {id:'c053',name:'杜氏刺尾鯛',scientific:'Acanthurus dussumieri'},
   {id:'c054',name:'黃擬烏尾鮗',scientific:'Paracaesio xanthura'},
   {id:'c055',name:'黃帶瓜子鱲',scientific:'Girella mezina'},
+  {id:'c056',name:'立翅旗魚（黑皮旗魚）',scientific:'Istiompax indica'},
   {id:'c019',name:'日本竹筴魚',scientific:'Trachurus japonicus'},
   {id:'c031',name:'雜紋鸚哥魚',scientific:'Scarus rivulatus'},
   {id:'c033',name:'藍頭綠鸚哥魚',scientific:'Chlorurus sordidus'},
@@ -743,13 +755,19 @@ function renderDecisionFishOptions(regionId){
   {id:'c042',name:'七帶豆娘魚',scientific:'Abudefduf septemfasciatus'}
  ];
  const localOccurrences=data?.species_ecology_context?.regional_occurrence_records||[];
- const available=regionId==='taitung_south'||regionId==='chenggong_donghe'
-  ?targets.filter(x=>x.id!=='c001'&&(['c036','c003','c004'].includes(x.id)||localOccurrences.some(r=>r.candidate_id===x.id&&r.region_id===regionId&&['present','port_sample_only'].includes(r.recorded_presence))))
+ const isTaitungRegion=isTaitungRadarRegion(regionId);
+ const available=isTaitungRegion
+  ?targets.filter(x=>x.id!=='c001'&&localOccurrences.some(r=>r.candidate_id===x.id&&taitungOccurrenceMatchesRegion(r,regionId)&&['present','fishery_record'].includes(r.recorded_presence)))
   :targets.filter(x=>['c036','c003','c004','c001'].includes(x.id));
- select.innerHTML='<option value="">請選擇目標魚種</option>'+available.map(x=>{const portSample=localOccurrences.some(r=>r.candidate_id===x.id&&r.region_id===regionId&&r.recorded_presence==='port_sample_only');return '<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+'（'+escapeP2Text(x.scientific)+'）'+(portSample?'｜港口樣本，捕獲來源未詳':'')+'</option>';}).join('');
+ select.innerHTML='<option value="">請選擇目標魚種</option>'+available.map(x=>{const countyScope=localOccurrences.some(r=>r.candidate_id===x.id&&r.region_id==='taitung'&&r.recorded_presence==='fishery_record');return '<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+'（'+escapeP2Text(x.scientific)+'）'+(countyScope?'｜台東縣域漁業紀錄，未細分海域':'')+'</option>';}).join('');
  if(available.some(x=>x.id===previous))select.value=previous;
- const p2Select=$('p2FishCandidate');if(p2Select)p2Select.value=select.value||'all';
- scope.textContent=(regionNames[regionId]||'所選海域')+'｜依該區出現紀錄列魚種；港口樣本不代表捕獲位置或漁法。缺少物種專屬反應證據時不計分，紀錄也不代表即時有魚或中魚率。';
+ const p2Select=$('p2FishCandidate');if(p2Select){
+  const oldP2=p2Select.value;
+  const p2Options=isTaitungRegion?available:[...new Map((data?.rows||[]).map(r=>[r.candidate_id,{id:r.candidate_id,name:r.common_name_zh,scientific:r.scientific_name}])).values()].sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
+  p2Select.innerHTML='<option value="all">'+(isTaitungRegion?'本區全部有區域證據魚種':'全部研究候選')+'</option>'+p2Options.map(x=>'<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+'（'+escapeP2Text(x.scientific)+'）</option>').join('');
+  p2Select.value=p2Options.some(x=>x.id===oldP2)?oldP2:(select.value||'all');
+ }
+ scope.textContent=(regionNames[regionId]||'所選海域')+'｜只列本區出現或有台東漁業捕獲依據的魚種；台東縣域資料未細分海域者會註明。港口樣本若無捕獲位置證據不列為本區魚種。缺少物種專屬反應證據時不計分；出現與漁獲紀錄不代表即時有魚或中魚率。';
 }
 
 function renderRadarDashboard(){
