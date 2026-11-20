@@ -81,6 +81,16 @@ FCI仍使用共用引擎的加權公式，但南方舵魚權重必須由台灣�
 
 上述可核對的水槽觀測點已另存為 southern_drummer_response_curve_observations.csv，保留來源、樣本數、時段、反應單位與限制；它是研究觀測表，不是已核准的 scoring rules。
 
+`southern_drummer_context_response_engine.py` 可對 L052 同一藻種、兩個原研究實際量測的溫度點計算描述性攝食量比值。它只回報論文水槽觀測值及比值，標記 `context_only_captive_feeding`；未量測溫度回傳 `no_exact_observed_point`。不做插值／外插、不輸出0–100分、不接入台灣東部預報或FCI。例：
+
+```bash
+python P2/species/southern_drummer_context_response_engine.py \
+  --response-group macroalgae_sst_sargassum \
+  --reference-temperature-c 30 --comparison-temperature-c 16
+```
+
+這只得到 L052 中 *Sargassum patens* 在30°C與16°C兩個水槽條件的觀測攝食率比值，不能解讀成野外魚情隨海溫的預測。藻種不同時必須選擇各自的 response group；沒有觀測點就不計算比值。
+
 本文件完成的是**南方舵魚物種專屬研究反應結構與證據邊界**，不是宣稱已取得台灣東部可部署的反應曲線。正式啟用前仍須取得：
 1. 台灣東部自然藻場種類／可利用量與同時段環境資料；
 2. 南方舵魚已鑑定個體的野外逐時活動或覓食觀測；

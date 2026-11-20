@@ -873,3 +873,14 @@ python P2/species/audit_environment_response_rules.py \\
 
 測試：`P2/test_preliminary_relative_score_engine.py` 涵蓋四種魚的來源追溯、兩種三指標代理齊備魚種的相對海況排序與6／12／24小時排名、黑鯛繁殖季活動代理的月份限制與不解鎖 FCI、黑鯛／瓜子鱲缺少逐時覓食依據時不產生中性假分數、缺失海況及分類提醒。正式門檻與權重檔仍保持未核准；初版與正式模型分開執行。
 
+### 南方舵魚水槽溫度觀測點比較器
+
+`P2/species/southern_drummer_context_response_engine.py` 提供研究用途的原始觀測點比較：僅比較 L052 同一褐藻在研究實際測得溫度下的攝食率，回報觀測值比值並帶上來源與限制。未測溫度會回傳 `no_exact_observed_point`；不插值、不外推、不輸出魚情分數或中魚機率，也不接入預報及漁獵雷達。這不是台灣東部模型參數。
+
+```bash
+python P2/species/southern_drummer_context_response_engine.py \
+  --response-group macroalgae_sst_sargassum \
+  --reference-temperature-c 30 --comparison-temperature-c 16
+python -m unittest P2.test_southern_drummer_response_curves -v
+```
+
