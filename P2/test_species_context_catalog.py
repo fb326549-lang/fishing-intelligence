@@ -84,6 +84,20 @@ class SpeciesContextCatalogTests(unittest.TestCase):
         self.assertEqual(rabbitfish["recorded_presence"],"present")
         self.assertIn("不是數量",rabbitfish["limitations"])
 
+    def test_green_island_inventory_adds_offshore_occurrence_context_without_mainland_region_scores(self):
+        register = Path(__file__).parent / "species" / "species_regional_occurrence_register.csv"
+        with register.open(encoding="utf-8-sig", newline="") as source_file:
+            rows = {row["regional_occurrence_id"]: row for row in csv.DictReader(source_file)}
+        expected = {"RO011": ("c001", "Girella punctata"), "RO012": ("c003", "Siganus fuscescens"), "RO013": ("c036", "Kyphosus bigibbus")}
+        for occurrence_id, (candidate_id, scientific_name) in expected.items():
+            row = rows[occurrence_id]
+            self.assertEqual((row["candidate_id"], row["taxon_scientific_name"]), (candidate_id, scientific_name))
+            self.assertEqual(row["region_id"].strip(), "")
+            self.assertEqual(row["model_use_status"], "context_only_green_island_fishery_inventory")
+            self.assertIn("+", row["method"])
+        self.assertIn("Girella mezina", rows["RO011"]["limitations"])
+        self.assertIn("六個本島雷達區域", rows["RO013"]["limitations"])
+
     def test_2016_southern_drummer_site_uses_taitung_south_region(self):
         register = Path(__file__).parent / "species" / "species_regional_occurrence_register.csv"
         with register.open(encoding="utf-8-sig", newline="") as source_file:
