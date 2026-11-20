@@ -50,6 +50,13 @@ class SpeciesResponseModelSpecTests(unittest.TestCase):
         self.assertEqual(record["model_use_status"], "context_only_local_habitat_not_species_response")
         self.assertIn("不可作六區即時餌源量", record["limitations"])
 
+    def test_black_seabream_strait_study_is_not_misread_as_east_coast_hourly_evidence(self):
+        content = (SPECIES_DIR / "black_seabream_response_model_spec.md").read_text(encoding="utf-8")
+        self.assertIn("Eastern Taiwan Strait", content)
+        self.assertIn("台灣西部外海", content)
+        self.assertIn("不能作為東岸岸釣", content)
+        self.assertIn("逐時觀測", content)
+
 
 if __name__ == "__main__":
     unittest.main()
