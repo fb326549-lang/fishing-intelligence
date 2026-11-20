@@ -158,6 +158,10 @@ def build_rows(records, candidate_rows, profiles, as_of):
         for cid in sorted(TARGETS):
             if cid in TAITUNG_ONLY_TARGETS and region not in TAITUNG_REGIONS:
                 continue
+            # The regional occurrence register has no Taitung record for
+            # Girella punctata; do not inherit the wider east-coast baseline.
+            if region in TAITUNG_REGIONS and cid == "c001":
+                continue
             profile, candidate = profiles[cid], candidates[cid]
             feeding_profile = profile["_feeding_phase_points"]
             activity_profile = profile["_activity_phase_points"]

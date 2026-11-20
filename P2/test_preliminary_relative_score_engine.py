@@ -28,7 +28,7 @@ def fixture_records(count=24, include_sea_state=True):
         }
         if include_sea_state:
             env.update({"wave_height_m": float((hour * 7) % 9) / 2, "wind_speed_10m_ms": float((hour * 5) % 11)})
-        rows.append({"region_id": "taitung_south", "valid_time": valid.isoformat(), "collected_at": "2026-11-10T23:00:00+08:00", "data_type": "forecast", "environment": env})
+        rows.append({"region_id": "chenggong_donghe", "valid_time": valid.isoformat(), "collected_at": "2026-11-10T23:00:00+08:00", "data_type": "forecast", "environment": env})
     return rows, start
 
 
@@ -134,8 +134,8 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
     def test_species_with_phase_evidence_receive_traceable_low_confidence_scores(self):
         records, as_of = fixture_records()
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
-        self.assertEqual({r["candidate_id"] for r in rows}, TARGETS)
-        self.assertEqual(len(rows), 24 * len(TARGETS))
+        self.assertEqual({r["candidate_id"] for r in rows}, TARGETS - {"c001"})
+        self.assertEqual(len(rows), 24 * (len(TARGETS) - 1))
         scored = [r for r in rows if r["overall_fish_condition_index"]]
         self.assertEqual({r["candidate_id"] for r in scored}, TARGETS - {"c004", "c001", "c010", "c027"} - NO_RESPONSE_EVIDENCE)
         self.assertEqual(len(scored), 24 * 2)
@@ -174,6 +174,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
 
     def test_food_and_activity_priors_are_species_specific_but_explicitly_low_confidence(self):
         records, as_of = fixture_records()
+        records = [{**r, "region_id": "hualien_north"} for r in records]
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         at_noon = {r["candidate_id"]: float(r["feeding_condition_score"]) for r in rows if r["valid_time"].endswith("12:00:00+08:00") and r["feeding_condition_score"]}
         self.assertEqual(len({at_noon[cid] for cid in TARGETS - {"c004", "c001", "c010", "c027"} - NO_RESPONSE_EVIDENCE}), 2)
@@ -198,12 +199,26 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
 
     def test_new_species_targets_are_scoped_to_taitung_regions(self):
         records, as_of = fixture_records(count=1)
-        records += [dict(record, region_id="hualien_north") for record in records]
+        records += [dict(record, region_id="taitung_south") for record in records]
+        records += [dict(record, region_id="hualien_north") for record in fixture_records(count=1)[0]]
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         taitung_ids = {row["candidate_id"] for row in rows if row["region_id"] == "taitung_south"}
         hualien_ids = {row["candidate_id"] for row in rows if row["region_id"] == "hualien_north"}
-        self.assertEqual(taitung_ids, TARGETS)
+        self.assertEqual(taitung_ids, TARGETS - {"c001"})
         self.assertEqual(hualien_ids, TARGETS - TAITUNG_ONLY_TARGETS)
+        self.assertNotIn("c001", taitung_ids)
+
+    def test_taitung_occurrence_catalog_species_are_listed_and_unsupported_naso_is_absent(self):
+        app_html = (Path(__file__).parents[1] / "index.html").read_text(encoding="utf-8")
+        occurrence_path = PROFILE.parent / "species_regional_occurrence_register.csv"
+        with occurrence_path.open(encoding="utf-8-sig", newline="") as handle:
+            region_records = list(csv.DictReader(handle))
+        taitung_species = {row["candidate_id"] for row in region_records
+                           if row["region_id"] in {"chenggong_donghe", "taitung_south"}
+                           and row["recorded_presence"] in {"present", "port_sample_only"}}
+        for candidate_id in taitung_species:
+            self.assertIn("id:'" + candidate_id + "'", app_html)
+        self.assertNotIn("id:'c052'", app_html)
 
     def test_rabbitfish_month_specific_diel_proxy_follows_registered_captive_observation(self):
         expected = {7: (40.0, 70.0), 8: (70.0, 40.0), 12: (70.0, 40.0)}
@@ -229,6 +244,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
 
     def test_girella_diurnal_activity_summary_does_not_create_feeding_score_or_composite(self):
         records, as_of = fixture_records()
+        records = [{**r, "region_id": "hualien_north"} for r in records]
         rows = [r for r in build_rows(records, candidate_rows(), self.profiles, as_of) if r["candidate_id"] == "c001"]
         self.assertTrue(all(r["feeding_condition_score"] == "" for r in rows))
         self.assertTrue(all(r["feeding_condition_status"] == "insufficient_species_specific_evidence" for r in rows))
@@ -330,6 +346,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
 
     def test_indicator_ranks_preserve_missing_species_evidence(self):
         records, as_of = fixture_records()
+        records = [{**r, "region_id": "hualien_north"} for r in records]
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         girella = [r for r in rows if r["candidate_id"] == "c001"]
         black_sea_bream = [r for r in rows if r["candidate_id"] == "c004"]
@@ -342,6 +359,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             records, as_of = fixture_records()
+            records = [{**r, "region_id": "hualien_north"} for r in records]
             environment_path = root / "environment.jsonl"
             environment_path.write_text("\n".join(json.dumps(row) for row in records) + "\n", encoding="utf-8")
             candidates_path = root / "candidates.csv"
@@ -365,12 +383,12 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertIn("海況相對分（風浪）", app_html)
             self.assertIn("不是魚種適合度", app_html)
             self.assertIn("不代表魚種生態適合度或安全判斷", app_html)
-            self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS)
-            self.assertEqual(len(payload["rows"]), 24 * len(TARGETS))
+            self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS - TAITUNG_ONLY_TARGETS)
+            self.assertEqual(len(payload["rows"]), 24 * len(TARGETS - TAITUNG_ONLY_TARGETS))
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))
             self.assertTrue(all("best_feeding_hour_status_6h" in row and "best_activity_hour_status_24h" in row for row in payload["rows"]))
             scored_species = {row["candidate_id"] for row in payload["rows"] if row["overall_fish_condition_index"] is not None}
-            self.assertEqual(scored_species, TARGETS - {"c004", "c001", "c010", "c027"} - NO_RESPONSE_EVIDENCE)
+            self.assertEqual(scored_species, {"c003", "c036"})
             black_sea_bream = [row for row in payload["rows"] if row["candidate_id"] == "c004"]
             self.assertTrue(all(row["overall_fish_condition_index"] is None for row in black_sea_bream))
             self.assertTrue(all(row["species_weights"] == {} for row in black_sea_bream))
