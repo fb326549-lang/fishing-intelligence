@@ -197,10 +197,18 @@ def rank_best_hours(rows, as_of):
         for group in groups.values():
             ranked = sorted((r for r in group if r["overall_fish_condition_index"]),
                             key=lambda r: (-float(r["overall_fish_condition_index"]), r["valid_time"]))
-            ranks = {r["valid_time"]: i + 1 for i, r in enumerate(ranked)}
-            best_time = ranked[0]["valid_time"] if ranked else None
+            ranks = {}
+            previous_score = None
+            current_rank = 0
+            for position, row in enumerate(ranked, 1):
+                score = float(row["overall_fish_condition_index"])
+                if previous_score is None or score != previous_score:
+                    current_rank = position
+                    previous_score = score
+                ranks[row["valid_time"]] = current_rank
             for row in group:
-                row[f"best_hour_status_{horizon}h"] = ("best_hour" if row["valid_time"] == best_time else "ranked_hour") if row["overall_fish_condition_index"] else "unscored_hour"
+                rank = ranks.get(row["valid_time"])
+                row[f"best_hour_status_{horizon}h"] = ("best_hour" if rank == 1 else "ranked_hour") if rank is not None else "unscored_hour"
                 row[f"best_hour_rank_{horizon}h"] = str(ranks.get(row["valid_time"], ""))
     for row in rows:
         row["best_hour_status"] = row.get("best_hour_status_6h", "outside_horizon")

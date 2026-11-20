@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "species"))
 sys.path.insert(0, str(Path(__file__).parent / "collector"))
-from preliminary_relative_score_engine import build_rows, load_profiles
+from preliminary_relative_score_engine import build_rows, load_profiles, rank_best_hours
 from export_hourly_fish_condition_index_json import export_index
 
 PROFILE = Path(__file__).parent / "species" / "preliminary_relative_score_profiles.csv"
@@ -176,8 +176,19 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
         for horizon in (6, 12, 24):
             winners = [r for r in rows if r["candidate_id"] == "c036" and r[f"best_hour_status_{horizon}h"] == "best_hour"]
-            self.assertEqual(len(winners), 1)
+            self.assertTrue(winners)
             self.assertTrue(winners[0][f"best_hour_rank_{horizon}h"])
+
+    def test_composite_ranking_preserves_all_tied_best_hours(self):
+        records, as_of = fixture_records()
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        c036 = [row for row in rows if row["candidate_id"] == "c036"]
+        for row in c036[:6]:
+            row["overall_fish_condition_index"] = "42.00"
+        rank_best_hours(rows, as_of)
+        winners = [row for row in c036[:6] if row["best_hour_status_6h"] == "best_hour"]
+        self.assertEqual(len(winners), 6)
+        self.assertTrue(all(row["best_hour_rank_6h"] == "1" for row in winners))
 
     def test_feeding_and_activity_are_ranked_independently_for_all_horizons(self):
         records, as_of = fixture_records()
