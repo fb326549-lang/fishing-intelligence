@@ -383,6 +383,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             self.assertIn("海況相對分（風浪）", app_html)
             self.assertIn("不是魚種適合度", app_html)
             self.assertIn("不代表魚種生態適合度或安全判斷", app_html)
+            self.assertIn("selectedOptions?.[0]?.textContent", app_html)
             self.assertEqual({row["candidate_id"] for row in payload["rows"]}, TARGETS - TAITUNG_ONLY_TARGETS)
             self.assertEqual(len(payload["rows"]), 24 * len(TARGETS - TAITUNG_ONLY_TARGETS))
             self.assertTrue(all(row["model_confidence"] == "low" for row in payload["rows"]))
