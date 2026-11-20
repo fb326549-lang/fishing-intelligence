@@ -58,6 +58,12 @@ def load_profiles(path: Path):
             raise ValueError(f"{cid}: preliminary weights must document the equal-weight convention")
         row["_weight"] = weight
         row["_urls"] = [u for u in row["source_urls"].split(";") if u.startswith("https://")]
+        for key in ("feeding_source_urls", "activity_source_urls"):
+            urls = [u for u in row.get(key, "").split(";") if u]
+            source_ids = row["feeding_source_ids" if key.startswith("feeding") else "activity_source_ids"].split(";")
+            if not urls or len(urls) != len(source_ids) or any(not url.startswith("https://") for url in urls):
+                raise ValueError(f"{cid}: {key} must list one traceable URL for each indicator-specific evidence ID")
+            row["_" + key] = urls
         if not row["_urls"]:
             raise ValueError(f"{cid}: at least one traceable source URL is required")
         result[cid] = row
@@ -162,7 +168,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 status = "preliminary_scored"
             trace = [
                 {"indicator_code": "feeding_condition", "phase": phase, "score": feeding,
-                 "evidence_ids": profile["feeding_source_ids"].split(";"), "source_urls": profile["_urls"],
+                 "evidence_ids": profile["feeding_source_ids"].split(";"), "source_urls": profile["_feeding_source_urls"],
                  "evidence_class": profile["evidence_class"], "phase_basis": feeding_basis,
                  "point_method": profile["point_method"], "quantitative_calibration": False, "limitation": profile["limitations"]},
                 {"indicator_code": "environment_suitability", "score": env_score,
@@ -170,7 +176,7 @@ def build_rows(records, candidate_rows, profiles, as_of):
                  "input_ranks": {"wave_height_m": wave_scores.get((region, valid_time)), "wind_speed_10m_ms": wind_scores.get((region, valid_time))},
                  "coverage": env_coverage, "excluded_unvalidated_inputs": ["sea_surface_temperature_c", "ocean_current_velocity_ms", "tide_height_m"]},
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
-                 "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_urls"],
+                 "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_activity_source_urls"],
                  "evidence_class": profile["evidence_class"], "seasonal_override_month": parse_dt(valid_time, "valid_time").month if month_override is not None else None,
                  "phase_basis": activity_basis, "point_method": profile["point_method"],
                  "quantitative_calibration": False, "limitation": profile["limitations"]},

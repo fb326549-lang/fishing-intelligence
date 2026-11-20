@@ -61,11 +61,18 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
         with PROFILE.open(encoding="utf-8-sig", newline="") as handle:
             profiles = list(csv.DictReader(handle))
         for row in profiles:
-            urls = set(row["source_urls"].split(";"))
-            source_ids = set((row["feeding_source_ids"] + ";" + row["activity_source_ids"]).split(";"))
-            for source_id in source_ids:
-                self.assertIn(source_id, source_by_id)
-                self.assertIn(source_by_id[source_id], urls)
+            all_urls = set(row["source_urls"].split(";"))
+            for indicator in ("feeding", "activity"):
+                source_ids = row[f"{indicator}_source_ids"].split(";")
+                urls = row[f"{indicator}_source_urls"].split(";")
+                self.assertEqual(len(source_ids), len(urls))
+                for source_id, url in zip(source_ids, urls):
+                    self.assertIn(source_id, source_by_id)
+                    self.assertEqual(source_by_id[source_id], url)
+                    self.assertIn(url, all_urls)
+        by_species = {row["candidate_id"]: row for row in profiles}
+        self.assertEqual(by_species["c036"]["feeding_source_ids"], "L051;L052;L053")
+        self.assertEqual(by_species["c001"]["feeding_source_ids"], "L040")
 
     def test_each_phase_score_and_missing_value_has_a_qualitative_basis(self):
         with PROFILE.open(encoding="utf-8-sig", newline="") as handle:
