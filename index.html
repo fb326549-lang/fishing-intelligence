@@ -718,12 +718,38 @@ function renderDecisionFishOptions(regionId){
   {id:'c036',name:'南方舵魚',scientific:'Kyphosus bigibbus'},
   {id:'c003',name:'臭肚',scientific:'Siganus fuscescens'},
   {id:'c004',name:'黑鯛',scientific:'Acanthopagrus schlegelii'},
-  {id:'c001',name:'瓜子鱲（須確認物種）',scientific:'Girella punctata'}
+  {id:'c001',name:'瓜子鱲（須確認物種）',scientific:'Girella punctata'},
+  {id:'c010',name:'花身雞魚',scientific:'Terapon jarbua'},
+  {id:'c027',name:'條紋豆娘魚',scientific:'Abudefduf vaigiensis'},
+  {id:'c018',name:'白帶魚',scientific:'Trichiurus lepturus'},
+  {id:'c023',name:'鬼頭刀',scientific:'Coryphaena hippurus'},
+  {id:'c043',name:'長鰭鰤',scientific:'Seriola rivoliana'},
+  {id:'c044',name:'條狀窄顱帶魚',scientific:'Evoxymetopon taeniatus'},
+  {id:'c045',name:'真烏魴',scientific:'Eumegistus illustris'},
+  {id:'c046',name:'紅紫鸚哥魚',scientific:'Scarus rubroviolaceus'},
+  {id:'c047',name:'花腹鯖',scientific:'Scomber australasicus'},
+  {id:'c048',name:'絲鰭姬鯛',scientific:'Pristipomoides filamentosus'},
+  {id:'c049',name:'紅鰓龍占魚',scientific:'Lethrinus rubrioperculatus'},
+  {id:'c050',name:'劍旗魚',scientific:'Xiphias gladius'},
+  {id:'c051',name:'巴布亞鰺',scientific:'Caranx papuensis'},
+  {id:'c053',name:'杜氏刺尾鯛',scientific:'Acanthurus dussumieri'},
+  {id:'c054',name:'黃擬烏尾鮗',scientific:'Paracaesio xanthura'},
+  {id:'c055',name:'黃帶瓜子鱲',scientific:'Girella mezina'},
+  {id:'c019',name:'日本竹筴魚',scientific:'Trachurus japonicus'},
+  {id:'c031',name:'雜紋鸚哥魚',scientific:'Scarus rivulatus'},
+  {id:'c033',name:'藍頭綠鸚哥魚',scientific:'Chlorurus sordidus'},
+  {id:'c040',name:'黃足笛鯛',scientific:'Lutjanus fulvus'},
+  {id:'c041',name:'星斑臭肚魚',scientific:'Siganus guttatus'},
+  {id:'c042',name:'七帶豆娘魚',scientific:'Abudefduf septemfasciatus'}
  ];
- select.innerHTML='<option value="">請選擇目標魚種</option>'+targets.map(x=>'<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+'（'+escapeP2Text(x.scientific)+'）</option>').join('');
- if(targets.some(x=>x.id===previous))select.value=previous;
+ const localOccurrences=data?.species_ecology_context?.regional_occurrence_records||[];
+ const available=regionId==='taitung_south'||regionId==='chenggong_donghe'
+  ?targets.filter(x=>x.id!=='c001'&&(['c036','c003','c004'].includes(x.id)||localOccurrences.some(r=>r.candidate_id===x.id&&r.region_id===regionId&&['present','port_sample_only'].includes(r.recorded_presence))))
+  :targets.filter(x=>['c036','c003','c004','c001'].includes(x.id));
+ select.innerHTML='<option value="">請選擇目標魚種</option>'+available.map(x=>{const portSample=localOccurrences.some(r=>r.candidate_id===x.id&&r.region_id===regionId&&r.recorded_presence==='port_sample_only');return '<option value="'+escapeP2Text(x.id)+'">'+escapeP2Text(x.name)+'（'+escapeP2Text(x.scientific)+'）'+(portSample?'｜港口樣本，捕獲來源未詳':'')+'</option>';}).join('');
+ if(available.some(x=>x.id===previous))select.value=previous;
  const p2Select=$('p2FishCandidate');if(p2Select)p2Select.value=select.value||'all';
- scope.textContent=(regionNames[regionId]||'所選海域')+'｜可選四種研究目標魚。歷史 eDNA 僅作出現背景，未檢出不代表沒有魚；指數為低信心初版估算。';
+ scope.textContent=(regionNames[regionId]||'所選海域')+'｜依該區出現紀錄列魚種；港口樣本不代表捕獲位置或漁法。缺少物種專屬反應證據時不計分，紀錄也不代表即時有魚或中魚率。';
 }
 
 function renderRadarDashboard(){
