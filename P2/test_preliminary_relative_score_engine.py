@@ -67,6 +67,35 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
                 self.assertIn(source_id, source_by_id)
                 self.assertIn(source_by_id[source_id], urls)
 
+    def test_each_phase_score_and_missing_value_has_a_qualitative_basis(self):
+        with PROFILE.open(encoding="utf-8-sig", newline="") as handle:
+            profile_rows = list(csv.DictReader(handle))
+        phases = {"dawn", "day", "dusk", "night"}
+        for profile in profile_rows:
+            for score_key, basis_key in (("feeding_phase_points", "feeding_phase_basis_json"),
+                                         ("activity_phase_points", "activity_phase_basis_json")):
+                points, basis = json.loads(profile[score_key]), json.loads(profile[basis_key])
+                self.assertEqual(set(points), phases)
+                self.assertEqual(set(basis), phases)
+                self.assertTrue(all(text.strip() for text in basis.values()))
+            overrides = json.loads(profile["activity_month_overrides_json"])
+            override_basis = json.loads(profile["activity_month_override_basis_json"])
+            self.assertEqual(set(overrides), set(override_basis))
+            self.assertIn("not quantitatively calibrated", profile["point_method"].lower())
+
+    def test_trace_explains_selected_phase_and_marks_points_uncalibrated(self):
+        records, as_of = fixture_records()
+        rows = build_rows(records, candidate_rows(), self.profiles, as_of)
+        noon = next(row for row in rows if row["candidate_id"] == "c003" and row["valid_time"].endswith("12:00:00+08:00"))
+        trace = json.loads(noon["indicator_trace_json"])
+        for item in (trace[0], trace[2]):
+            self.assertTrue(item["phase_basis"])
+            self.assertFalse(item["quantitative_calibration"])
+            self.assertIn("not quantitatively calibrated", item["point_method"].lower())
+        unavailable = next(row for row in rows if row["candidate_id"] == "c004")
+        unavailable_trace = json.loads(unavailable["indicator_trace_json"])
+        self.assertIn("intentionally unavailable", unavailable_trace[0]["phase_basis"])
+
     def test_species_with_phase_evidence_receive_traceable_low_confidence_scores(self):
         records, as_of = fixture_records()
         rows = build_rows(records, candidate_rows(), self.profiles, as_of)
@@ -125,6 +154,7 @@ class PreliminaryRelativeScoreTests(unittest.TestCase):
             trace = json.loads(night["indicator_trace_json"])[2]
             self.assertEqual(trace["seasonal_override_month"], month)
             self.assertIn("L050", trace["evidence_ids"])
+            self.assertIn("captive Japan DIDSON", trace["phase_basis"])
 
     def test_girella_diurnal_activity_summary_does_not_create_feeding_score_or_composite(self):
         records, as_of = fixture_records()

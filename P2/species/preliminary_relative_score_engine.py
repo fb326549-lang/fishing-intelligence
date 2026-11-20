@@ -33,13 +33,26 @@ def load_profiles(path: Path):
             if set(profile) != set(PHASES) or any(v is not None and not 0 <= float(v) <= 100 for v in profile.values()):
                 raise ValueError(f"{cid}: {key} must define dawn/day/dusk/night points in 0..100 or null when unsupported")
             row["_" + key] = {k: None if v is None else float(v) for k, v in profile.items()}
+        for key in ("feeding_phase_basis_json", "activity_phase_basis_json"):
+            basis = json.loads(row.get(key, "{}") or "{}")
+            if set(basis) != set(PHASES) or any(not isinstance(value, str) or not value.strip() for value in basis.values()):
+                raise ValueError(f"{cid}: {key} must explain every dawn/day/dusk/night assignment or missing score")
+            row["_" + key] = basis
         month_overrides = json.loads(row.get("activity_month_overrides_json", "{}") or "{}")
+        month_basis = json.loads(row.get("activity_month_override_basis_json", "{}") or "{}")
         for month, values in month_overrides.items():
             if month not in {str(m) for m in range(1, 13)} or set(values) != set(PHASES):
                 raise ValueError(f"{cid}: invalid monthly activity override")
             if any(value is not None and not 0 <= float(value) <= 100 for value in values.values()):
                 raise ValueError(f"{cid}: monthly activity points must be 0..100 or null")
+            if month not in month_basis or set(month_basis[month]) != set(PHASES) or any(not isinstance(value, str) or not value.strip() for value in month_basis[month].values()):
+                raise ValueError(f"{cid}: monthly activity override needs a basis for every phase")
+        if set(month_basis) != set(month_overrides):
+            raise ValueError(f"{cid}: monthly activity override basis months must match overrides")
         row["_activity_month_overrides"] = month_overrides
+        row["_activity_month_override_basis"] = month_basis
+        if not row.get("point_method", "").strip() or "not quantitatively calibrated" not in row["point_method"].lower():
+            raise ValueError(f"{cid}: point_method must state that points are not quantitatively calibrated")
         weight = float(row["weight_each"])
         if abs(weight - 1 / 3) > 1e-5:
             raise ValueError(f"{cid}: preliminary weights must document the equal-weight convention")
@@ -127,8 +140,13 @@ def build_rows(records, candidate_rows, profiles, as_of):
             feeding = feeding_profile.get(phase)
             activity = activity_profile.get(phase)
             month_override = profile["_activity_month_overrides"].get(str(parse_dt(valid_time, "valid_time").month))
+            month = str(parse_dt(valid_time, "valid_time").month)
+            unknown_phase_basis = "Solar phase is unavailable because sunrise or sunset is missing; no diel phase score is selected."
+            feeding_basis = profile["_feeding_phase_basis_json"].get(phase, unknown_phase_basis)
+            activity_basis = profile["_activity_phase_basis_json"].get(phase, unknown_phase_basis)
             if month_override is not None:
                 activity = month_override.get(phase)
+                activity_basis = profile["_activity_month_override_basis"][month][phase]
             coverage_phase = 0.25 if solar_available else 0.0  # time phase is one of four planned feeding/activity inputs.
             indicators = {"feeding_condition": feeding, "environment_suitability": env_score, "fish_activity": activity}
             if any(value is None for value in indicators.values()):
@@ -145,7 +163,8 @@ def build_rows(records, candidate_rows, profiles, as_of):
             trace = [
                 {"indicator_code": "feeding_condition", "phase": phase, "score": feeding,
                  "evidence_ids": profile["feeding_source_ids"].split(";"), "source_urls": profile["_urls"],
-                 "evidence_class": profile["evidence_class"], "limitation": profile["limitations"]},
+                 "evidence_class": profile["evidence_class"], "phase_basis": feeding_basis,
+                 "point_method": profile["point_method"], "quantitative_calibration": False, "limitation": profile["limitations"]},
                 {"indicator_code": "environment_suitability", "score": env_score,
                  "inputs_used": {k: env.get(k) for k in ("wave_height_m", "wind_speed_10m_ms")},
                  "input_ranks": {"wave_height_m": wave_scores.get((region, valid_time)), "wind_speed_10m_ms": wind_scores.get((region, valid_time))},
@@ -153,7 +172,8 @@ def build_rows(records, candidate_rows, profiles, as_of):
                 {"indicator_code": "fish_activity", "phase": phase, "score": activity,
                  "evidence_ids": profile["activity_source_ids"].split(";"), "source_urls": profile["_urls"],
                  "evidence_class": profile["evidence_class"], "seasonal_override_month": parse_dt(valid_time, "valid_time").month if month_override is not None else None,
-                 "limitation": profile["limitations"]},
+                 "phase_basis": activity_basis, "point_method": profile["point_method"],
+                 "quantitative_calibration": False, "limitation": profile["limitations"]},
                 {"indicator_code": "composite", "weights": WEIGHTS if overall is not None else {},
                  "weight_basis": ("provisional_equal_weight_convention_not_empirically_calibrated" if overall is not None
                                   else "not_applicable_no_composite_score"),
