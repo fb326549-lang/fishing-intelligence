@@ -2,8 +2,8 @@
   "schema_version": "1.0.0",
   "source": "CWA",
   "analysis_kind": "observed_marine_exposure_screening",
-  "generated_at": "2026-11-23T10:00:55.701369+00:00",
-  "source_snapshot_generated_at": "2026-11-23T10:00:55.667261+00:00",
+  "generated_at": "2026-11-23T21:57:16.472165+00:00",
+  "source_snapshot_generated_at": "2026-11-23T21:57:16.441086+00:00",
   "stale_after_minutes": 180,
   "threshold_policy": {
     "type": "internal_screening_only",
@@ -50,11 +50,11 @@
       "region_id": "yilan_suao",
       "region_name": "宜蘭、蘇澳",
       "state": "assessed",
-      "exposure_level": "moderate",
-      "exposure_label": "中",
+      "exposure_level": "low",
+      "exposure_label": "低",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-23T17:00:00+08:00",
-      "observation_age_minutes": 60.9,
+      "latest_observation_time": "2026-11-24T05:00:00+08:00",
+      "observation_age_minutes": 57.3,
       "stale_after_minutes": 180,
       "station_count": 4,
       "mapped_station_count": 5,
@@ -62,7 +62,7 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 0.9,
+          "value": 0.8,
           "unit": "m",
           "level": "low",
           "label": "低",
@@ -70,34 +70,34 @@
         },
         {
           "factor": "wind_speed_ms",
-          "value": 6.65,
+          "value": 2.35,
           "unit": "m/s",
-          "level": "moderate",
-          "label": "中",
+          "level": "low",
+          "label": "低",
           "basis": "internal_screening_band_not_official_warning"
         }
       ],
       "other_observations": {
-        "wave_period_s": 5.7,
-        "tide_height_m": 0.72,
+        "wave_period_s": 6.5,
+        "tide_height_m": 0.385,
         "current_speed_ms": null,
-        "wave_direction_deg": 112.0,
-        "wind_direction_deg": 128.5
+        "wave_direction_deg": 90.0,
+        "wind_direction_deg": 332.5
       },
       "historical_window": {
-        "latest_observation_time": "2026-11-22T23:00:00+08:00",
+        "latest_observation_time": "2026-11-23T23:00:00+08:00",
         "data_kind": "observed",
         "latest_values": {
-          "wave_height_m": 0.9,
-          "wave_period_s": 4.7,
-          "wave_direction_deg": 78.0,
-          "sea_temperature_c": 22.65,
-          "tide_height_m": -0.705,
-          "wind_speed_ms": 2.5,
-          "wind_direction_deg": 311.5,
-          "current_direction_deg": null,
-          "current_speed_ms": null,
-          "current_speed_knots": null
+          "wave_height_m": 0.95,
+          "wave_period_s": 5.7,
+          "wave_direction_deg": 123.0,
+          "sea_temperature_c": 23.267,
+          "tide_height_m": -0.82,
+          "wind_speed_ms": 1.767,
+          "wind_direction_deg": 323.8,
+          "current_direction_deg": 165.0,
+          "current_speed_ms": 0.3,
+          "current_speed_knots": 0.58
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
@@ -118,8 +118,8 @@
       "exposure_level": "low",
       "exposure_label": "低",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-23T17:00:00+08:00",
-      "observation_age_minutes": 60.9,
+      "latest_observation_time": "2026-11-24T05:00:00+08:00",
+      "observation_age_minutes": 57.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
@@ -127,7 +127,7 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 0.8,
+          "value": 0.7,
           "unit": "m",
           "level": "low",
           "label": "低",
@@ -143,26 +143,26 @@
         }
       ],
       "other_observations": {
-        "wave_period_s": 5.7,
-        "tide_height_m": 0.82,
-        "current_speed_ms": 0.01,
-        "wave_direction_deg": 90.0,
-        "wind_direction_deg": 189.5
+        "wave_period_s": 5.9,
+        "tide_height_m": 0.57,
+        "current_speed_ms": 0.08,
+        "wave_direction_deg": 101.0,
+        "wind_direction_deg": 256.0
       },
       "historical_window": {
-        "latest_observation_time": "2026-11-22T23:00:00+08:00",
+        "latest_observation_time": "2026-11-23T23:00:00+08:00",
         "data_kind": "observed",
         "latest_values": {
-          "wave_height_m": 0.8,
-          "wave_period_s": 5.6,
-          "wave_direction_deg": 90.0,
+          "wave_height_m": 0.7,
+          "wave_period_s": 5.5,
+          "wave_direction_deg": 112.0,
           "sea_temperature_c": 25.45,
-          "tide_height_m": -0.71,
-          "wind_speed_ms": 2.7,
-          "wind_direction_deg": 241.5,
-          "current_direction_deg": 92.0,
-          "current_speed_ms": 0.07,
-          "current_speed_knots": 0.14
+          "tide_height_m": -0.86,
+          "wind_speed_ms": 3.2,
+          "wind_direction_deg": 227.5,
+          "current_direction_deg": 111.0,
+          "current_speed_ms": 0.06,
+          "current_speed_knots": 0.12
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
@@ -220,8 +220,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-23T17:00:00+08:00",
-      "observation_age_minutes": 60.9,
+      "latest_observation_time": "2026-11-24T05:00:00+08:00",
+      "observation_age_minutes": 57.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 2,
@@ -229,7 +229,7 @@
       "factors": [
         {
           "factor": "wind_speed_ms",
-          "value": 1.7,
+          "value": 3.1,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -238,22 +238,22 @@
       ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 0.95,
+        "tide_height_m": 0.68,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": 232.0
+        "wind_direction_deg": 236.0
       },
       "historical_window": {
-        "latest_observation_time": "2026-11-22T23:00:00+08:00",
+        "latest_observation_time": "2026-11-23T23:00:00+08:00",
         "data_kind": "observed",
         "latest_values": {
           "wave_height_m": null,
           "wave_period_s": null,
           "wave_direction_deg": null,
           "sea_temperature_c": null,
-          "tide_height_m": -0.63,
-          "wind_speed_ms": 2.5,
-          "wind_direction_deg": 232.0,
+          "tide_height_m": -0.79,
+          "wind_speed_ms": 1.8,
+          "wind_direction_deg": 213.0,
           "current_direction_deg": null,
           "current_speed_ms": null,
           "current_speed_knots": null
@@ -277,8 +277,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-23T17:00:00+08:00",
-      "observation_age_minutes": 60.9,
+      "latest_observation_time": "2026-11-24T05:00:00+08:00",
+      "observation_age_minutes": 57.3,
       "stale_after_minutes": 180,
       "station_count": 3,
       "mapped_station_count": 3,
@@ -286,7 +286,7 @@
       "factors": [
         {
           "factor": "wind_speed_ms",
-          "value": 1.1,
+          "value": 1.9,
           "unit": "m/s",
           "level": "low",
           "label": "低",
@@ -295,22 +295,22 @@
       ],
       "other_observations": {
         "wave_period_s": null,
-        "tide_height_m": 1.035,
+        "tide_height_m": 0.73,
         "current_speed_ms": null,
         "wave_direction_deg": null,
-        "wind_direction_deg": 292.0
+        "wind_direction_deg": 319.0
       },
       "historical_window": {
-        "latest_observation_time": "2026-11-22T23:00:00+08:00",
+        "latest_observation_time": "2026-11-23T23:00:00+08:00",
         "data_kind": "observed",
         "latest_values": {
-          "wave_height_m": 1.1,
-          "wave_period_s": 5.5,
-          "wave_direction_deg": 90.2,
-          "sea_temperature_c": 25.3,
-          "tide_height_m": -0.65,
-          "wind_speed_ms": null,
-          "wind_direction_deg": 323.0,
+          "wave_height_m": 1.2,
+          "wave_period_s": 6.0,
+          "wave_direction_deg": 96.1,
+          "sea_temperature_c": 25.5,
+          "tide_height_m": -0.76,
+          "wind_speed_ms": 0.4,
+          "wind_direction_deg": 331.0,
           "current_direction_deg": null,
           "current_speed_ms": null,
           "current_speed_knots": null
@@ -334,8 +334,8 @@
       "exposure_level": "unknown",
       "exposure_label": "無法判定",
       "freshness": "fresh",
-      "latest_observation_time": "2026-11-23T17:00:00+08:00",
-      "observation_age_minutes": 60.9,
+      "latest_observation_time": "2026-11-24T05:00:00+08:00",
+      "observation_age_minutes": 57.3,
       "stale_after_minutes": 180,
       "station_count": 2,
       "mapped_station_count": 3,
@@ -343,34 +343,34 @@
       "factors": [
         {
           "factor": "wave_height_m",
-          "value": 1.5,
+          "value": 1.4,
           "unit": "m",
-          "level": "high",
-          "label": "高",
+          "level": "moderate",
+          "label": "中",
           "basis": "internal_screening_band_not_official_warning"
         }
       ],
       "other_observations": {
-        "wave_period_s": 6.4,
-        "tide_height_m": 0.95,
-        "current_speed_ms": 0.05,
+        "wave_period_s": 6.7,
+        "tide_height_m": 0.63,
+        "current_speed_ms": 0.08,
         "wave_direction_deg": null,
         "wind_direction_deg": null
       },
       "historical_window": {
-        "latest_observation_time": "2026-11-22T23:00:00+08:00",
+        "latest_observation_time": "2026-11-23T23:00:00+08:00",
         "data_kind": "observed",
         "latest_values": {
-          "wave_height_m": 1.1,
-          "wave_period_s": 5.6,
+          "wave_height_m": 1.2,
+          "wave_period_s": 6.6,
           "wave_direction_deg": 101.0,
-          "sea_temperature_c": 25.7,
-          "tide_height_m": -0.52,
-          "wind_speed_ms": 5.1,
-          "wind_direction_deg": 344.0,
-          "current_direction_deg": 119.0,
-          "current_speed_ms": 0.27,
-          "current_speed_knots": 0.52
+          "sea_temperature_c": 26.0,
+          "tide_height_m": -0.65,
+          "wind_speed_ms": 3.5,
+          "wind_direction_deg": 332.0,
+          "current_direction_deg": 181.0,
+          "current_speed_ms": 0.04,
+          "current_speed_knots": 0.08
         },
         "use_limit": "30天資料中的最新觀測快照，不是30天平均、分布或氣候常態；不計算異常值或趨勢。"
       },
