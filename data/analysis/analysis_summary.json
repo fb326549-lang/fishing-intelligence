@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T03:35:40.274470+00:00",
+  "generated_at": "2026-11-24T06:51:02.094912+00:00",
   "data_kind": "historical_forecast_verification",
   "observation_dataset": "O-B0075-001",
   "forecast_dataset": "F-A0021-001",
   "height_datum": "TWVD2001",
-  "observation_history_records": 2353,
-  "forecast_vintage_records": 118862,
-  "forecast_snapshot_count": 31,
-  "matched_event_count": 7929,
+  "observation_history_records": 2515,
+  "forecast_vintage_records": 122790,
+  "forecast_snapshot_count": 32,
+  "matched_event_count": 8763,
   "station_coverage": [
     {
       "station_id": "C4U02",
@@ -17,14 +17,14 @@
       "region_id": "yilan_suao",
       "pair_distance_m": 263,
       "status": "matched",
-      "observation_samples": 388,
+      "observation_samples": 415,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 66,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1372,
-      "eligible_forecast_events_issued_before_target": 1307,
+      "observed_extrema": 71,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1529,
+      "eligible_forecast_events_issued_before_target": 1461,
       "unmatched_eligible_forecast_events": 0,
-      "matched_events": 1307
+      "matched_events": 1461
     },
     {
       "station_id": "C4U01",
@@ -33,14 +33,14 @@
       "region_id": "yilan_suao",
       "pair_distance_m": 111,
       "status": "matched",
-      "observation_samples": 387,
+      "observation_samples": 414,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 71,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1385,
-      "eligible_forecast_events_issued_before_target": 1336,
+      "observed_extrema": 76,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1511,
+      "eligible_forecast_events_issued_before_target": 1460,
       "unmatched_eligible_forecast_events": 0,
-      "matched_events": 1336
+      "matched_events": 1460
     },
     {
       "station_id": "C4T01",
@@ -49,14 +49,14 @@
       "region_id": "hualien_north",
       "pair_distance_m": 0,
       "status": "matched",
-      "observation_samples": 388,
+      "observation_samples": 415,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 75,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1385,
-      "eligible_forecast_events_issued_before_target": 1337,
-      "unmatched_eligible_forecast_events": 30,
-      "matched_events": 1307
+      "observed_extrema": 80,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1511,
+      "eligible_forecast_events_issued_before_target": 1461,
+      "unmatched_eligible_forecast_events": 0,
+      "matched_events": 1461
     },
     {
       "station_id": "1566",
@@ -65,14 +65,14 @@
       "region_id": "fengbin_shitiping",
       "pair_distance_m": 0,
       "status": "matched",
-      "observation_samples": 389,
+      "observation_samples": 416,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 73,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1385,
-      "eligible_forecast_events_issued_before_target": 1336,
+      "observed_extrema": 77,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1511,
+      "eligible_forecast_events_issued_before_target": 1460,
       "unmatched_eligible_forecast_events": 0,
-      "matched_events": 1336
+      "matched_events": 1460
     },
     {
       "station_id": "C4S02",
@@ -81,14 +81,14 @@
       "region_id": "chenggong_donghe",
       "pair_distance_m": 10,
       "status": "matched",
-      "observation_samples": 388,
+      "observation_samples": 415,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 73,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1385,
-      "eligible_forecast_events_issued_before_target": 1336,
-      "unmatched_eligible_forecast_events": 30,
-      "matched_events": 1306
+      "observed_extrema": 78,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1511,
+      "eligible_forecast_events_issued_before_target": 1460,
+      "unmatched_eligible_forecast_events": 0,
+      "matched_events": 1460
     },
     {
       "station_id": "1586",
@@ -97,14 +97,14 @@
       "region_id": "taitung_south",
       "pair_distance_m": 103,
       "status": "matched",
-      "observation_samples": 389,
+      "observation_samples": 416,
       "median_sampling_interval_minutes": 60.0,
-      "observed_extrema": 72,
-      "forecast_vintages_seen": 31,
-      "forecast_events_in_observation_window": 1385,
-      "eligible_forecast_events_issued_before_target": 1337,
+      "observed_extrema": 77,
+      "forecast_vintages_seen": 32,
+      "forecast_events_in_observation_window": 1511,
+      "eligible_forecast_events_issued_before_target": 1461,
       "unmatched_eligible_forecast_events": 0,
-      "matched_events": 1337
+      "matched_events": 1461
     }
   ],
   "accuracy_groups": [
@@ -112,109 +112,109 @@
       "dimension": "overall",
       "entity": "all",
       "lead_time_bucket": "all",
-      "matched_event_count": 7929,
-      "mae_height_m": 0.076,
-      "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 17.7,
+      "matched_event_count": 8763,
+      "mae_height_m": 0.073,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 17.5,
       "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-09T11:22:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "chenggong_donghe",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 31,
+      "matched_event_count": 32,
       "mae_height_m": 0.061,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 21.9,
+      "mae_timing_minutes": 21.8,
       "median_absolute_timing_error_minutes": 20.0,
       "first_forecast_time": "2026-11-09T11:42:00+08:00",
-      "last_forecast_time": "2026-11-21T15:31:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "chenggong_donghe",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.091,
       "median_absolute_height_error_m": 0.11,
-      "mae_timing_minutes": 20.1,
-      "median_absolute_timing_error_minutes": 20.5,
+      "mae_timing_minutes": 20.4,
+      "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:40:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "chenggong_donghe",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 58,
-      "mae_height_m": 0.103,
+      "matched_event_count": 60,
+      "mae_height_m": 0.101,
       "median_absolute_height_error_m": 0.09,
       "mae_timing_minutes": 14.0,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:56:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "chenggong_donghe",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 106,
+      "matched_event_count": 107,
       "mae_height_m": 0.11,
       "median_absolute_height_error_m": 0.13,
-      "mae_timing_minutes": 14.5,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-23T10:38:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "chenggong_donghe",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1081,
-      "mae_height_m": 0.077,
+      "matched_event_count": 1230,
+      "mae_height_m": 0.075,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 18.2,
-      "median_absolute_timing_error_minutes": 16.0,
+      "mae_timing_minutes": 18.3,
+      "median_absolute_timing_error_minutes": 17.0,
       "first_forecast_time": "2026-11-11T07:28:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "fengbin_shitiping",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
-      "mae_height_m": 0.034,
+      "matched_event_count": 33,
+      "mae_height_m": 0.035,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 17.8,
+      "mae_timing_minutes": 18.0,
       "median_absolute_timing_error_minutes": 22.0,
       "first_forecast_time": "2026-11-09T11:22:00+08:00",
-      "last_forecast_time": "2026-11-21T15:15:00+08:00"
+      "last_forecast_time": "2026-11-23T16:26:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "fengbin_shitiping",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.054,
+      "matched_event_count": 31,
+      "mae_height_m": 0.053,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 16.4,
-      "median_absolute_timing_error_minutes": 8.5,
+      "mae_timing_minutes": 16.1,
+      "median_absolute_timing_error_minutes": 8.0,
       "first_forecast_time": "2026-11-09T17:22:00+08:00",
-      "last_forecast_time": "2026-11-21T21:44:00+08:00"
+      "last_forecast_time": "2026-11-23T23:08:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "fengbin_shitiping",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 57,
+      "matched_event_count": 59,
       "mae_height_m": 0.05,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 14.7,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-22T09:36:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "region",
@@ -232,109 +232,109 @@
       "dimension": "region",
       "entity": "fengbin_shitiping",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1101,
-      "mae_height_m": 0.046,
+      "matched_event_count": 1221,
+      "mae_height_m": 0.045,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 15.4,
+      "mae_timing_minutes": 15.3,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-11T07:11:00+08:00",
-      "last_forecast_time": "2026-11-23T10:17:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "hualien_north",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
+      "matched_event_count": 33,
       "mae_height_m": 0.031,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 18.6,
+      "mae_timing_minutes": 18.5,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-09T11:43:00+08:00",
-      "last_forecast_time": "2026-11-21T15:35:00+08:00"
+      "last_forecast_time": "2026-11-23T16:44:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "hualien_north",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.079,
-      "median_absolute_height_error_m": 0.055,
-      "mae_timing_minutes": 18.3,
-      "median_absolute_timing_error_minutes": 20.0,
+      "matched_event_count": 31,
+      "mae_height_m": 0.078,
+      "median_absolute_height_error_m": 0.05,
+      "mae_timing_minutes": 18.5,
+      "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:41:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:26:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "hualien_north",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 58,
-      "mae_height_m": 0.072,
+      "matched_event_count": 60,
+      "mae_height_m": 0.071,
       "median_absolute_height_error_m": 0.07,
       "mae_timing_minutes": 12.1,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:22:00+08:00",
-      "last_forecast_time": "2026-11-22T10:03:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "hualien_north",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 106,
-      "mae_height_m": 0.075,
+      "matched_event_count": 107,
+      "mae_height_m": 0.074,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 14.5,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-23T05:12:00+08:00"
+      "last_forecast_time": "2026-11-23T10:42:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "hualien_north",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1081,
+      "matched_event_count": 1230,
       "mae_height_m": 0.037,
-      "median_absolute_height_error_m": 0.03,
-      "mae_timing_minutes": 17.1,
+      "median_absolute_height_error_m": 0.04,
+      "mae_timing_minutes": 17.0,
       "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-11T07:33:00+08:00",
-      "last_forecast_time": "2026-11-23T05:12:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "taitung_south",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 33,
-      "mae_height_m": 0.143,
+      "matched_event_count": 34,
+      "mae_height_m": 0.142,
       "median_absolute_height_error_m": 0.12,
-      "mae_timing_minutes": 21.5,
+      "mae_timing_minutes": 21.4,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T11:38:00+08:00",
-      "last_forecast_time": "2026-11-21T15:36:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "taitung_south",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.149,
-      "median_absolute_height_error_m": 0.155,
-      "mae_timing_minutes": 20.6,
+      "median_absolute_height_error_m": 0.15,
+      "mae_timing_minutes": 20.8,
       "median_absolute_timing_error_minutes": 24.0,
       "first_forecast_time": "2026-11-09T17:39:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "taitung_south",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 57,
-      "mae_height_m": 0.167,
+      "matched_event_count": 59,
+      "mae_height_m": 0.165,
       "median_absolute_height_error_m": 0.15,
-      "mae_timing_minutes": 12.1,
+      "mae_timing_minutes": 12.0,
       "median_absolute_timing_error_minutes": 6.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:58:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "region",
@@ -343,7 +343,7 @@
       "matched_event_count": 110,
       "mae_height_m": 0.179,
       "median_absolute_height_error_m": 0.17,
-      "mae_timing_minutes": 15.6,
+      "mae_timing_minutes": 15.5,
       "median_absolute_timing_error_minutes": 10.0,
       "first_forecast_time": "2026-11-10T12:06:00+08:00",
       "last_forecast_time": "2026-11-23T10:36:00+08:00"
@@ -352,109 +352,109 @@
       "dimension": "region",
       "entity": "taitung_south",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1107,
-      "mae_height_m": 0.138,
+      "matched_event_count": 1227,
+      "mae_height_m": 0.135,
       "median_absolute_height_error_m": 0.14,
-      "mae_timing_minutes": 18.2,
+      "mae_timing_minutes": 17.7,
       "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-11T07:30:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "yilan_suao",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 64,
-      "mae_height_m": 0.044,
-      "median_absolute_height_error_m": 0.025,
+      "matched_event_count": 66,
+      "mae_height_m": 0.043,
+      "median_absolute_height_error_m": 0.02,
       "mae_timing_minutes": 18.8,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-09T11:30:00+08:00",
-      "last_forecast_time": "2026-11-21T15:50:00+08:00"
+      "last_forecast_time": "2026-11-23T16:55:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "yilan_suao",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 50,
-      "mae_height_m": 0.05,
+      "matched_event_count": 51,
+      "mae_height_m": 0.049,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 19.5,
+      "mae_timing_minutes": 19.6,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:25:00+08:00",
-      "last_forecast_time": "2026-11-21T22:28:00+08:00"
+      "last_forecast_time": "2026-11-23T23:24:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "yilan_suao",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 116,
-      "mae_height_m": 0.083,
+      "matched_event_count": 120,
+      "mae_height_m": 0.081,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 15.9,
+      "mae_timing_minutes": 15.8,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-10T00:21:00+08:00",
-      "last_forecast_time": "2026-11-22T10:24:00+08:00"
+      "last_forecast_time": "2026-11-24T11:05:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "yilan_suao",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 221,
-      "mae_height_m": 0.075,
+      "matched_event_count": 223,
+      "mae_height_m": 0.074,
       "median_absolute_height_error_m": 0.07,
       "mae_timing_minutes": 17.4,
       "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-10T07:29:00+08:00",
-      "last_forecast_time": "2026-11-23T10:27:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "region",
       "entity": "yilan_suao",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 2192,
-      "mae_height_m": 0.073,
-      "median_absolute_height_error_m": 0.06,
-      "mae_timing_minutes": 19.0,
-      "median_absolute_timing_error_minutes": 18.0,
+      "matched_event_count": 2461,
+      "mae_height_m": 0.066,
+      "median_absolute_height_error_m": 0.05,
+      "mae_timing_minutes": 18.5,
+      "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-11T07:29:00+08:00",
-      "last_forecast_time": "2026-11-23T10:27:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1566",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
-      "mae_height_m": 0.034,
+      "matched_event_count": 33,
+      "mae_height_m": 0.035,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 17.8,
+      "mae_timing_minutes": 18.0,
       "median_absolute_timing_error_minutes": 22.0,
       "first_forecast_time": "2026-11-09T11:22:00+08:00",
-      "last_forecast_time": "2026-11-21T15:15:00+08:00"
+      "last_forecast_time": "2026-11-23T16:26:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1566",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.054,
+      "matched_event_count": 31,
+      "mae_height_m": 0.053,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 16.4,
-      "median_absolute_timing_error_minutes": 8.5,
+      "mae_timing_minutes": 16.1,
+      "median_absolute_timing_error_minutes": 8.0,
       "first_forecast_time": "2026-11-09T17:22:00+08:00",
-      "last_forecast_time": "2026-11-21T21:44:00+08:00"
+      "last_forecast_time": "2026-11-23T23:08:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1566",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 57,
+      "matched_event_count": 59,
       "mae_height_m": 0.05,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 14.7,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-22T09:36:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "station",
@@ -472,49 +472,49 @@
       "dimension": "station",
       "entity": "1566",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1101,
-      "mae_height_m": 0.046,
+      "matched_event_count": 1221,
+      "mae_height_m": 0.045,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 15.4,
+      "mae_timing_minutes": 15.3,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-11T07:11:00+08:00",
-      "last_forecast_time": "2026-11-23T10:17:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1586",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 33,
-      "mae_height_m": 0.143,
+      "matched_event_count": 34,
+      "mae_height_m": 0.142,
       "median_absolute_height_error_m": 0.12,
-      "mae_timing_minutes": 21.5,
+      "mae_timing_minutes": 21.4,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T11:38:00+08:00",
-      "last_forecast_time": "2026-11-21T15:36:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1586",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.149,
-      "median_absolute_height_error_m": 0.155,
-      "mae_timing_minutes": 20.6,
+      "median_absolute_height_error_m": 0.15,
+      "mae_timing_minutes": 20.8,
       "median_absolute_timing_error_minutes": 24.0,
       "first_forecast_time": "2026-11-09T17:39:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "1586",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 57,
-      "mae_height_m": 0.167,
+      "matched_event_count": 59,
+      "mae_height_m": 0.165,
       "median_absolute_height_error_m": 0.15,
-      "mae_timing_minutes": 12.1,
+      "mae_timing_minutes": 12.0,
       "median_absolute_timing_error_minutes": 6.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:58:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "station",
@@ -523,7 +523,7 @@
       "matched_event_count": 110,
       "mae_height_m": 0.179,
       "median_absolute_height_error_m": 0.17,
-      "mae_timing_minutes": 15.6,
+      "mae_timing_minutes": 15.5,
       "median_absolute_timing_error_minutes": 10.0,
       "first_forecast_time": "2026-11-10T12:06:00+08:00",
       "last_forecast_time": "2026-11-23T10:36:00+08:00"
@@ -532,169 +532,169 @@
       "dimension": "station",
       "entity": "1586",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1107,
-      "mae_height_m": 0.138,
+      "matched_event_count": 1227,
+      "mae_height_m": 0.135,
       "median_absolute_height_error_m": 0.14,
-      "mae_timing_minutes": 18.2,
+      "mae_timing_minutes": 17.7,
       "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-11T07:30:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4S02",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 31,
+      "matched_event_count": 32,
       "mae_height_m": 0.061,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 21.9,
+      "mae_timing_minutes": 21.8,
       "median_absolute_timing_error_minutes": 20.0,
       "first_forecast_time": "2026-11-09T11:42:00+08:00",
-      "last_forecast_time": "2026-11-21T15:31:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4S02",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.091,
       "median_absolute_height_error_m": 0.11,
-      "mae_timing_minutes": 20.1,
-      "median_absolute_timing_error_minutes": 20.5,
+      "mae_timing_minutes": 20.4,
+      "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:40:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4S02",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 58,
-      "mae_height_m": 0.103,
+      "matched_event_count": 60,
+      "mae_height_m": 0.101,
       "median_absolute_height_error_m": 0.09,
       "mae_timing_minutes": 14.0,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:56:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4S02",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 106,
+      "matched_event_count": 107,
       "mae_height_m": 0.11,
       "median_absolute_height_error_m": 0.13,
-      "mae_timing_minutes": 14.5,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-23T10:38:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4S02",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1081,
-      "mae_height_m": 0.077,
+      "matched_event_count": 1230,
+      "mae_height_m": 0.075,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 18.2,
-      "median_absolute_timing_error_minutes": 16.0,
+      "mae_timing_minutes": 18.3,
+      "median_absolute_timing_error_minutes": 17.0,
       "first_forecast_time": "2026-11-11T07:28:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4T01",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
+      "matched_event_count": 33,
       "mae_height_m": 0.031,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 18.6,
+      "mae_timing_minutes": 18.5,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-09T11:43:00+08:00",
-      "last_forecast_time": "2026-11-21T15:35:00+08:00"
+      "last_forecast_time": "2026-11-23T16:44:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4T01",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.079,
-      "median_absolute_height_error_m": 0.055,
-      "mae_timing_minutes": 18.3,
-      "median_absolute_timing_error_minutes": 20.0,
+      "matched_event_count": 31,
+      "mae_height_m": 0.078,
+      "median_absolute_height_error_m": 0.05,
+      "mae_timing_minutes": 18.5,
+      "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:41:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:26:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4T01",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 58,
-      "mae_height_m": 0.072,
+      "matched_event_count": 60,
+      "mae_height_m": 0.071,
       "median_absolute_height_error_m": 0.07,
       "mae_timing_minutes": 12.1,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:22:00+08:00",
-      "last_forecast_time": "2026-11-22T10:03:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4T01",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 106,
-      "mae_height_m": 0.075,
+      "matched_event_count": 107,
+      "mae_height_m": 0.074,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 14.5,
+      "mae_timing_minutes": 14.6,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-23T05:12:00+08:00"
+      "last_forecast_time": "2026-11-23T10:42:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4T01",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1081,
+      "matched_event_count": 1230,
       "mae_height_m": 0.037,
-      "median_absolute_height_error_m": 0.03,
-      "mae_timing_minutes": 17.1,
+      "median_absolute_height_error_m": 0.04,
+      "mae_timing_minutes": 17.0,
       "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-11T07:33:00+08:00",
-      "last_forecast_time": "2026-11-23T05:12:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U01",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
+      "matched_event_count": 33,
       "mae_height_m": 0.037,
-      "median_absolute_height_error_m": 0.015,
-      "mae_timing_minutes": 23.5,
+      "median_absolute_height_error_m": 0.02,
+      "mae_timing_minutes": 23.7,
       "median_absolute_timing_error_minutes": 25.0,
       "first_forecast_time": "2026-11-09T11:30:00+08:00",
-      "last_forecast_time": "2026-11-21T15:27:00+08:00"
+      "last_forecast_time": "2026-11-23T16:30:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U01",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.043,
+      "matched_event_count": 31,
+      "mae_height_m": 0.042,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 20.7,
+      "mae_timing_minutes": 20.8,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:25:00+08:00",
-      "last_forecast_time": "2026-11-21T21:59:00+08:00"
+      "last_forecast_time": "2026-11-23T23:24:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U01",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 57,
-      "mae_height_m": 0.071,
+      "matched_event_count": 59,
+      "mae_height_m": 0.069,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 11.6,
+      "mae_timing_minutes": 11.4,
       "median_absolute_timing_error_minutes": 9.0,
       "first_forecast_time": "2026-11-10T00:21:00+08:00",
-      "last_forecast_time": "2026-11-22T09:49:00+08:00"
+      "last_forecast_time": "2026-11-24T11:05:00+08:00"
     },
     {
       "dimension": "station",
@@ -712,25 +712,25 @@
       "dimension": "station",
       "entity": "C4U01",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1104,
-      "mae_height_m": 0.06,
+      "matched_event_count": 1224,
+      "mae_height_m": 0.056,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 18.1,
+      "mae_timing_minutes": 17.9,
       "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-11T07:29:00+08:00",
-      "last_forecast_time": "2026-11-23T10:27:00+08:00"
+      "last_forecast_time": "2026-11-24T11:05:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U02",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 32,
-      "mae_height_m": 0.05,
-      "median_absolute_height_error_m": 0.045,
-      "mae_timing_minutes": 14.1,
+      "matched_event_count": 33,
+      "mae_height_m": 0.049,
+      "median_absolute_height_error_m": 0.04,
+      "mae_timing_minutes": 13.8,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-09T12:05:00+08:00",
-      "last_forecast_time": "2026-11-21T15:50:00+08:00"
+      "last_forecast_time": "2026-11-23T16:55:00+08:00"
     },
     {
       "dimension": "station",
@@ -748,37 +748,37 @@
       "dimension": "station",
       "entity": "C4U02",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 59,
-      "mae_height_m": 0.094,
+      "matched_event_count": 61,
+      "mae_height_m": 0.091,
       "median_absolute_height_error_m": 0.07,
       "mae_timing_minutes": 20.0,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-10T00:49:00+08:00",
-      "last_forecast_time": "2026-11-22T10:24:00+08:00"
+      "last_forecast_time": "2026-11-24T06:33:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U02",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 108,
+      "matched_event_count": 110,
       "mae_height_m": 0.08,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 19.5,
-      "median_absolute_timing_error_minutes": 18.5,
+      "mae_timing_minutes": 19.3,
+      "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-10T07:29:00+08:00",
-      "last_forecast_time": "2026-11-23T05:41:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "station",
       "entity": "C4U02",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 1088,
-      "mae_height_m": 0.085,
-      "median_absolute_height_error_m": 0.08,
-      "mae_timing_minutes": 20.0,
-      "median_absolute_timing_error_minutes": 18.0,
+      "matched_event_count": 1237,
+      "mae_height_m": 0.076,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 19.2,
+      "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-11T08:08:00+08:00",
-      "last_forecast_time": "2026-11-23T05:41:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -796,25 +796,25 @@
       "dimension": "station_tide",
       "entity": "1566|乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 20,
-      "mae_height_m": 0.048,
+      "matched_event_count": 21,
+      "mae_height_m": 0.047,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 12.6,
+      "mae_timing_minutes": 12.4,
       "median_absolute_timing_error_minutes": 5.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-21T21:44:00+08:00"
+      "last_forecast_time": "2026-11-23T23:08:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "1566|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.071,
       "median_absolute_height_error_m": 0.08,
-      "mae_timing_minutes": 10.1,
+      "mae_timing_minutes": 9.9,
       "median_absolute_timing_error_minutes": 6.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-22T09:36:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -832,25 +832,25 @@
       "dimension": "station_tide",
       "entity": "1566|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.055,
+      "matched_event_count": 612,
+      "mae_height_m": 0.054,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 19.7,
+      "mae_timing_minutes": 18.3,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-11T12:26:00+08:00",
-      "last_forecast_time": "2026-11-23T10:17:00+08:00"
+      "last_forecast_time": "2026-11-24T10:57:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "1566|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 22,
-      "mae_height_m": 0.021,
+      "matched_event_count": 23,
+      "mae_height_m": 0.022,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 17.0,
+      "mae_timing_minutes": 17.3,
       "median_absolute_timing_error_minutes": 22.0,
       "first_forecast_time": "2026-11-09T17:22:00+08:00",
-      "last_forecast_time": "2026-11-21T15:15:00+08:00"
+      "last_forecast_time": "2026-11-23T16:26:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -868,13 +868,13 @@
       "dimension": "station_tide",
       "entity": "1566|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 27,
-      "mae_height_m": 0.027,
+      "matched_event_count": 28,
+      "mae_height_m": 0.026,
       "median_absolute_height_error_m": 0.03,
-      "mae_timing_minutes": 19.8,
+      "mae_timing_minutes": 19.9,
       "median_absolute_timing_error_minutes": 25.0,
       "first_forecast_time": "2026-11-10T06:35:00+08:00",
-      "last_forecast_time": "2026-11-22T04:02:00+08:00"
+      "last_forecast_time": "2026-11-24T05:37:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -892,13 +892,13 @@
       "dimension": "station_tide",
       "entity": "1566|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 549,
-      "mae_height_m": 0.037,
+      "matched_event_count": 609,
+      "mae_height_m": 0.036,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 11.0,
-      "median_absolute_timing_error_minutes": 10.0,
+      "mae_timing_minutes": 12.3,
+      "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-11T07:11:00+08:00",
-      "last_forecast_time": "2026-11-23T04:50:00+08:00"
+      "last_forecast_time": "2026-11-24T05:37:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -916,25 +916,25 @@
       "dimension": "station_tide",
       "entity": "1586|乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 20,
-      "mae_height_m": 0.161,
+      "matched_event_count": 21,
+      "mae_height_m": 0.16,
       "median_absolute_height_error_m": 0.17,
-      "mae_timing_minutes": 21.6,
+      "mae_timing_minutes": 21.9,
       "median_absolute_timing_error_minutes": 25.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "1586|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.189,
-      "median_absolute_height_error_m": 0.215,
+      "matched_event_count": 31,
+      "mae_height_m": 0.185,
+      "median_absolute_height_error_m": 0.21,
       "mae_timing_minutes": 15.0,
-      "median_absolute_timing_error_minutes": 11.0,
+      "median_absolute_timing_error_minutes": 13.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:58:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -943,7 +943,7 @@
       "matched_event_count": 57,
       "mae_height_m": 0.206,
       "median_absolute_height_error_m": 0.24,
-      "mae_timing_minutes": 14.7,
+      "mae_timing_minutes": 14.5,
       "median_absolute_timing_error_minutes": 7.0,
       "first_forecast_time": "2026-11-10T12:06:00+08:00",
       "last_forecast_time": "2026-11-23T10:36:00+08:00"
@@ -952,25 +952,25 @@
       "dimension": "station_tide",
       "entity": "1586|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 555,
-      "mae_height_m": 0.144,
+      "matched_event_count": 615,
+      "mae_height_m": 0.141,
       "median_absolute_height_error_m": 0.14,
-      "mae_timing_minutes": 19.5,
+      "mae_timing_minutes": 19.0,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-11T12:34:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:14:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "1586|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 23,
+      "matched_event_count": 24,
       "mae_height_m": 0.117,
       "median_absolute_height_error_m": 0.11,
-      "mae_timing_minutes": 21.9,
+      "mae_timing_minutes": 21.8,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-09T17:39:00+08:00",
-      "last_forecast_time": "2026-11-21T15:36:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -988,13 +988,13 @@
       "dimension": "station_tide",
       "entity": "1586|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 27,
-      "mae_height_m": 0.142,
+      "matched_event_count": 28,
+      "mae_height_m": 0.141,
       "median_absolute_height_error_m": 0.14,
-      "mae_timing_minutes": 8.8,
+      "mae_timing_minutes": 8.6,
       "median_absolute_timing_error_minutes": 6.0,
       "first_forecast_time": "2026-11-10T06:54:00+08:00",
-      "last_forecast_time": "2026-11-22T04:16:00+08:00"
+      "last_forecast_time": "2026-11-24T05:56:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1012,13 +1012,13 @@
       "dimension": "station_tide",
       "entity": "1586|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.131,
-      "median_absolute_height_error_m": 0.14,
-      "mae_timing_minutes": 17.0,
+      "matched_event_count": 612,
+      "mae_height_m": 0.129,
+      "median_absolute_height_error_m": 0.12,
+      "mae_timing_minutes": 16.4,
       "median_absolute_timing_error_minutes": 14.0,
       "first_forecast_time": "2026-11-11T07:30:00+08:00",
-      "last_forecast_time": "2026-11-23T05:07:00+08:00"
+      "last_forecast_time": "2026-11-24T05:56:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1036,61 +1036,61 @@
       "dimension": "station_tide",
       "entity": "C4S02|乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 21,
+      "matched_event_count": 22,
       "mae_height_m": 0.102,
       "median_absolute_height_error_m": 0.11,
-      "mae_timing_minutes": 21.1,
+      "mae_timing_minutes": 21.4,
       "median_absolute_timing_error_minutes": 25.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4S02|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 30,
-      "mae_height_m": 0.117,
+      "matched_event_count": 31,
+      "mae_height_m": 0.115,
       "median_absolute_height_error_m": 0.13,
-      "mae_timing_minutes": 16.7,
-      "median_absolute_timing_error_minutes": 12.5,
+      "mae_timing_minutes": 16.8,
+      "median_absolute_timing_error_minutes": 13.0,
       "first_forecast_time": "2026-11-10T00:25:00+08:00",
-      "last_forecast_time": "2026-11-22T09:56:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4S02|乾潮",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 53,
-      "mae_height_m": 0.118,
+      "matched_event_count": 54,
+      "mae_height_m": 0.117,
       "median_absolute_height_error_m": 0.13,
-      "mae_timing_minutes": 11.7,
+      "mae_timing_minutes": 11.9,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-22T22:44:00+08:00"
+      "last_forecast_time": "2026-11-23T10:38:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4S02|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 529,
-      "mae_height_m": 0.093,
+      "matched_event_count": 618,
+      "mae_height_m": 0.09,
       "median_absolute_height_error_m": 0.09,
-      "mae_timing_minutes": 18.2,
-      "median_absolute_timing_error_minutes": 16.0,
+      "mae_timing_minutes": 18.8,
+      "median_absolute_timing_error_minutes": 17.0,
       "first_forecast_time": "2026-11-11T12:43:00+08:00",
-      "last_forecast_time": "2026-11-22T22:44:00+08:00"
+      "last_forecast_time": "2026-11-24T11:19:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4S02|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 22,
+      "matched_event_count": 23,
       "mae_height_m": 0.05,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 22.6,
+      "mae_timing_minutes": 22.4,
       "median_absolute_timing_error_minutes": 20.0,
       "first_forecast_time": "2026-11-09T17:40:00+08:00",
-      "last_forecast_time": "2026-11-21T15:31:00+08:00"
+      "last_forecast_time": "2026-11-23T16:42:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1108,13 +1108,13 @@
       "dimension": "station_tide",
       "entity": "C4S02|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 28,
-      "mae_height_m": 0.088,
+      "matched_event_count": 29,
+      "mae_height_m": 0.086,
       "median_absolute_height_error_m": 0.09,
       "mae_timing_minutes": 11.1,
       "median_absolute_timing_error_minutes": 9.0,
       "first_forecast_time": "2026-11-10T06:51:00+08:00",
-      "last_forecast_time": "2026-11-22T04:13:00+08:00"
+      "last_forecast_time": "2026-11-24T05:51:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1132,13 +1132,13 @@
       "dimension": "station_tide",
       "entity": "C4S02|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.061,
-      "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 18.2,
+      "matched_event_count": 612,
+      "mae_height_m": 0.059,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 17.8,
       "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-11T07:28:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-24T05:51:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1156,61 +1156,61 @@
       "dimension": "station_tide",
       "entity": "C4T01|乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 21,
-      "mae_height_m": 0.102,
+      "matched_event_count": 22,
+      "mae_height_m": 0.099,
       "median_absolute_height_error_m": 0.15,
-      "mae_timing_minutes": 18.9,
+      "mae_timing_minutes": 19.2,
       "median_absolute_timing_error_minutes": 22.0,
       "first_forecast_time": "2026-11-10T00:22:00+08:00",
-      "last_forecast_time": "2026-11-21T22:02:00+08:00"
+      "last_forecast_time": "2026-11-23T23:26:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4T01|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.075,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 15.7,
+      "mae_timing_minutes": 15.9,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:22:00+08:00",
-      "last_forecast_time": "2026-11-22T10:03:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4T01|乾潮",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 53,
-      "mae_height_m": 0.074,
-      "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 12.0,
+      "matched_event_count": 54,
+      "mae_height_m": 0.073,
+      "median_absolute_height_error_m": 0.065,
+      "mae_timing_minutes": 12.1,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T12:12:00+08:00",
-      "last_forecast_time": "2026-11-22T22:44:00+08:00"
+      "last_forecast_time": "2026-11-23T10:42:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4T01|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 529,
-      "mae_height_m": 0.036,
-      "median_absolute_height_error_m": 0.03,
-      "mae_timing_minutes": 15.9,
-      "median_absolute_timing_error_minutes": 17.0,
+      "matched_event_count": 618,
+      "mae_height_m": 0.038,
+      "median_absolute_height_error_m": 0.04,
+      "mae_timing_minutes": 16.7,
+      "median_absolute_timing_error_minutes": 18.0,
       "first_forecast_time": "2026-11-11T12:42:00+08:00",
-      "last_forecast_time": "2026-11-22T22:44:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4T01|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 23,
-      "mae_height_m": 0.029,
+      "matched_event_count": 24,
+      "mae_height_m": 0.03,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 19.7,
+      "mae_timing_minutes": 19.5,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-09T17:41:00+08:00",
-      "last_forecast_time": "2026-11-21T15:35:00+08:00"
+      "last_forecast_time": "2026-11-23T16:44:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1228,13 +1228,13 @@
       "dimension": "station_tide",
       "entity": "C4T01|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 28,
-      "mae_height_m": 0.068,
+      "matched_event_count": 29,
+      "mae_height_m": 0.067,
       "median_absolute_height_error_m": 0.08,
-      "mae_timing_minutes": 8.2,
+      "mae_timing_minutes": 8.0,
       "median_absolute_timing_error_minutes": 2.0,
       "first_forecast_time": "2026-11-10T06:58:00+08:00",
-      "last_forecast_time": "2026-11-22T04:22:00+08:00"
+      "last_forecast_time": "2026-11-24T06:00:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1252,13 +1252,13 @@
       "dimension": "station_tide",
       "entity": "C4T01|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
+      "matched_event_count": 612,
       "mae_height_m": 0.037,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 18.3,
-      "median_absolute_timing_error_minutes": 21.0,
+      "mae_timing_minutes": 17.3,
+      "median_absolute_timing_error_minutes": 17.0,
       "first_forecast_time": "2026-11-11T07:33:00+08:00",
-      "last_forecast_time": "2026-11-23T05:12:00+08:00"
+      "last_forecast_time": "2026-11-24T06:00:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1276,25 +1276,25 @@
       "dimension": "station_tide",
       "entity": "C4U01|乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 20,
-      "mae_height_m": 0.052,
+      "matched_event_count": 21,
+      "mae_height_m": 0.05,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 19.9,
+      "mae_timing_minutes": 20.0,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-10T00:21:00+08:00",
-      "last_forecast_time": "2026-11-21T21:59:00+08:00"
+      "last_forecast_time": "2026-11-23T23:24:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4U01|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 30,
+      "matched_event_count": 31,
       "mae_height_m": 0.063,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 11.7,
-      "median_absolute_timing_error_minutes": 10.5,
+      "mae_timing_minutes": 11.5,
+      "median_absolute_timing_error_minutes": 10.0,
       "first_forecast_time": "2026-11-10T00:21:00+08:00",
-      "last_forecast_time": "2026-11-22T09:49:00+08:00"
+      "last_forecast_time": "2026-11-24T11:05:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1312,25 +1312,25 @@
       "dimension": "station_tide",
       "entity": "C4U01|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.05,
+      "matched_event_count": 612,
+      "mae_height_m": 0.048,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 18.6,
+      "mae_timing_minutes": 18.2,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-11T12:26:00+08:00",
-      "last_forecast_time": "2026-11-23T10:27:00+08:00"
+      "last_forecast_time": "2026-11-24T11:05:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4U01|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 22,
-      "mae_height_m": 0.035,
+      "matched_event_count": 23,
+      "mae_height_m": 0.034,
       "median_absolute_height_error_m": 0.01,
-      "mae_timing_minutes": 23.5,
+      "mae_timing_minutes": 23.8,
       "median_absolute_timing_error_minutes": 25.0,
       "first_forecast_time": "2026-11-09T17:25:00+08:00",
-      "last_forecast_time": "2026-11-21T15:27:00+08:00"
+      "last_forecast_time": "2026-11-23T16:30:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1348,13 +1348,13 @@
       "dimension": "station_tide",
       "entity": "C4U01|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 27,
-      "mae_height_m": 0.079,
+      "matched_event_count": 28,
+      "mae_height_m": 0.076,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 11.5,
+      "mae_timing_minutes": 11.3,
       "median_absolute_timing_error_minutes": 9.0,
       "first_forecast_time": "2026-11-10T06:51:00+08:00",
-      "last_forecast_time": "2026-11-22T04:11:00+08:00"
+      "last_forecast_time": "2026-11-24T05:54:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1372,13 +1372,13 @@
       "dimension": "station_tide",
       "entity": "C4U01|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.071,
-      "median_absolute_height_error_m": 0.065,
-      "mae_timing_minutes": 17.5,
+      "matched_event_count": 612,
+      "mae_height_m": 0.065,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 17.6,
       "median_absolute_timing_error_minutes": 14.0,
       "first_forecast_time": "2026-11-11T07:29:00+08:00",
-      "last_forecast_time": "2026-11-23T05:03:00+08:00"
+      "last_forecast_time": "2026-11-24T05:54:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1408,49 +1408,49 @@
       "dimension": "station_tide",
       "entity": "C4U02|乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 38,
-      "mae_height_m": 0.064,
+      "matched_event_count": 39,
+      "mae_height_m": 0.062,
       "median_absolute_height_error_m": 0.05,
-      "mae_timing_minutes": 16.3,
+      "mae_timing_minutes": 16.1,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-10T00:49:00+08:00",
-      "last_forecast_time": "2026-11-22T10:24:00+08:00"
+      "last_forecast_time": "2026-11-23T23:52:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4U02|乾潮",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 48,
-      "mae_height_m": 0.06,
+      "matched_event_count": 50,
+      "mae_height_m": 0.058,
       "median_absolute_height_error_m": 0.04,
-      "mae_timing_minutes": 21.0,
+      "mae_timing_minutes": 20.5,
       "median_absolute_timing_error_minutes": 23.0,
       "first_forecast_time": "2026-11-10T12:34:00+08:00",
-      "last_forecast_time": "2026-11-22T23:10:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4U02|乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 536,
-      "mae_height_m": 0.075,
-      "median_absolute_height_error_m": 0.08,
-      "mae_timing_minutes": 17.4,
+      "matched_event_count": 625,
+      "mae_height_m": 0.067,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 16.2,
       "median_absolute_timing_error_minutes": 13.0,
       "first_forecast_time": "2026-11-11T13:02:00+08:00",
-      "last_forecast_time": "2026-11-22T23:10:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "station_tide",
       "entity": "C4U02|滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 23,
-      "mae_height_m": 0.05,
+      "matched_event_count": 24,
+      "mae_height_m": 0.048,
       "median_absolute_height_error_m": 0.02,
-      "mae_timing_minutes": 15.9,
+      "mae_timing_minutes": 15.5,
       "median_absolute_timing_error_minutes": 11.0,
       "first_forecast_time": "2026-11-09T17:49:00+08:00",
-      "last_forecast_time": "2026-11-21T15:50:00+08:00"
+      "last_forecast_time": "2026-11-23T16:55:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1468,13 +1468,13 @@
       "dimension": "station_tide",
       "entity": "C4U02|滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 21,
-      "mae_height_m": 0.15,
+      "matched_event_count": 22,
+      "mae_height_m": 0.143,
       "median_absolute_height_error_m": 0.16,
-      "mae_timing_minutes": 26.5,
+      "mae_timing_minutes": 26.8,
       "median_absolute_timing_error_minutes": 29.0,
       "first_forecast_time": "2026-11-10T07:29:00+08:00",
-      "last_forecast_time": "2026-11-22T04:48:00+08:00"
+      "last_forecast_time": "2026-11-24T06:33:00+08:00"
     },
     {
       "dimension": "station_tide",
@@ -1492,13 +1492,13 @@
       "dimension": "station_tide",
       "entity": "C4U02|滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 552,
-      "mae_height_m": 0.095,
-      "median_absolute_height_error_m": 0.075,
-      "mae_timing_minutes": 22.6,
+      "matched_event_count": 612,
+      "mae_height_m": 0.086,
+      "median_absolute_height_error_m": 0.06,
+      "mae_timing_minutes": 22.2,
       "median_absolute_timing_error_minutes": 19.0,
       "first_forecast_time": "2026-11-11T08:08:00+08:00",
-      "last_forecast_time": "2026-11-23T05:41:00+08:00"
+      "last_forecast_time": "2026-11-24T06:33:00+08:00"
     },
     {
       "dimension": "tide_type",
@@ -1516,61 +1516,61 @@
       "dimension": "tide_type",
       "entity": "乾潮",
       "lead_time_bucket": "06-12h",
-      "matched_event_count": 113,
-      "mae_height_m": 0.092,
+      "matched_event_count": 118,
+      "mae_height_m": 0.09,
       "median_absolute_height_error_m": 0.09,
-      "mae_timing_minutes": 18.9,
+      "mae_timing_minutes": 19.0,
       "median_absolute_timing_error_minutes": 21.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-21T22:28:00+08:00"
+      "last_forecast_time": "2026-11-23T23:27:00+08:00"
     },
     {
       "dimension": "tide_type",
       "entity": "乾潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 188,
-      "mae_height_m": 0.095,
+      "matched_event_count": 194,
+      "mae_height_m": 0.094,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 14.4,
+      "mae_timing_minutes": 14.3,
       "median_absolute_timing_error_minutes": 12.0,
       "first_forecast_time": "2026-11-10T00:05:00+08:00",
-      "last_forecast_time": "2026-11-22T10:24:00+08:00"
+      "last_forecast_time": "2026-11-24T11:21:00+08:00"
     },
     {
       "dimension": "tide_type",
       "entity": "乾潮",
       "lead_time_bucket": "24-48h",
-      "matched_event_count": 331,
-      "mae_height_m": 0.103,
+      "matched_event_count": 335,
+      "mae_height_m": 0.102,
       "median_absolute_height_error_m": 0.09,
       "mae_timing_minutes": 15.6,
       "median_absolute_timing_error_minutes": 16.0,
       "first_forecast_time": "2026-11-10T11:54:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "tide_type",
       "entity": "乾潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 3253,
-      "mae_height_m": 0.076,
+      "matched_event_count": 3700,
+      "mae_height_m": 0.073,
       "median_absolute_height_error_m": 0.07,
-      "mae_timing_minutes": 18.2,
+      "mae_timing_minutes": 17.9,
       "median_absolute_timing_error_minutes": 17.0,
       "first_forecast_time": "2026-11-11T12:26:00+08:00",
-      "last_forecast_time": "2026-11-23T10:36:00+08:00"
+      "last_forecast_time": "2026-11-24T11:47:00+08:00"
     },
     {
       "dimension": "tide_type",
       "entity": "滿潮",
       "lead_time_bucket": "00-06h",
-      "matched_event_count": 135,
-      "mae_height_m": 0.051,
+      "matched_event_count": 141,
+      "mae_height_m": 0.05,
       "median_absolute_height_error_m": 0.03,
-      "mae_timing_minutes": 20.1,
+      "mae_timing_minutes": 20.0,
       "median_absolute_timing_error_minutes": 20.0,
       "first_forecast_time": "2026-11-09T17:22:00+08:00",
-      "last_forecast_time": "2026-11-21T15:50:00+08:00"
+      "last_forecast_time": "2026-11-23T16:55:00+08:00"
     },
     {
       "dimension": "tide_type",
@@ -1588,13 +1588,13 @@
       "dimension": "tide_type",
       "entity": "滿潮",
       "lead_time_bucket": "12-24h",
-      "matched_event_count": 158,
-      "mae_height_m": 0.09,
+      "matched_event_count": 164,
+      "mae_height_m": 0.088,
       "median_absolute_height_error_m": 0.08,
       "mae_timing_minutes": 13.8,
       "median_absolute_timing_error_minutes": 9.0,
       "first_forecast_time": "2026-11-10T06:35:00+08:00",
-      "last_forecast_time": "2026-11-22T04:48:00+08:00"
+      "last_forecast_time": "2026-11-24T06:33:00+08:00"
     },
     {
       "dimension": "tide_type",
@@ -1612,13 +1612,13 @@
       "dimension": "tide_type",
       "entity": "滿潮",
       "lead_time_bucket": "48h+",
-      "matched_event_count": 3309,
-      "mae_height_m": 0.072,
-      "median_absolute_height_error_m": 0.06,
-      "mae_timing_minutes": 17.4,
+      "matched_event_count": 3669,
+      "mae_height_m": 0.069,
+      "median_absolute_height_error_m": 0.05,
+      "mae_timing_minutes": 17.3,
       "median_absolute_timing_error_minutes": 15.0,
       "first_forecast_time": "2026-11-11T07:11:00+08:00",
-      "last_forecast_time": "2026-11-23T05:41:00+08:00"
+      "last_forecast_time": "2026-11-24T06:33:00+08:00"
     }
   ],
   "limitations": [
