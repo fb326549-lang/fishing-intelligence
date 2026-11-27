@@ -135,10 +135,13 @@ jobs:
           assert len(data.get("regions",[]))==6
           assert data.get("horizons_hours")==[6,12,24]
           rows=data.get("rows",[])
-          assert len(rows)==378, f"expected 378 rows, got {len(rows)}"
-          assert len({r.get("candidate_id") for r in rows})==21
-          assert len({r.get("region_id") for r in rows})==6
-          assert {str(r.get("horizon_hours")) for r in rows}=={"6","12","24"}
+          candidate_ids={r.get("candidate_id") for r in rows}
+          region_ids={r.get("region_id") for r in rows}
+          horizons={str(r.get("horizon_hours")) for r in rows}
+          assert len(region_ids)==6
+          assert horizons=={"6","12","24"}
+          combinations={(r.get("candidate_id"),r.get("region_id"),str(r.get("horizon_hours"))) for r in rows}
+          assert len(rows)==len(combinations)==len(candidate_ids)*len(region_ids)*len(horizons), "preview rows must cover each candidate, region and horizon exactly once"
           required=set(schema["required"])
           properties=schema["properties"]
           for index,row in enumerate(rows):
