@@ -31,6 +31,7 @@ PRIORITY = {
     "c036": "verified_taxon",
     "c037": "verified_taxon",
     "c039": "verified_taxon",
+    "c043": "verified_taxon_taitung_regional_distribution_context_no_subregion_response",
     "c055": "verified_taxon_taitung_single_specimen_response_unverified",
     "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
 }

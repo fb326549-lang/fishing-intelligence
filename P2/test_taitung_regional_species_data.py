@@ -41,6 +41,9 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
             with self.subTest(occurrence=row["regional_occurrence_id"]):
                 if row["site_code"] == "GREEN-ISLAND-FISHERY-2008" or row["candidate_id"] == "c052":
                     self.assertEqual(row["region_id"], "")
+                elif row["regional_occurrence_id"] == "RO041":
+                    self.assertEqual(row["region_id"], "")
+                    self.assertEqual(row["recorded_presence"], "regional_distribution_context")
                 elif row["region_id"] == "taitung":
                     self.assertEqual(row["candidate_id"], "c056")
                 else:
@@ -110,6 +113,7 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertEqual(port_only_candidates - target_candidates, port_only_candidates - {"c023"})
         self.assertIn("c023", target_candidates)
         self.assertIn("c056", target_candidates)
+        self.assertNotIn("c043", target_candidates)
         self.assertNotIn("c052", target_candidates)
         self.assertNotIn("c001", target_candidates)
         self.assertFalse(any(row["candidate_id"] in {"c003", "c004"} and row["region_id"] == "taitung_south"
@@ -124,6 +128,14 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertIn("未細分成功東河／台東南段", row["site_name"])
         self.assertIn("未提供可映射", row["study_scope"])
         self.assertEqual(row["recorded_presence"], "fishery_record")
+
+    def test_longfin_yellowtail_distribution_context_does_not_claim_subregion_presence(self):
+        row = self.by_occurrence["RO041"]
+        self.assertEqual((row["candidate_id"], row["taxon_scientific_name"]), ("c043", "Seriola rivoliana"))
+        self.assertEqual(row["recorded_presence"], "regional_distribution_context")
+        self.assertEqual(row["region_id"], "")
+        self.assertTrue(row["limitations"].strip())
+        self.assertEqual(self.candidates["c043"]["taxonomy_status"], "verified_taxon")
 
     def test_success_port_report_sampling_events_match_reported_taxa_and_counts(self):
         sample_rows = [row for row in self.occurrences if row["site_code"] == "TAI-NEWPORT-SAMPLES-2025"]

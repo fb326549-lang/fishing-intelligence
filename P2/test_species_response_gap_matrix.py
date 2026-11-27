@@ -53,6 +53,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c036,南方舵魚,Kyphosus bigibbus\n"
                 "c037,天竺舵魚,Kyphosus cinerascens\n"
                 "c039,正鰹,Katsuwonus pelamis\n"
+                "c043,長鰭鰤,Seriola rivoliana\n"
                 "c055,黃帶瓜子鱲,Girella mezina\n"
                 "c056,立翅旗魚,Istiompax indica\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
@@ -88,7 +89,7 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L055,c004,feeding_condition,https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001293552,context_only_external_region\n"
                 "L114,c056,activity_period,https://doi.org/10.1016/j.fishres.2014.10.023,context_only_offshore_commercial_fishery_not_shore_activity\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),184)
+            self.assertEqual(len(rows),192)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
@@ -104,6 +105,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             self.assertEqual(dolphinfish["evidence_status"],"evidence_gap")
             self.assertIn("E001;E002",dolphinfish["evidence_ids"])
             self.assertEqual(amberjack["eligibility_gate"],"verified_taxon")
+            longfin=next(r for r in rows if r["candidate_id"]=="c043" and r["response_domain"]=="temperature_range")
+            self.assertEqual(longfin["eligibility_gate"],"verified_taxon_taitung_regional_distribution_context_no_subregion_response")
+            self.assertEqual(longfin["evidence_status"],"evidence_gap")
             self.assertIn("habitat",black["existing_parameter_codes"])
             rabbit=next(r for r in rows if r["candidate_id"]=="c003" and r["response_domain"]=="temperature_range")
             self.assertEqual(rabbit["evidence_status"],"external_literature_found_context_only")
