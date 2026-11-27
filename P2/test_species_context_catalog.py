@@ -8,6 +8,21 @@ sys.path.insert(0, str(Path(__file__).parent / "species"))
 from build_species_context_catalog import build_catalog
 
 class SpeciesContextCatalogTests(unittest.TestCase):
+    def test_taitung_dussumieri_ecology_flows_through_existing_context_catalog(self):
+        repo = Path(__file__).resolve().parent.parent
+        catalog = build_catalog(
+            repo / "P1" / "species" / "species_candidate_register.csv",
+            repo / "P1" / "species" / "species_ecology_parameters.csv",
+            repo / "P1" / "species" / "species_evidence_register.csv",
+            Path(__file__).resolve().parent / "species" / "species_regional_occurrence_register.csv",
+        )
+        records = [r for r in catalog["records"] if r["candidate_id"] == "c053"]
+        self.assertEqual({r["parameter_code"] for r in records}, {"habitat", "reported_depth_min", "reported_depth_max", "diel_activity", "diet", "activity_water_layer"})
+        self.assertTrue(all(r["source_url"] == "https://fishdb.sinica.edu.tw/taxon/381262-fishdb" for r in records))
+        self.assertTrue(all(r["model_use_status"].startswith("context_only") for r in records))
+        occurrence = next(r for r in catalog["regional_occurrence_records"] if r["regional_occurrence_id"] == "RO042")
+        self.assertEqual((occurrence["candidate_id"], occurrence["region_id"], occurrence["recorded_presence"]), ("c053", "taitung_south", "present"))
+
     def test_catalog_preserves_species_context_provenance_and_limits(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)

@@ -6,11 +6,11 @@ ROOT=Path(__file__).parent
 PROFILE=ROOT/"species"/"species_indicator_model_profiles.csv"
 
 class SpeciesIndicatorProfileTests(unittest.TestCase):
-    def test_four_requested_species_have_separate_evidence_gated_profiles(self):
+    def test_taitung_species_have_separate_evidence_gated_profiles(self):
         with PROFILE.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual({r["candidate_id"] for r in rows},{"c001","c003","c004","c036","c055","c056"})
-        self.assertEqual(len(rows),6)
+        self.assertEqual({r["candidate_id"] for r in rows},{"c001","c003","c004","c036","c053","c055","c056"})
+        self.assertEqual(len(rows),7)
         for row in rows:
             self.assertTrue(row["feeding_ecology"])
             self.assertTrue(row["feeding_condition_candidate_inputs"])
@@ -32,5 +32,9 @@ class SpeciesIndicatorProfileTests(unittest.TestCase):
         self.assertIn("鑑種",rows["c001"]["model_blockers"])
         self.assertIn("與 Girella punctata",rows["c055"]["model_blockers"])
         self.assertIn("9–11月",rows["c056"]["model_blockers"])
+        self.assertIn("富山",rows["c053"]["model_blockers"])
+        self.assertTrue(rows["c053"]["feeding_model_status"].startswith("context_only_"))
+        self.assertTrue(rows["c053"]["environment_model_status"].startswith("context_only_"))
+        self.assertTrue(rows["c053"]["activity_model_status"].startswith("context_only_"))
 
 if __name__=="__main__": unittest.main()

@@ -143,6 +143,19 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertEqual(profile["evidence_class"], "local_underwater_visual_occurrence_no_species_response_evidence")
         self.assertTrue(all(value is None for value in __import__("json").loads(profile["feeding_phase_points"]).values()))
         self.assertTrue(all(value is None for value in __import__("json").loads(profile["activity_phase_points"]).values()))
+        evidence = next(row for row in read_rows(ROOT.parent / "P1" / "species" / "species_evidence_register.csv") if row["evidence_id"] == "E078")
+        self.assertEqual((evidence["candidate_id"], evidence["scientific_name"]), ("c053", "Acanthurus dussumieri"))
+        self.assertTrue(evidence["source_url"].startswith("https://fishdb.sinica.edu.tw/"))
+        ecology = [row for row in read_rows(ROOT.parent / "P1" / "species" / "species_ecology_parameters.csv") if row["candidate_id"] == "c053"]
+        self.assertEqual({row["parameter_code"] for row in ecology}, {"habitat", "reported_depth_min", "reported_depth_max", "diel_activity", "diet", "activity_water_layer"})
+        self.assertTrue(all(row["evidence_id"] == "E078" and row["model_use_status"].startswith("context_only") for row in ecology))
+        response = [row for row in read_rows(ROOT / "species" / "species_response_parameters.csv") if row["candidate_id"] == "c053"]
+        self.assertEqual({row["response_record_id"] for row in response}, {row["ecology_record_id"] for row in ecology})
+        self.assertTrue(all(row["model_use_status"].startswith("context_only") for row in response))
+        model = next(row for row in read_rows(ROOT / "species" / "species_indicator_model_profiles.csv") if row["candidate_id"] == "c053")
+        self.assertIn("E078", model["source_record_ids"])
+        self.assertIn("RO042", model["source_record_ids"])
+        self.assertIn("維持缺值", model["model_blockers"])
 
     def test_longfin_yellowtail_distribution_context_does_not_claim_subregion_presence(self):
         row = self.by_occurrence["RO041"]
