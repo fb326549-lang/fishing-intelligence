@@ -908,3 +908,10 @@ python -m unittest P2.test_southern_drummer_response_curves -v
 
 - 杜氏刺尾鯛（`Acanthurus dussumieri`）新增富山保育區外亞潮帶目視穿越線出現紀錄，樣區依既有雷達緯度分區規則歸至 `taitung_south`；映射是應用規劃區分類，不是官方海域界線。保育區內出現資料沒有併入區外紀錄，且區內依法禁止採捕。
 - 這筆2024年單一地點調查只支持在地物種出現，不是釣獲、魚量、日夜活動或覓食反應證據。杜氏刺尾鯛所有逐時指標及綜合分數仍留白；原有新港港口樣本保留為捕獲海域未知的獨立紀錄。來源：[海保署／臺東縣政府期末報告](https://mpa.oca.gov.tw/Files/Knowledge/ca88d9bee8a24287ac558d923e525913.pdf)。
+
+
+## Taitung c053 杜氏刺尾鯛生態脈絡補充
+
+`P1/species/species_evidence_register.csv` 的 E078 與 `species_ecology_parameters.csv` 的 EP136–EP141，整理臺灣魚類資料庫所載杜氏刺尾鯛（`Acanthurus dussumieri`）之一般棲地、4–131 公尺報告深度、日行性、幼魚/成魚活動水層與藻類/矽藻/有機碎屑食性；資料已由既有遷移器納入 `P2/species/species_response_parameters.csv`，亦供既有物種生態脈絡 JSON/PWA 產製流程使用。P2 文獻登錄 L118、物種指標模型概況與相對分數檔同步保留來源鏈及缺口。
+
+這些是臺灣全域物種自然史背景，不是台東餌源可利用量、逐時活動觀測或海溫/海流/潮汐/浪況反應。台東局部出現仍只由 RO042（富山保育區外亞潮帶目視調查）支持，不能解讀成釣獲或現時存在。故三項指標及綜合分數/最佳時段仍為缺值；此補充只豐富現有魚種分析脈絡，不新增計算架構或門檻。
