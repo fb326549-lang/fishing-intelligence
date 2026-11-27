@@ -52,7 +52,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "c034,雙色鯨鸚哥魚,Cetoscarus bicolor\n"
                 "c036,南方舵魚,Kyphosus bigibbus\n"
                 "c037,天竺舵魚,Kyphosus cinerascens\n"
-                "c039,正鰹,Katsuwonus pelamis\n",encoding="utf-8")
+                "c039,正鰹,Katsuwonus pelamis\n"
+                "c055,黃帶瓜子鱲,Girella mezina\n"
+                "c056,立翅旗魚,Istiompax indica\n",encoding="utf-8")
             ecology.write_text("candidate_id,parameter_code,evidence_id\nc001,habitat,E1\n",encoding="utf-8")
             evidence.write_text(
                 "candidate_id,evidence_id,source_url\n"
@@ -83,9 +85,10 @@ class SpeciesGapMatrixTests(unittest.TestCase):
                 "L052,c036,temperature_response,https://www2.fish-u.ac.jp/kenkyu/sangakukou/kenkyuhoukoku/64/04_1.pdf,context_only_captive_feeding\n"
                 "L053,c036,diel_feeding,https://doi.org/10.11233/aquaculturesci.69.135,context_only_captive_activity\n"
                 "L054,c004,feeding_condition,https://doi.org/10.5846/stxb201911022308,context_only_external_region\n"
-                "L055,c004,feeding_condition,https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001293552,context_only_external_region\n",encoding="utf-8")
+                "L055,c004,feeding_condition,https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001293552,context_only_external_region\n"
+                "L114,c056,activity_period,https://doi.org/10.1016/j.fishres.2014.10.023,context_only_offshore_commercial_fishery_not_shore_activity\n",encoding="utf-8")
             rows=build_matrix(candidates,ecology,evidence,literature)
-            self.assertEqual(len(rows),168)
+            self.assertEqual(len(rows),184)
             white=next(r for r in rows if r["candidate_id"]=="c002")
             grouper=next(r for r in rows if r["candidate_id"]=="c030")
             black=next(r for r in rows if r["candidate_id"]=="c001")
@@ -141,6 +144,9 @@ class SpeciesGapMatrixTests(unittest.TestCase):
             context=__import__("json").loads(seasonal_fishery["literature_context_json"])
             self.assertEqual(context[0]["model_use_status"],"context_only_east_taiwan_commercial_fishery")
             self.assertEqual(seasonal_fishery["model_use_policy"],"not_model_eligible_until_direct_response_evidence_reviewed")
+            black_marlin_activity=next(r for r in rows if r["candidate_id"]=="c056" and r["response_domain"]=="activity_period")
+            self.assertEqual(black_marlin_activity["literature_record_ids"],"L114")
+            self.assertIn("context_only_offshore_commercial_fishery_not_shore_activity",black_marlin_activity["literature_use_status"])
             southern_feeding=next(r for r in rows if r["candidate_id"]=="c036" and r["response_domain"]=="feeding_conditions")
             self.assertEqual(southern_feeding["literature_record_ids"],"L051")
             self.assertEqual(southern_feeding["literature_use_status"],"context_only_captive_feeding")

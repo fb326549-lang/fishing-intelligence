@@ -9,8 +9,8 @@ class SpeciesIndicatorProfileTests(unittest.TestCase):
     def test_four_requested_species_have_separate_evidence_gated_profiles(self):
         with PROFILE.open(encoding="utf-8-sig",newline="") as f:
             rows=list(csv.DictReader(f))
-        self.assertEqual({r["candidate_id"] for r in rows},{"c001","c003","c004","c036"})
-        self.assertEqual(len(rows),4)
+        self.assertEqual({r["candidate_id"] for r in rows},{"c001","c003","c004","c036","c055","c056"})
+        self.assertEqual(len(rows),6)
         for row in rows:
             self.assertTrue(row["feeding_ecology"])
             self.assertTrue(row["feeding_condition_candidate_inputs"])
@@ -30,5 +30,7 @@ class SpeciesIndicatorProfileTests(unittest.TestCase):
         self.assertIn("K. bigibbus",rows["c036"]["model_blockers"])
         self.assertIn("西部",rows["c004"]["model_blockers"])
         self.assertIn("鑑種",rows["c001"]["model_blockers"])
+        self.assertIn("與 Girella punctata",rows["c055"]["model_blockers"])
+        self.assertIn("9–11月",rows["c056"]["model_blockers"])
 
 if __name__=="__main__": unittest.main()
