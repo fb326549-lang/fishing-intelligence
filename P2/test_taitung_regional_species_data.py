@@ -110,10 +110,11 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         target_candidates = {row["candidate_id"] for row in self.occurrences
                              if row["region_id"] in {"chenggong_donghe", "taitung_south", "taitung"}
                              and row["recorded_presence"] in {"present", "fishery_record"}}
-        self.assertEqual(port_only_candidates - target_candidates, port_only_candidates - {"c023"})
+        self.assertEqual(port_only_candidates - target_candidates, port_only_candidates - {"c023", "c053"})
         self.assertIn("c023", target_candidates)
         self.assertIn("c056", target_candidates)
         self.assertNotIn("c043", target_candidates)
+        self.assertIn("c053", target_candidates)
         self.assertNotIn("c052", target_candidates)
         self.assertNotIn("c001", target_candidates)
         self.assertFalse(any(row["candidate_id"] in {"c003", "c004"} and row["region_id"] == "taitung_south"
@@ -128,6 +129,20 @@ class TaitungRegionalSpeciesDataTests(unittest.TestCase):
         self.assertIn("未細分成功東河／台東南段", row["site_name"])
         self.assertIn("未提供可映射", row["study_scope"])
         self.assertEqual(row["recorded_presence"], "fishery_record")
+
+    def test_dussumieri_has_taitung_south_outside_reserve_occurrence_but_no_score(self):
+        row = self.by_occurrence["RO042"]
+        self.assertEqual((row["candidate_id"], row["taxon_scientific_name"]), ("c053", "Acanthurus dussumieri"))
+        self.assertEqual((row["region_id"], row["recorded_presence"]), ("taitung_south", "present"))
+        self.assertIn("保育區外", row["site_name"])
+        self.assertIn("22°49′44″N", row["study_scope"])
+        self.assertTrue(row["source_url"].startswith("https://mpa.oca.gov.tw/"))
+        self.assertIn("不是捕獲或釣獲", row["limitations"])
+        self.assertIn("保育區內禁止採捕", row["limitations"])
+        profile = next(row for row in read_rows(ROOT / "species" / "preliminary_relative_score_profiles.csv") if row["candidate_id"] == "c053")
+        self.assertEqual(profile["evidence_class"], "local_underwater_visual_occurrence_no_species_response_evidence")
+        self.assertTrue(all(value is None for value in __import__("json").loads(profile["feeding_phase_points"]).values()))
+        self.assertTrue(all(value is None for value in __import__("json").loads(profile["activity_phase_points"]).values()))
 
     def test_longfin_yellowtail_distribution_context_does_not_claim_subregion_presence(self):
         row = self.by_occurrence["RO041"]
