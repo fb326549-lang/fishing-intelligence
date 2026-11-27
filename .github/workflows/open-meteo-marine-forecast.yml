@@ -179,7 +179,7 @@ jobs:
           top_required=set(schema["required"])
           assert top_required<=set(data), f"FCI missing top-level fields: {sorted(top_required-set(data))}"
           assert set(data)<=set(schema["properties"]), f"FCI has undeclared top-level fields: {sorted(set(data)-set(schema['properties']))}"
-          assert {row.get("candidate_id") for row in data["rows"]}=={"c036","c003","c004","c001","c010","c027","c018","c023","c043","c044","c045","c046","c047","c048","c049","c050","c051","c053","c054","c055"}
+          assert {row.get("candidate_id") for row in data["rows"]}=={"c036","c003","c004","c001","c010","c027","c018","c023","c043","c044","c045","c046","c047","c048","c049","c050","c051","c053","c054","c055","c056"}
           assert {row.get("region_id") for row in data["rows"]}==set(data["regions"])
           assert all(row.get("data_type")=="forecast" for row in data["rows"])
           assert all(row.get("interpretation")=="preliminary_species_relative_fish_condition_index_not_catch_probability" for row in data["rows"])
