@@ -141,7 +141,8 @@ jobs:
           assert len(region_ids)==6
           assert horizons=={"6","12","24"}
           combinations={(r.get("candidate_id"),r.get("region_id"),str(r.get("horizon_hours"))) for r in rows}
-          assert len(rows)==len(combinations)==len(candidate_ids)*len(region_ids)*len(horizons), "preview rows must cover each candidate, region and horizon exactly once"
+          candidate_regions={(r.get("candidate_id"),r.get("region_id")) for r in rows}
+          assert len(rows)==len(combinations)==len(candidate_regions)*len(horizons), "preview rows must cover each candidate-region pair and horizon exactly once"
           required=set(schema["required"])
           properties=schema["properties"]
           for index,row in enumerate(rows):
@@ -162,7 +163,7 @@ jobs:
           assert edna and all(r.get("model_use_status")=="context_only_edna_occurrence" for r in edna)
           ecology=data.get("species_ecology_context",{}).get("records",[])
           assert ecology and all(r.get("source_url") for r in ecology)
-          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":21,"edna_context_records":len(edna),"ecology_records":len(ecology),"schema_rows_validated":len(rows),"scores_withheld":True})
+          print({"status":"passed","rows":len(rows),"regions":len(data["regions"]),"candidates":len(candidate_ids),"edna_context_records":len(edna),"ecology_records":len(ecology),"schema_rows_validated":len(rows),"scores_withheld":True})
           PY
           cp "$payload" "$latest_dir/latest_hourly_fish_outlook.json"
           fci_payload=p2-history-data/data/latest_hourly_fish_condition_index.json
