@@ -16,8 +16,8 @@ from pathlib import Path
 
 from indicator_score_engine import parse_dt, read_csv, select_latest_forecast_vintages
 
-TARGETS = {"c036", "c003", "c004", "c001", "c010", "c027", "c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
-TAITUNG_ONLY_TARGETS = {"c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
+TARGETS = {"c036", "c003", "c004", "c001", "c010", "c027", "c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055", "c056"}
+TAITUNG_ONLY_TARGETS = {"c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055", "c056"}
 TAITUNG_REGIONS = {"chenggong_donghe", "taitung_south"}
 PHASES = ("dawn", "day", "dusk", "night")
 WEIGHTS = {"feeding_condition": 1 / 3, "environment_suitability": 1 / 3, "fish_activity": 1 / 3}

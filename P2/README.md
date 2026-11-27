@@ -894,3 +894,10 @@ python P2/species/southern_drummer_context_response_engine.py \
 python -m unittest P2.test_southern_drummer_response_curves -v
 ```
 
+### 台東新增魚種資料整合（2026-11）
+
+- `c055 Girella mezina`（黃帶瓜子鱲）與 `c056 Istiompax indica`（立翅旗魚）已加入既有物種資料、來源追溯、專屬指標模型概況及缺口矩陣，並列入既有分析候選名單。這只擴充資料與候選設定，沒有改版面或資料架構。
+- 黃帶瓜子鱲的台東證據只有成功一尾幼魚定置網標本（座標誤差10公里）；全台物種自然史只能作 context。立翅旗魚具台東物種級手釣標本及東部海域9尾PSAT研究；9–11月高峰來自外海商業鏢旗魚漁業，不能推作岸釣最佳時段。
+- 先前引用的水試所頁面中文稱黑皮旗魚、英文稱 blue marlin（`Makaira nigricans`），存在物種名稱衝突，已降為來源稽核紀錄；立翅旗魚資料改以明確列出 `Istiompax indica` 的東部研究和已鑑種標本追溯。
+- 兩種魚的覓食、環境適合度、活動力及綜合指數目前均留空；沒有新增門檻、時段分數或權重。台東港口採樣但未提供捕獲海域的候選魚仍不因採樣港而成為區域出現證據。
+

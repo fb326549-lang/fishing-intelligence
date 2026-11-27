@@ -13,8 +13,8 @@ from preliminary_relative_score_engine import build_rows, load_profiles, percent
 from export_hourly_fish_condition_index_json import export_index
 
 PROFILE = Path(__file__).parent / "species" / "preliminary_relative_score_profiles.csv"
-TARGETS = {"c036", "c003", "c004", "c001", "c010", "c027", "c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
-NO_RESPONSE_EVIDENCE = {"c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055"}
+TARGETS = {"c036", "c003", "c004", "c001", "c010", "c027", "c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055", "c056"}
+NO_RESPONSE_EVIDENCE = {"c018", "c023", "c043", "c044", "c045", "c046", "c047", "c048", "c049", "c050", "c051", "c053", "c054", "c055", "c056"}
 
 
 def fixture_records(count=24, include_sea_state=True):
@@ -57,6 +57,7 @@ def candidate_rows():
             ("c053", "杜氏刺尾鯛", "Acanthurus dussumieri"),
             ("c054", "黃擬烏尾鮗", "Paracaesio xanthura"),
             ("c055", "黃帶瓜子鱲", "Girella mezina"),
+            ("c056", "立翅旗魚", "Istiompax indica"),
         )
     ]
 
