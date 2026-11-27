@@ -33,16 +33,6 @@ PRIORITY = {
     "c039": "verified_taxon",
     "c055": "verified_taxon_taitung_single_specimen_response_unverified",
     "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
-    "c055": "verified_taxon_taitung_single_specimen_response_unverified",
-    "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
-    "c055": "verified_taxon_taitung_single_specimen_response_unverified",
-    "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
-    "c055": "verified_taxon_taitung_single_specimen_response_unverified",
-    "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
-    "c055": "verified_taxon_taitung_single_specimen_response_unverified",
-    "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
-    "c055": "verified_taxon_taitung_single_specimen_response_unverified",
-    "c056": "verified_taxon_taitung_offshore_fishery_only_shore_response_unverified",
 }
 DOMAINS = [
     ("temperature_range", "temperature_response"),
